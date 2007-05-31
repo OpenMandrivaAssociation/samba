@@ -1,8 +1,8 @@
 %define pkg_name	samba
-%define version		3.0.24
-%define rel		2
+%define version		3.0.25a
+%define rel		1
 #define	subrel		1
-%define vscanver 	0.3.6b
+%define vscanver 	0.3.6c-beta4
 %define smbldapver	0.9.2
 %define libsmbmajor 	0
 
@@ -290,7 +290,6 @@ Source28:	samba.pamd0_9
 Source29:	system-auth-winbind.pamd
 
 
-Patch1: smbw.patch
 Patch4: samba-3.0-smbmount-sbin.patch
 Patch5:	smbldap-tools-0.9.1-mdkconfig.patch
 %if !%have_pversion
@@ -955,7 +954,6 @@ echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 %setup -q -n %{pkg_name}-%{source_ver}
 %endif
 #%patch111 -p1
-%patch1 -p1 -b .smbw
 %patch4 -p1 -b .sbin
 pushd examples/LDAP/smbldap-tools-%smbldapver
 %patch5 -p1
@@ -972,7 +970,9 @@ echo "Applying patches for current version: %{ver}"
 #%patch15 -p1
 pushd source
 #%patch17
-%patch18
+# XXX - andreas - doesn't apply to 3.0.25a and no new upstream version
+# (there were VFS changes in samba)
+#%patch18
 popd
 %patch19 -p1
 
@@ -1653,9 +1653,13 @@ done
 %if %build_vscan
 %exclude %{_libdir}/%{name}/vfs/vscan*.so
 %endif
+%{_libdir}/samba/fi.msg
 %dir %{_libdir}/%{name}/pdb
 %{_libdir}/%{name}/auth
 %{_libdir}/%{name}/*.so
+%dir %{_libdir}/%{name}/nss_info
+%{_libdir}/%{name}/nss_info/rfc2307.so
+%{_libdir}/%{name}/nss_info/sfu.so
 
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smbusers
 %attr(-,root,root) %config(noreplace) %{_initrddir}/smb%{samba_major}
@@ -1672,6 +1676,29 @@ done
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
+%{_mandir}/man8/idmap_ad.8*
+%{_mandir}/man8/idmap_ldap.8*
+%{_mandir}/man8/idmap_nss.8*
+%{_mandir}/man8/idmap_rid.8*
+%{_mandir}/man8/idmap_tdb.8*
+%{_mandir}/man8/vfs_audit.8*
+%{_mandir}/man8/vfs_cacheprime.8*
+%{_mandir}/man8/vfs_cap.8*
+%{_mandir}/man8/vfs_catia.8*
+%{_mandir}/man8/vfs_commit.8*
+%{_mandir}/man8/vfs_default_quota.8*
+%{_mandir}/man8/vfs_extd_audit.8*
+%{_mandir}/man8/vfs_fake_perms.8*
+%{_mandir}/man8/vfs_full_audit.8*
+%{_mandir}/man8/vfs_gpfs.8*
+%{_mandir}/man8/vfs_netatalk.8*
+%{_mandir}/man8/vfs_notify_fam.8*
+%{_mandir}/man8/vfs_prealloc.8*
+%{_mandir}/man8/vfs_readahead.8*
+%{_mandir}/man8/vfs_readonly.8*
+%{_mandir}/man8/vfs_recycle.8*
+%{_mandir}/man8/vfs_shadow_copy.8*
+
 
 %files smbldap-tools
 %defattr(-,root,root)
@@ -1741,6 +1768,7 @@ done
 %exclude %{_bindir}/smb*m*nt%{samba_major}
 %exclude %{_mandir}/man8/smb*m*nt*.8*
 %endif
+%{_mandir}/man8/eventlogadm3.8.bz2
 # Link of smbspool to CUPS
 %{_prefix}/lib*/cups/backend/smb%{alternative_major}
 
@@ -1765,6 +1793,7 @@ done
 %attr(-,root,root) %{_localstatedir}/%{name}/codepages
 %{_mandir}/man5/smb.conf*.5*
 %{_mandir}/man5/lmhosts*.5*
+%{_mandir}/man8/tdbtool.8*
 #%{_mandir}/man7/Samba*.7*
 %dir %{_datadir}/swat%{samba_major}
 %attr(0750,root,adm) %{_datadir}/%{name}/scripts/smb-migrate
