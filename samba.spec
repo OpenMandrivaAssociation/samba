@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.0.25a
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta4
 %define smbldapver	0.9.2
@@ -1041,7 +1041,7 @@ cp docs/htmldocs/*.{html,css} clean-docs/samba-doc/docs/htmldocs
 ln -sf %{_datadir}/swat%{samba_major}/help/{Samba3-ByExample,Samba3-HOWTO,Samba3-Developers-Guide,using_samba,manpages} clean-docs/samba-doc/docs/htmldocs/
 
 %build
-#%serverbuild
+%serverbuild
 (cd source
 CFLAGS="`echo "$RPM_OPT_FLAGS"|sed -e 's/-g//g'` -DLDAP_DEPRECATED"
 %if %gcc331
