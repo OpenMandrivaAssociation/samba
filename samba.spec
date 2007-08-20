@@ -1768,7 +1768,7 @@ done
 %exclude %{_bindir}/smb*m*nt%{samba_major}
 %exclude %{_mandir}/man8/smb*m*nt*.8*
 %endif
-%{_mandir}/man8/eventlogadm3.8.bz2
+%{_mandir}/man8/eventlogadm3.8*
 # Link of smbspool to CUPS
 %{_prefix}/lib*/cups/backend/smb%{alternative_major}
 
