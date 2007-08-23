@@ -332,7 +332,7 @@ BuildRequires: libldap-devel krb5-devel
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
-Requires(pre): fileutils sed grep
+Requires(pre): coreutils sed grep
 
 %description
 Samba provides an SMB server which can be used to provide
