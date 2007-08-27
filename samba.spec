@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.0.25b
-%define rel		2
+%define rel		3
 #define	subrel		1
 %define vscanver 	0.3.6c-beta4
 %define smbldapver	0.9.2
@@ -262,6 +262,7 @@ Group: System/Servers
 Source: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
 URL:	http://www.samba.org
 Source1: samba.log
+Source2: samba.bash-completion
 Source3: samba.xinetd
 Source4: swat_48.png.bz2
 Source5: swat_32.png.bz2
@@ -1419,6 +1420,10 @@ Questions/issues: sbenedict@mandrakesoft.com
 
 EOF
 
+# bash completion
+install -d -m 755 %{buildroot}%{_sysconfdir}/bash_completion.d
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -1754,6 +1759,7 @@ done
 %defattr(-,root,root)
 %(for i in %{_bindir}/{%{clientbin},eventlogadm}%{alternative_major};do echo $i;done)
 %(for i in %{_mandir}/man?/{%{clientbin}}%{alternative_major}.?.*;do echo $i|grep -v smbprint;done)
+%{_sysconfdir}/bash_completion.d/%{name}
 #xclude %{_mandir}/man?/smbget*
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
