@@ -1307,7 +1307,7 @@ Icon=swat%{samba_major}
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=X-MandrivaLinux-System-Configuration-Networking
+Categories=X-MandrivaLinux-System-Configuration-Networking;
 EOF
 
 mkdir -p $RPM_BUILD_ROOT%{_liconsdir} $RPM_BUILD_ROOT%{_iconsdir} $RPM_BUILD_ROOT%{_miconsdir}
