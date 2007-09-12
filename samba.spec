@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.0.25b
-%define rel		3
+%define rel		4
 #define	subrel		1
 %define vscanver 	0.3.6c-beta4
 %define smbldapver	0.9.2
@@ -260,6 +260,7 @@ Release: %{release}
 License: GPL
 Group: System/Servers
 Source: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
+Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
 URL:	http://www.samba.org
 Source1: samba.log
 Source2: samba.bash-completion
@@ -301,6 +302,7 @@ Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
+Patch20: samba-3.0.25-CVE-2007-4138.patch
 
 %else
 # Version specific patches: upcoming version
@@ -976,6 +978,7 @@ pushd source
 #%patch18
 popd
 %patch19 -p1
+%patch20 -p1 -b .cve4138
 
 # patches from cvs/samba team
 pushd source
