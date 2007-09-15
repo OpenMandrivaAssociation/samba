@@ -208,7 +208,7 @@
 %global vfsdir examples.bin/VFS
 
 #Standard texts for descriptions:
-%define message_bugzilla() %(echo -e -n "Please file bug reports for this package at Mandrake bugzilla \\n(http://qa.mandrakesoft.com) under the product name %{1}")
+%define message_bugzilla() %(echo -e -n "Please file bug reports for this package at Mandriva bugzilla \\n(http://qa.mandriva.com) under the product name %{1}")
 %define message_system %(echo -e -n "NOTE: These packages of samba-%{version}, are provided, parallel installable\\nwith samba-2.2.x, to allow easy migration from samba-2.2.x to samba-%{version},\\nbut are not officially supported")
 
 #check gcc version to disable some optimisations on gcc-3.3.1
@@ -1418,8 +1418,6 @@ A clean samba3 smb.conf is in /usr/share/samba, named smb.conf.clean.
 Your original conf should be /etc/samba/smb.conf.tomerge.
 
 The actual merge script is /usr/share/samba/scripts/smb-migrate.
-
-Questions/issues: sbenedict@mandrakesoft.com
 
 EOF
 
