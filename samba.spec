@@ -303,6 +303,7 @@ Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch20: samba-3.0.25-CVE-2007-4138.patch
+Patch21: samba-include_fix.diff
 
 %else
 # Version specific patches: upcoming version
@@ -979,6 +980,7 @@ pushd source
 popd
 %patch19 -p1
 %patch20 -p1 -b .cve4138
+%patch21 -p1
 
 # patches from cvs/samba team
 pushd source
@@ -1102,7 +1104,8 @@ perl -pi -e 's/-g //g' Makefile
 perl -pi -e 's|-Wl,-rpath,%{_libdir}||g;s|-Wl,-rpath -Wl,%{_libdir}||g' Makefile
 
 make proto_exists
-%make all libsmbclient smbfilter wins %{?_with_test: torture debug2html bin/log2pcap} bin/smbget client/mount.cifs client/umount.cifs
+%make all libsmbclient smbfilter wins %{?_with_test: torture debug2html bin/log2pcap} bin/smbget
+%make CFLAGS="%{optflags} -fPIC" client/mount.cifs client/umount.cifs
 
 )
 
