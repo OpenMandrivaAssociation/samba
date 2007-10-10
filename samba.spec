@@ -1,8 +1,8 @@
 %define pkg_name	samba
-%define version		3.0.25b
-%define rel		4
+%define version		3.0.26a
+%define rel		1
 #define	subrel		1
-%define vscanver 	0.3.6c-beta4
+%define vscanver 	0.3.6c-beta5
 %define smbldapver	0.9.2
 %define libsmbmajor 	0
 
@@ -270,7 +270,7 @@ Source5: swat_32.png.bz2
 Source6: swat_16.png.bz2
 Source7: README.%{name}-mandrake-rpm
 %if %build_vscan
-Source8: samba-vscan-%{vscanver}.tar.bz2
+Source8: samba-vscan-%{vscanver}.tar.gz
 %endif
 %if %build_vscan && %mdkversion >= 920
 BuildRequires: file-devel
@@ -979,7 +979,7 @@ pushd source
 #%patch18
 popd
 %patch19 -p1
-%patch20 -p1 -b .cve4138
+#patch20 -p1 -b .cve4138
 %patch21 -p1
 
 # patches from cvs/samba team
