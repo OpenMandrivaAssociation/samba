@@ -334,6 +334,7 @@ BuildRequires: libldap-devel
 %if %build_ads
 BuildRequires: libldap-devel krb5-devel
 %endif
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
 Requires(pre): coreutils sed grep
 
