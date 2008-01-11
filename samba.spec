@@ -1292,17 +1292,6 @@ done
 
 # menu support
 
-mkdir -p $RPM_BUILD_ROOT%{_menudir}
-cat > $RPM_BUILD_ROOT%{_menudir}/%{name}-swat << EOF
-?package(%{name}-swat):\
-command="www-browser http://localhost:901/" \
-needs="x11" \
-icon="swat%{samba_major}.png" \
-section="Configuration/Networking" \
-title="Samba Configuration (SWAT)" \
-longtitle="The Swat Samba Administration Tool" \
-xdg="true"
-EOF
 mkdir -p %{buildroot}/%{_datadir}/applications
 cat > %{buildroot}/%{_datadir}/applications/mandriva-%{name}-swat.desktop << EOF
 [Desktop Entry]
@@ -1738,7 +1727,6 @@ done
 %config(noreplace) %{_sysconfdir}/xinetd.d/swat%{samba_major}
 #%attr(-,root,root) /sbin/*
 %{_sbindir}/swat%{samba_major}
-%{_menudir}/%{name}-swat
 %{_datadir}/applications/mandriva-%{name}-swat.desktop
 %{_miconsdir}/*.png
 %{_liconsdir}/*.png
