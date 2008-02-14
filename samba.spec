@@ -850,7 +850,7 @@ Trend antivirus software (which must be installed to use this).
 
 %package -n mount-cifs%{samba_major}
 URL:	http://www.samba.org
-Summary: cifs filesystem mount helper
+Summary: CIFS filesystem mount helper
 Group: Networking/Other
 Conflicts:	%{name}-client <= 3.0.11-1mdk
 
