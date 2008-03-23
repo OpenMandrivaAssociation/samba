@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.0.28a
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define smbldapver	0.9.2
@@ -634,7 +634,7 @@ the development of other software to access SMB shares.
 %package -n %{libname}-static-devel
 URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
-Group:          System/Libraries
+Group:          Development/C
 Provides:       libsmbclient-static-devel = %{version}-%{release}
 Requires:       %{libname}-devel = %{version}-%{release}
 
@@ -1836,7 +1836,8 @@ done
 %if %build_system
 %files -n %{libname}
 %defattr(-,root,root)
-%{_libdir}/libsmbclient.so.*
+%{_libdir}/libsmbclient.so.%{major}
+%{_libdir}/libsmbclient.so.%{major}.*
 %else
 %exclude %{_libdir}/libsmbclient.so.*
 %endif
