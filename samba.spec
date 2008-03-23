@@ -1837,7 +1837,6 @@ done
 %files -n %{libname}
 %defattr(-,root,root)
 %{_libdir}/libsmbclient.so.%{major}
-%{_libdir}/libsmbclient.so.%{major}.*
 %else
 %exclude %{_libdir}/libsmbclient.so.*
 %endif
