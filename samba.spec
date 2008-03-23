@@ -1836,7 +1836,7 @@ done
 %if %build_system
 %files -n %{libname}
 %defattr(-,root,root)
-%{_libdir}/libsmbclient.so.%{major}
+%{_libdir}/libsmbclient.so.%{libsmbmajor}
 %else
 %exclude %{_libdir}/libsmbclient.so.*
 %endif
