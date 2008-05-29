@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.0.28a
-%define rel		2
+%define rel		3
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define smbldapver	0.9.2
@@ -304,7 +304,7 @@ Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch20: samba-3.0.25-CVE-2007-4138.patch
 Patch21: samba-include_fix.diff
-
+Patch22: samba-3.0.28b-upstream-CVE-2008-1105.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -981,6 +981,7 @@ popd
 %patch19 -p1
 #patch20 -p1 -b .cve4138
 %patch21 -p1
+%patch22 -p1 -b .cve-2008-1105
 
 # patches from cvs/samba team
 pushd source
