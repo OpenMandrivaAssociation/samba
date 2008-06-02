@@ -1158,9 +1158,9 @@ mkdir -p $RPM_BUILD_ROOT/var/cache/%{name}
 mkdir -p $RPM_BUILD_ROOT/var/log/%{name}
 mkdir -p $RPM_BUILD_ROOT/var/run/%{name}
 mkdir -p $RPM_BUILD_ROOT/var/spool/%{name}
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/%{name}/{netlogon,profiles,printers}
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/%{name}/codepages/src
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/{netlogon,profiles,printers}
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/codepages/src
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/security
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
@@ -1667,10 +1667,10 @@ done
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 #%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/samba-slapd.include
 %(for i in %{_mandir}/man?/{%{serverbin},%{serversbin}}%{samba_major}\.[0-9]*;do echo $i|grep -v mkntpwd;done)
-%attr(775,root,adm) %dir %{_localstatedir}/%{name}/netlogon
-%attr(755,root,root) %dir %{_localstatedir}/%{name}/profiles
-%attr(755,root,root) %dir %{_localstatedir}/%{name}/printers
-%attr(2775,root,adm) %dir %{_localstatedir}/%{name}/printers/*
+%attr(775,root,adm) %dir %{_localstatedir}/lib/%{name}/netlogon
+%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/profiles
+%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/printers
+%attr(2775,root,adm) %dir %{_localstatedir}/lib/%{name}/printers/*
 %attr(1777,root,root) %dir /var/spool/%{name}
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
@@ -1788,8 +1788,8 @@ done
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb-winbind.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/lmhosts
-%dir %{_localstatedir}/%{name}
-%attr(-,root,root) %{_localstatedir}/%{name}/codepages
+%dir %{_localstatedir}/lib/%{name}
+%attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_mandir}/man5/smb.conf*.5*
 %{_mandir}/man5/lmhosts*.5*
 %{_mandir}/man8/tdbtool.8*
