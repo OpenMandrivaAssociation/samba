@@ -5,6 +5,9 @@
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor 	0
 
+# samba vscan plugins dont link without:
+%define _disable_ld_no_undefined 1
+
 # CS3 is based on mdk10.0 and whoever told maintainers %mdkversion would be
 # monotonic lied
 %if %mdkversion == 300
@@ -293,8 +296,8 @@ Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
-Patch20: samba-3.0.25-CVE-2007-4138.patch
 Patch21: samba-include_fix.diff
+Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -940,8 +943,8 @@ pushd source
 #%patch18
 popd
 %patch19 -p1
-#patch20 -p1 -b .cve4138
 %patch21 -p1
+%patch22 -p1
 
 # patches from cvs/samba team
 pushd source
@@ -1036,15 +1039,12 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 %if %build_ldap
 		--with-ldapsam \
 %endif
-		--with-tdbsam \
                 --with-syslog \
                 --with-quotas \
                 --with-utmp \
-		--with-manpages-langs=en \
 %if %build_acl
 		--with-acl-support      \
 %endif
-		--disable-mysqltest \
 		--with-shared-modules=idmap_rid,idmap_ad \
 		--program-suffix=%{samba_major} 
 #		--with-expsam=%build_expsam \
