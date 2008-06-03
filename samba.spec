@@ -1,9 +1,8 @@
 %define pkg_name	samba
-%define version		3.0.28a
-%define rel		3
+%define version		3.0.30
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
-%define smbldapver	0.9.2
 %define libsmbmajor 	0
 
 # CS3 is based on mdk10.0 and whoever told maintainers %mdkversion would be
@@ -61,8 +60,6 @@
 %define build_non_default 0
 
 # Default options
-# build a package of smbldap-tools?
-%define build_smbldap	1
 %define build_alternatives	0
 %define build_system	0
 %define build_acl 	1
@@ -80,10 +77,6 @@
 %define build_pgsql 	0
 
 # Set defaults for each version
-%if %mdkversion >= 1020
-%define build_smbldap 0
-%endif
-
 %if %mdkversion >= 1000
 %define build_system	1
 %endif
@@ -277,7 +270,6 @@ BuildRequires: file-devel
 %endif
 Source10: samba-print-pdf.sh.bz2
 Source11: smb-migrate.bz2
-Source12: migrate-smbldap.bz2
 
 #Sources that used to be in packaging patch:
 Source20:	smbusers
@@ -293,7 +285,6 @@ Source29:	system-auth-winbind.pamd
 
 
 Patch4: samba-3.0-smbmount-sbin.patch
-Patch5:	smbldap-tools-0.9.1-mdkconfig.patch
 %if !%have_pversion
 # Version specific patches: current version
 Patch8:	samba-3.0.21-revert-libsmbclient-move.patch
@@ -304,7 +295,6 @@ Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch20: samba-3.0.25-CVE-2007-4138.patch
 Patch21: samba-include_fix.diff
-Patch22: samba-3.0.28b-upstream-CVE-2008-1105.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -389,9 +379,6 @@ Provides:  samba3-server
 Obsoletes: samba3-server
 %else
 #Provides: samba-server
-%endif
-%if %build_smbldap
-Requires:	%{name}-smbldap-tools = %{version}
 %endif
 
 %description server
@@ -858,29 +845,6 @@ Conflicts:	%{name}-client <= 3.0.11-1mdk
 This package provides the mount.cifs helper to mount cifs filesystems
 using the cifs filesystem driver
 
-%package smbldap-tools
-URL:		http://samba.idealx.org
-Summary:	User & Group administration tools for Samba-OpenLDAP
-Group:		System/Servers
-%if %build_smbldap
-Provides:	smbldap-tools = %{smbldapver}
-Conflicts:	smbldap-tools > %{smbldapver}
-%else
-Requires:	smbldap-tools >= %{smbldapver}
-%endif
-Conflicts:	%{name}-server < 3.0.11-1mdk
-
-%description smbldap-tools
-Smbldap-tools is a set of perl scripts written by Idealx. Those scripts are
-designed to help managing users and groups in a ldap directory server and
-can be used both by users and administrators of Linux systems:
-. users can change their password in a way similar to the standard
-  "passwd" command,
-. administrators can perform users and groups management
-
-This package contains the version of smbldap-tools bundled with the
-samba source release.
-
 %prep
 
 # Allow users to query build options with --with options:
@@ -959,9 +923,6 @@ echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 %endif
 #%patch111 -p1
 %patch4 -p1 -b .sbin
-pushd examples/LDAP/smbldap-tools-%smbldapver
-%patch5 -p1
-popd
 # Version specific patches: current version
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
@@ -981,7 +942,6 @@ popd
 %patch19 -p1
 #patch20 -p1 -b .cve4138
 %patch21 -p1
-%patch22 -p1 -b .cve-2008-1105
 
 # patches from cvs/samba team
 pushd source
@@ -1039,7 +999,6 @@ find docs examples -name '.cvsignore' -exec rm -f {} \;
 chmod -R a+rX examples docs *Manifest* README  Roadmap COPYING
 mkdir -p clean-docs/samba-doc
 cp -a examples docs clean-docs/samba-doc
-rm -Rf clean-docs/samba-doc/examples/LDAP/smbldap-tools*
 mv -f clean-docs/samba-doc/examples/libsmbclient clean-docs/
 rm -Rf clean-docs/samba-doc/docs/{docbook,manpages,htmldocs,using_samba}
 #ln -s %{_datadir}/swat%{samba_major}/using_samba clean-docs/samba-doc/docs/using_samba
@@ -1109,9 +1068,6 @@ make proto_exists
 %make CFLAGS="%{optflags} -fPIC" client/mount.cifs client/umount.cifs
 
 )
-
-# Build mkntpasswd in examples/LDAP/ for smbldaptools
-#make -C examples.bin/LDAP/smbldap-tools-%{smbldapver}/mkntpwd
 
 %if %build_vscan
 echo -e "\n\nBuild antivirus VFS modules\n\n"
@@ -1220,38 +1176,7 @@ done
 mkdir -p %{buildroot}%{_sysconfdir}/security
 install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}/security/pam_winbind.conf
 
-%if %build_smbldap
-# Install smbldap-tools scripts:
-for i in examples/LDAP/smbldap-tools-%{smbldapver}/smbldap-*; do
-	install -m 750 $i $RPM_BUILD_ROOT/%{_bindir}/`basename $i`%{samba_major}
-	#ln -s %{_datadir}/%{name}/scripts/`basename $i` $RPM_BUILD_ROOT/%{_bindir}/`basename $i|sed -e 's/\.pl//g'`%{samba_major}
-done
-
-mkdir -p %{buildroot}/%{perl_vendorlib}
-install -m 750 examples/LDAP/smbldap-tools-%{smbldapver}/smbldap_tools.pm $RPM_BUILD_ROOT/%{perl_vendorlib}/smbldap_tools%{samba_major}.pm
-
-# The conf file	
-install -d %{buildroot}/%{_sysconfdir}/smbldap-tools%{samba_major}
-install -m 640 examples/LDAP/smbldap-tools-%{smbldapver}/smbldap*.conf $RPM_BUILD_ROOT/%{_sysconfdir}/smbldap-tools%{samba_major}
-
-#Fix the smbldap-tools when not system samba:
-%if !%build_system
-install -d %{buildroot}/%{_sysconfdir}/smbldap-tools%{samba_major}
-perl -pi -e 's/^(use|package)(\s+)smbldap_(\w+);$/${1}${2}smbldap_${3}%{samba_major};/g' \
-%{buildroot}/%{_sysconfdir}/smbldap-tools%{samba_major}/smbldap*.conf \
-%{buildroot}/%{_bindir}/smbldap-*
-#perl -pi -e 's,/usr/local/sbin/mkntpwd,/usr/sbin/mkntpwd%{samba_major},g;s,553,421,g' %{buildroot}/%{_sysconfdir}/%{name}/smbldap_conf.pm
-#perl -pi -e 's,\$smbldap_conf::SID,\$smbldap_conf3::SID,g' %{buildroot}/%{_datadir}/%{name}/scripts/smbldap*.p?
-%endif
-perl -pi -e 's,^(my.*_conf.*etc).*/(\w+\.conf.*),${1}/smbldap-tools%{samba_major}/${2},g' %{buildroot}/%{perl_vendorlib}/smbldap_tools%{samba_major}.pm
-perl -pi -e 's,/usr/local/sbin/smbldap-passwd.pl,%{_datadir}/%{name}/scripts/smbldap-passwd.pl,g' %{buildroot}/%{_datadir}/%{name}/scripts/smbldap-useradd.pl 
-
-#ln -s %{_sysconfdir}/%{name}/smbldap_conf.pm $RPM_BUILD_ROOT/%{perl_vendorlib}/smbldap_conf%{samba_major}.pm
-#ln -s %{_datadir}/%{name}/scripts/smbldap_tools.pm $RPM_BUILD_ROOT/%{perl_vendorlib}/smbldap_tools%{samba_major}.pm
-
-# Samba smbpasswd migration script:
 install -m755 examples/LDAP/convertSambaAccount $RPM_BUILD_ROOT/%{_datadir}/%{name}/scripts/
-%endif #build_smbldap
 
 # make a conf file for winbind from the default one:
 	cat packaging/Mandrake/smb.conf|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandrake/smb-winbind.conf
@@ -1318,11 +1243,6 @@ bzcat %{SOURCE6} > $RPM_BUILD_ROOT%{_miconsdir}/swat%{samba_major}.png
 
 bzcat %{SOURCE10}> $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts/print-pdf
 bzcat %{SOURCE11}> $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts/smb-migrate
-bzcat %{SOURCE12}> $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts/migrate-smbldap
-
-perl -pi -e 's,/%{pkg_name}/,/%{name}/,g;s,/smbldap-tools/,/smbldap-tools%{samba_major}/,g'  %{buildroot}/%{_datadir}/%{name}/scripts/migrate-smbldap
-
-
 
 # Fix configs when not building system samba:
 
@@ -1614,33 +1534,6 @@ update-alternatives --auto mount.cifs
 
 %endif
 
-%post smbldap-tools
-if [ -e %{_sysconfdir}/%{name}/smbldap_conf.pm.rpmsave ]
-then 
-	echo "Migrating smbldap configuration"
-	%{_datadir}/%{name}/scripts/migrate-smbldap
-	echo "Renaming old config file"
-	mv -vf %{_sysconfdir}/%{name}/smbldap_conf.pm.{rpmsave,migrated}
-fi
-
-
-%triggerin server -- %{name}-smbldap-tools
-for i in %{_bindir}/smbldap-{{group,user}{add,del,mod,show},migrate-{accounts,groups},passwd,populate}\
-%if %{build_smbldap}
-%{samba_major}
-%endif
-
-  do ln -sf $i %{_datadir}/%{name}/scripts/`basename $i`.pl
-done
-
-%triggerun server -- %{name}-smbldap-tools
-for i in %{_datadir}/%{name}/scripts/smbldap-{{group,user}{add,del,mod,show},migrate-{accounts,groups},passwd,populate}\
-%if %{build_smbldap}
-%{samba_major}\
-%endif
-.pl
-  do if [ -L $i ];then rm -f $i;fi
-done
 
 %files server
 %defattr(-,root,root)
@@ -1675,43 +1568,9 @@ done
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
-%{_mandir}/man8/idmap_ad.8*
-%{_mandir}/man8/idmap_ldap.8*
-%{_mandir}/man8/idmap_nss.8*
-%{_mandir}/man8/idmap_rid.8*
-%{_mandir}/man8/idmap_tdb.8*
-%{_mandir}/man8/vfs_audit.8*
-%{_mandir}/man8/vfs_cacheprime.8*
-%{_mandir}/man8/vfs_cap.8*
-%{_mandir}/man8/vfs_catia.8*
-%{_mandir}/man8/vfs_commit.8*
-%{_mandir}/man8/vfs_default_quota.8*
-%{_mandir}/man8/vfs_extd_audit.8*
-%{_mandir}/man8/vfs_fake_perms.8*
-%{_mandir}/man8/vfs_full_audit.8*
-%{_mandir}/man8/vfs_gpfs.8*
-%{_mandir}/man8/vfs_netatalk.8*
-%{_mandir}/man8/vfs_notify_fam.8*
-%{_mandir}/man8/vfs_prealloc.8*
-%{_mandir}/man8/vfs_readahead.8*
-%{_mandir}/man8/vfs_readonly.8*
-%{_mandir}/man8/vfs_recycle.8*
-%{_mandir}/man8/vfs_shadow_copy.8*
-
-
-%files smbldap-tools
-%defattr(-,root,root)
-%attr(0755,root,root) %{_datadir}/%{name}/scripts/migrate-smbldap
-#%attr(0750,root,adm) %{_datadir}/%{name}/scripts/smbldap-*
-%if %build_smbldap
-%attr(0750,root,adm) %{_bindir}/smbldap*
-%attr(0640,root,adm) %config(noreplace) %{_sysconfdir}/smbldap-tools%{samba_major}/smbldap*.conf
-#%attr(0644,root,root) %{_datadir}/%{name}/scripts/smbldap_tools.pm
-%{perl_vendorlib}/*.pm
-#%attr(0700,root,root) %{_datadir}/%{name}/scripts/*port_smbpasswd.pl
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/convertSambaAccount
-%endif
-
+%{_mandir}/man8/idmap_*.8*
+%{_mandir}/man8/vfs_*.8*
 
 %files doc
 %defattr(-,root,root)
@@ -1756,13 +1615,11 @@ done
 #xclude %{_mandir}/man?/smbget*
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
-%(for i in /sbin/{%{client_sbin}}%{alternative_major};do echo $i;done)
+%(for i in /sbin/{%{client_sbin}}%{alternative_major};do echo $i|grep -v "smb.*m.*nt";done)
 %attr(755,root,root) %{_bindir}/smbmount%{alternative_major}
 %attr(4755,root,root) %{_bindir}/smbumount%{alternative_major}
 %attr(4755,root,root) %{_bindir}/smbmnt%{alternative_major}
-%{_mandir}/man8/smbmnt*.8*
-%{_mandir}/man8/smbmount*.8*
-%{_mandir}/man8/smbumount*.8*
+%{_mandir}/man8/smb*m*nt*.8*
 %else
 %exclude %{_bindir}/smb*m*nt%{samba_major}
 %exclude %{_mandir}/man8/smb*m*nt*.8*
@@ -2036,7 +1893,6 @@ done
 #%exclude %{_mandir}/man1/editreg*
 
 # todo:
-# trigger to remove smbldap links
 # fix alternatives for mount.cifs
 
 
