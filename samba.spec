@@ -1473,7 +1473,9 @@ fi
 if [ -f /var/lock/subsys/xinetd ]; then
         service xinetd reload >/dev/null 2>&1 || :
 fi
+%if %mdkversion < 200900
 %update_menus
+%endif
 
 %postun swat
 
@@ -1485,7 +1487,9 @@ fi
 
 if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || true ; fi
 
+%if %mdkversion < 200900
 %clean_menus
+%endif
 
 %if %build_system
 %if %mdkversion < 200900
