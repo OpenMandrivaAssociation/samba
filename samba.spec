@@ -1,9 +1,14 @@
 %define pkg_name	samba
-%define version		3.0.30
+%define version		3.2.0
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
-%define libsmbmajor 	0
+%define libsmbmajor	0
+%define netapimajor	0
+%define smbsharemodesmajor	0
+%define	tallocmajor	1
+%define tdbmajor	1
+%define	wbclientmajor	0
 
 # samba vscan plugins dont link without:
 %define _disable_ld_no_undefined 1
@@ -23,6 +28,16 @@
 %{!?mklibname: %global mklibname(ds) %lib%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}}
 
 %define libname %mklibname smbclient %libsmbmajor
+%define libnetapi %mklibname netapi %netapimajor
+%define netapidevel %mklibname -d netapi
+%define libsmbsharemodes %mklibname smbsharemodes %smbsharemodesmajor
+%define smbsharemodesdevel %mklibname -d smbsharemodes
+%define libtalloc %mklibname talloc %tallocmajor
+%define tallocdevel %mklibname -d talloc
+%define libtdb %mklibname tdb %tdbmajor
+%define tdbdevel %mklibname -d tdb
+%define libwbclient %mklibname wbclient %wbclientmajor
+%define wbclientdevel %mklibname -d wbclient
 
 # Version and release replaced by samba-team at release from samba cvs
 %define pversion PVERSION
@@ -49,7 +64,8 @@
 # Check to see if we are running a build from a tarball release from samba.org
 # (%have_pversion) If so, disable vscan, unless explicitly requested
 # (--with vscan).
-%define build_vscan 	1
+#FIXME
+%define build_vscan 	0
 %if %have_pversion
 %define build_vscan 	0
 %{?_with_vscan: %define build_vscan 1}
@@ -215,13 +231,13 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin net,ntlm_auth,rpcclient,smbcacls,smbcquotas,smbpasswd,smbtree,testparm
 
-%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump
+%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump,ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch
 %global serversbin nmbd,samba,smbd
 
-%global clientbin 	findsmb,nmblookup,smbclient,smbmnt,smbmount,smbprint,smbspool,smbtar,smbumount,smbget
+%global clientbin 	findsmb,nmblookup,smbclient,smbprint,smbspool,smbtar,smbget
 %global client_sbin 	mount.smb,mount.smbfs
 %global cifs_bin	mount.cifs,umount.cifs
-%global client_man	man1/findsmb.1,man1/nmblookup.1,man1/smbclient.1,man1/smbget.1,man1/smbtar.1,man5/smbgetrc.5,man8/smbmnt.8,man8/smbmount.8,man8/smbspool.8,man8/smbumount.8
+%global client_man	man1/findsmb.1,man1/nmblookup.1,man1/smbclient.1,man1/smbget.1,man1/smbtar.1,man5/smbgetrc.5,man8/smbspool.8
 
 %global testbin 	debug2html,smbtorture,msgtest,masktest,locktest,locktest2,nsstest,vfstest
 
@@ -265,8 +281,8 @@ Source4: swat_48.png.bz2
 Source5: swat_32.png.bz2
 Source6: swat_16.png.bz2
 Source7: README.%{name}-mandrake-rpm
-%if %build_vscan
 Source8: samba-vscan-%{vscanver}.tar.gz
+%if %build_vscan
 %endif
 %if %build_vscan && %mdkversion >= 920
 BuildRequires: file-devel
@@ -287,11 +303,9 @@ Source28:	samba.pamd0_9
 Source29:	system-auth-winbind.pamd
 
 
-Patch4: samba-3.0-smbmount-sbin.patch
 %if !%have_pversion
 # Version specific patches: current version
 Patch8:	samba-3.0.21-revert-libsmbclient-move.patch
-Patch9:	samba-3.0.6-smbmount-unixext.patch
 Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
@@ -307,9 +321,14 @@ Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 %endif
 Requires: pam >= 0.64, samba-common = %{version}
 BuildRequires: pam-devel readline-devel libncurses-devel popt-devel
-BuildRequires: libxml2-devel postgresql-devel
+BuildRequires: libxml2-devel 
+%if %build_pgsql
+BuildRequires: postgresql-devel
+%endif
 %ifnarch alpha
+%if %build_mysql
 BuildRequires: mysql-devel
+%endif
 %endif
 %if %build_acl
 BuildRequires: libacl-devel
@@ -608,7 +627,7 @@ SMB shares.
 URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
 Group:		Development/C
-Provides:	libsmbclient-devel
+Provides:	libsmbclient-devel = %{version}-%{release}
 Requires:       %{libname} = %{version}-%{release}
 
 %description -n %{libname}-devel
@@ -636,6 +655,81 @@ allowing the development of other software to access SMB shares.
 %if %have_pversion && %build_system
 %message_bugzilla %{libname}-devel
 %endif
+
+%package -n %libnetapi
+Summary: Samba library for accessing functions in 'net' binary
+Group: System/Libraries
+
+%description -n %libnetapi
+Samba library for accessing functions in 'net' binary
+
+%package -n %netapidevel
+Group: Development/Libraries
+Summary: Samba library for accessing functions in 'net' binary
+Provides: netapi-devel = %{version}-%{release}
+
+%description -n %netapidevel
+Samba library for accessing functions in 'net' binary
+
+%package -n %libsmbsharemodes
+Group: System/Libraries
+Summary: Samba Library for accessing smb share modes (locks etc.)
+
+%description -n %libsmbsharemodes
+Samba Library for accessing smb share modes (locks etc.)
+
+%package -n %smbsharemodesdevel
+Group: Development/Libraries
+Summary: Samba Library for accessing smb share modes (locks etc.)
+Provides: smbsharemodes-devel = %{version}-%{release}
+
+%description -n %smbsharemodesdevel
+Samba Library for accessing smb share modes (locks etc.)
+
+%package -n %libtalloc
+Group: System/Libraries
+Summary: Library implementing Samba's memory allocator
+
+%description -n %libtalloc
+Library implementing Samba's memory allocator
+
+%package -n %tallocdevel
+Group: Development/Libraries
+Summary: Library implementing Samba's memory allocator
+Provides: talloc-devel = %{version}-%{release}
+
+%description -n %tallocdevel
+Library implementing Samba's memory allocator
+
+%package -n %libtdb
+Group: System/Libraries
+Summary: Library implementing Samba's embedded database
+
+%description -n %libtdb
+Library implementing Samba's embedded database
+
+%package -n %tdbdevel
+Group: Development/Libraries
+Summary: Library implementing Samba's embedded database
+Provides: tdb-devel = %{version}-%{release}
+
+%description -n %tdbdevel
+Library implementing Samba's embedded database
+
+%package -n %libwbclient
+Group: System/Libraries
+Summary: Library providing access to winbindd
+
+%description -n %libwbclient
+Library providing access to winbindd
+
+%package -n %wbclientdevel
+Group: Development/Libraries
+Summary: Library providing access to winbindd
+Provides: wbclient-devel = %{version}-%{release}
+
+%description -n %wbclientdevel
+Library providing access to winbindd
 
 #%package passdb-ldap
 #URL:		http://www.samba.org
@@ -851,7 +945,7 @@ using the cifs filesystem driver
 %prep
 
 # Allow users to query build options with --with options:
-#%define opt_status(%1)	%(echo %{1})
+#%%define opt_status(%1)	%(echo %{1})
 %if %{?_with_options:1}%{!?_with_options:0}
 %define opt_status(%{1})	%(if [ %{1} -eq 1 ];then echo enabled;else echo disabled;fi)
 #exit 1
@@ -925,13 +1019,11 @@ echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 %setup -q -n %{pkg_name}-%{source_ver}
 %endif
 #%patch111 -p1
-%patch4 -p1 -b .sbin
 # Version specific patches: current version
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
 #%patch7 -p1 -b .lib64
 %patch8 -p1 -b .libsmbdir
-%patch9 -p1 -b .unixext
 #%patch10 -p1 -b .rpcclient-libs
 %patch11 -p1 -b .mdk
 #%patch14 -p1 -b .fixdocs
@@ -942,7 +1034,8 @@ pushd source
 # (there were VFS changes in samba)
 #%patch18
 popd
-%patch19 -p1
+#FIXME
+#patch19 -p1
 %patch21 -p1
 %patch22 -p1
 
@@ -1124,8 +1217,16 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts
 
 install -m755 source/bin/lib*.a $RPM_BUILD_ROOT%{_libdir}/
 pushd $RPM_BUILD_ROOT/%{_libdir}
-[ -f libsmbclient.so ] && mv -f libsmbclient.so libsmbclient.so.%{libsmbmajor}
-ln -sf libsmbclient.so.%{libsmbmajor} libsmbclient.so
+for i in libsmbclient:%libsmbmajor libnetapi:%netapimajor \
+  libsmbsharemodes:%smbsharemodesmajor libtalloc:%tallocmajor libtdb:%tdbmajor \
+  libwbclient:%wbclientmajor
+do
+  lib=${i%%:*}
+  major=${i#*:}
+  [ -f samba/${lib}.so ] && mv samba/${lib}.so ${lib}.so.${major}
+  [ -f ${lib}.so ] && mv -f ${lib}.so ${lib}.so.${major}
+  ln -sf ${lib}.so.${major} ${lib}.so
+done
 popd
 
 # smbsh forgotten
@@ -1556,10 +1657,10 @@ update-alternatives --auto mount.cifs
 %{_libdir}/samba/fi.msg
 %dir %{_libdir}/%{name}/pdb
 %{_libdir}/%{name}/auth
-%{_libdir}/%{name}/*.so
+#{_libdir}/%{name}/*.so
 %dir %{_libdir}/%{name}/nss_info
 %{_libdir}/%{name}/nss_info/rfc2307.so
-%{_libdir}/%{name}/nss_info/sfu.so
+%{_libdir}/%{name}/nss_info/sfu*.so
 
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smbusers
 %attr(-,root,root) %config(noreplace) %{_initrddir}/smb%{samba_major}
@@ -1624,10 +1725,6 @@ update-alternatives --auto mount.cifs
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
 %(for i in /sbin/{%{client_sbin}}%{alternative_major};do echo $i|grep -v "smb.*m.*nt";done)
-%attr(755,root,root) %{_bindir}/smbmount%{alternative_major}
-%attr(4755,root,root) %{_bindir}/smbumount%{alternative_major}
-%attr(4755,root,root) %{_bindir}/smbmnt%{alternative_major}
-%{_mandir}/man8/smb*m*nt*.8*
 %else
 %exclude %{_bindir}/smb*m*nt%{samba_major}
 %exclude %{_mandir}/man8/smb*m*nt*.8*
@@ -1728,6 +1825,51 @@ update-alternatives --auto mount.cifs
 %else
 %exclude %{_libdir}/lib*.a
 %endif
+
+%files -n %libnetapi
+%defattr(-,root,root)
+%{_libdir}/libnetapi.so.%{netapimajor}*
+
+%files -n %netapidevel
+%defattr(-,root,root)
+%{_libdir}/libnetapi*.so
+%{_includedir}/netapi.h
+
+%files -n %libsmbsharemodes
+%defattr(-,root,root)
+%{_libdir}/libsmbsharemodes.so.%{smbsharemodesmajor}*
+
+%files -n %smbsharemodesdevel
+%defattr(-,root,root)
+%{_libdir}/libsmbsharemodes.so
+%{_includedir}/smb_share_modes.h
+
+%files -n %libtalloc
+%defattr(-,root,root)
+%{_libdir}/libtalloc.so.%{tallocmajor}*
+
+%files -n %tallocdevel
+%defattr(-,root,root)
+%{_libdir}/libtalloc.so
+%{_includedir}/talloc.h
+
+%files -n %libtdb
+%defattr(-,root,root)
+%{_libdir}/libtdb.so.%{tdbmajor}*
+
+%files -n %tdbdevel
+%defattr(-,root,root)
+%{_libdir}/libtdb.so
+%{_includedir}/tdb.h
+
+%files -n %libwbclient
+%defattr(-,root,root)
+%{_libdir}/libwbclient.so.%{wbclientmajor}
+
+%files -n %wbclientdevel
+%defattr(-,root,root)
+%{_libdir}/libwbclient.so
+%{_includedir}/wbclient.h
 
 #%files passdb-ldap
 #%defattr(-,root,root)
