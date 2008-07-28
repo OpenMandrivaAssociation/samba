@@ -664,7 +664,7 @@ Group: System/Libraries
 Samba library for accessing functions in 'net' binary
 
 %package -n %netapidevel
-Group: Development/Libraries
+Group: Development/C
 Summary: Samba library for accessing functions in 'net' binary
 Provides: netapi-devel = %{version}-%{release}
 
@@ -679,7 +679,7 @@ Summary: Samba Library for accessing smb share modes (locks etc.)
 Samba Library for accessing smb share modes (locks etc.)
 
 %package -n %smbsharemodesdevel
-Group: Development/Libraries
+Group: Development/C
 Summary: Samba Library for accessing smb share modes (locks etc.)
 Provides: smbsharemodes-devel = %{version}-%{release}
 
@@ -694,7 +694,7 @@ Summary: Library implementing Samba's memory allocator
 Library implementing Samba's memory allocator
 
 %package -n %tallocdevel
-Group: Development/Libraries
+Group: Development/C
 Summary: Library implementing Samba's memory allocator
 Provides: talloc-devel = %{version}-%{release}
 
@@ -709,7 +709,7 @@ Summary: Library implementing Samba's embedded database
 Library implementing Samba's embedded database
 
 %package -n %tdbdevel
-Group: Development/Libraries
+Group: Development/C
 Summary: Library implementing Samba's embedded database
 Provides: tdb-devel = %{version}-%{release}
 
@@ -724,7 +724,7 @@ Summary: Library providing access to winbindd
 Library providing access to winbindd
 
 %package -n %wbclientdevel
-Group: Development/Libraries
+Group: Development/C
 Summary: Library providing access to winbindd
 Provides: wbclient-devel = %{version}-%{release}
 
