@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.2.0
+%define version		3.2.1
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -273,6 +273,7 @@ License: GPL
 Group: System/Servers
 Source: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
 Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
+Source98: http://www.samba.org/samba/ftp/samba-pubkey.asc
 URL:	http://www.samba.org
 Source1: samba.log
 Source2: samba.bash-completion
@@ -322,6 +323,7 @@ Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Requires: pam >= 0.64, samba-common = %{version}
 BuildRequires: pam-devel readline-devel libncurses-devel popt-devel
 BuildRequires: libxml2-devel 
+BuildRequires: gnupg
 %if %build_pgsql
 BuildRequires: postgresql-devel
 %endif
@@ -1012,6 +1014,35 @@ echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 echo "This rpm was built with default options">%{SOURCE7}
 echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 %endif
+
+
+#Try and validate signatures on source:
+export GNUPGHOME=%{_tmppath}/samba-gpghome
+if [ -d "$GNUPGHOME" ]
+then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1
+fi
+install -d -m700 $GNUPGHOME
+gpg --import %{SOURCE98}
+VERIFYSOURCE=`basename %{SOURCE0}`
+VERIFYSOURCE=%{_tmppath}/${VERIFYSOURCE%%.gz}
+gzip -dc %{SOURCE0} > $VERIFYSOURCE
+pushd %{_tmppath}
+cp %{SOURCE99} .
+gpg --trust-model always --verify `basename %{SOURCE99}`
+VERIFIED=$?
+rm -f `basename %{SOURCE99}`
+popd
+rm -Rf $GNUPGHOME
+
+rm -f $VERIFYSOURCE
+if [ "$VERIFIED" -eq 0 ]
+then
+	echo "Verification of %{SOURCE0} against %{SOURCE99} with key %{SOURCE98} succeeded"
+else
+	echo "Source verification failed!" >&2
+	exit 1
+fi
+
 
 %if %build_vscan
 %setup -q -a 8 -n %{pkg_name}-%{source_ver}
