@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.2.1
+%define version		3.2.2
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -236,7 +236,11 @@
 
 %global clientbin 	findsmb,nmblookup,smbclient,smbprint,smbspool,smbtar,smbget
 %global client_sbin 	mount.smb,mount.smbfs
+%if %mdkversion >= 200800
+%global cifs_bin	mount.cifs,umount.cifs,cifs.upcall
+%else
 %global cifs_bin	mount.cifs,umount.cifs
+%endif
 %global client_man	man1/findsmb.1,man1/nmblookup.1,man1/smbclient.1,man1/smbget.1,man1/smbtar.1,man5/smbgetrc.5,man8/smbspool.8
 
 %global testbin 	debug2html,smbtorture,msgtest,masktest,locktest,locktest2,nsstest,vfstest
@@ -306,13 +310,14 @@ Source29:	system-auth-winbind.pamd
 
 %if !%have_pversion
 # Version specific patches: current version
-Patch8:	samba-3.0.21-revert-libsmbclient-move.patch
 Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch21: samba-include_fix.diff
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
+Patch23: samba-3.2.2-separate-modules.patch
+Patch24: samba-3.2.2-fix-cifsupcall-linkorder.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -347,6 +352,9 @@ BuildRequires: libcups-devel cups-common
 BuildRequires: libldap-devel
 %if %build_ads
 BuildRequires: libldap-devel krb5-devel
+%endif
+%if %mdkversion >= 200800
+BuildRequires: keyutils-devel
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
@@ -1054,7 +1062,6 @@ fi
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
 #%patch7 -p1 -b .lib64
-%patch8 -p1 -b .libsmbdir
 #%patch10 -p1 -b .rpcclient-libs
 %patch11 -p1 -b .mdk
 #%patch14 -p1 -b .fixdocs
@@ -1069,6 +1076,8 @@ popd
 #patch19 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
+%patch24 -p1
 
 # patches from cvs/samba team
 pushd source
@@ -1146,13 +1155,15 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 %configure      --prefix=%{_prefix} \
                 --sysconfdir=%{_sysconfdir}/%{name} \
                 --localstatedir=/var \
-                --with-libdir=%{_libdir}/%{name} \
+                --with-modulesdir=%{_libdir}/%{name} \
                 --with-privatedir=%{_sysconfdir}/%{name} \
 		--with-lockdir=/var/cache/%{name} \
 		--with-piddir=/var/run \
                 --with-swatdir=%{_datadir}/swat%{samba_major} \
                 --with-configdir=%{_sysconfdir}/%{name} \
 		--with-logfilebase=/var/log/%{name} \
+                --with-pammodulesdir=%{_lib}/security/ \
+                --with-rootsbindir=/bin \
 %if !%build_ads
 		--with-ads=no	\
 %endif
@@ -1170,6 +1181,8 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-acl-support      \
 %endif
 		--with-shared-modules=idmap_rid,idmap_ad \
+		--with-cifsmount \
+		--with-cifsupcall \
 		--program-suffix=%{samba_major} 
 #		--with-expsam=%build_expsam \
 #		--with-shared-modules=pdb_ldap,idmap_ldap \
@@ -1189,7 +1202,6 @@ perl -pi -e 's|-Wl,-rpath,%{_libdir}||g;s|-Wl,-rpath -Wl,%{_libdir}||g' Makefile
 
 make proto_exists
 %make all libsmbclient smbfilter wins %{?_with_test: torture debug2html bin/log2pcap} bin/smbget
-%make CFLAGS="%{optflags} -fPIC" client/mount.cifs client/umount.cifs
 
 )
 
@@ -1222,7 +1234,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
 
 (cd source
-make DESTDIR=$RPM_BUILD_ROOT LIBDIR=%{_libdir}/%{name} MANDIR=%{_mandir} PAMMODULESDIR=/%{_lib}/security ROOTSBINDIR=/bin  install installclientlib installmodules)
+make DESTDIR=$RPM_BUILD_ROOT install installclientlib installmodules)
 
 # we ship docs in the docs supackage, and lik it into swat, delete the extra copy:
 rm -Rf %{buildroot}/%{_datadir}/swat/using_samba
@@ -1243,22 +1255,12 @@ mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W3
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/codepages/src
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/security
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
+mkdir -p $RPM_BUILD_ROOT%{_sbindir}
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts
 
 install -m755 source/bin/lib*.a $RPM_BUILD_ROOT%{_libdir}/
-pushd $RPM_BUILD_ROOT/%{_libdir}
-for i in libsmbclient:%libsmbmajor libnetapi:%netapimajor \
-  libsmbsharemodes:%smbsharemodesmajor libtalloc:%tallocmajor libtdb:%tdbmajor \
-  libwbclient:%wbclientmajor
-do
-  lib=${i%%:*}
-  major=${i#*:}
-  [ -f samba/${lib}.so ] && mv samba/${lib}.so ${lib}.so.${major}
-  [ -f ${lib}.so ] && mv -f ${lib}.so ${lib}.so.${major}
-  ln -sf ${lib}.so.${major} ${lib}.so
-done
-popd
 
 # smbsh forgotten
 #install -m 755 source/bin/smbsh $RPM_BUILD_ROOT%{_bindir}/
@@ -1662,8 +1664,10 @@ update-alternatives --install /bin/mount.cifs mount.cifs \
 --slave /sbin/mount.cifs smount.cifs /sbin/mount.cifs%{alternative_major} \
 --slave /bin/umount.cifs umount.cifs /bin/umount.cifs%{alternative_major} \
 --slave /sbin/umount.cifs sumount.cifs /sbin/umount.cifs%{alternative_major} \
+--slave /sbin/cifs.upcall cifs.upcall /sbin/cifs.upcall%{alternative_major} \
 --slave %{_mandir}/man8/mount.cifs.8%{_extension} mount.cifs.8 %{_mandir}/man8/mount.cifs%{alternative_major}.8%{_extension} \
 --slave %{_mandir}/man8/umount.cifs.8%{_extension} umount.cifs.8 %{_mandir}/man8/umount.cifs%{alternative_major}.8%{_extension} \
+--slave %{_mandir}/man8/cifs.upcall.8%{_extension} cifs.upcall.8 %{_mandir}/man8/cifs.upcall%{alternative_major}.8%{_extension} \
 || update-alternatives --auto mount.cifs
 
 %preun -n mount-cifs%{samba_major}
@@ -2068,7 +2072,9 @@ update-alternatives --auto mount.cifs
 %files -n mount-cifs%{samba_major}
 %defattr(-,root,root)
 %attr(4755,root,root) /*bin/*mount.cifs%{alternative_major}
+/*bin/cifs.upcall%{alternative_major}
 %{_mandir}/man8/*mount.cifs*.8*
+%{_mandir}/man8/cifs.upcall*.8*
 
 #%exclude %{_mandir}/man1/smbsh*.1*
 #%exclude %{_mandir}/man1/editreg*
