@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.2.3
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -1254,7 +1254,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/{netlogon,profiles,printe
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/codepages/src
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/security
-mkdir -p $RPM_BUILD_ROOT%{_libdir}
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/pkgconfig
 mkdir -p $RPM_BUILD_ROOT%{_sbindir}
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
@@ -1471,6 +1471,24 @@ EOF
 # bash completion
 install -d -m 755 %{buildroot}%{_sysconfdir}/bash_completion.d
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
+
+# Development pkgconfig files
+
+# 1. Generate the .pc files that are not done automatically
+# (NB: This does not work when done at the same time as configure above)
+for i in talloc tdb; do
+	pushd source/lib/$i
+	./autogen.sh -V && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
+	popd
+done
+
+# 2. Install them
+for i in smbclient smbsharemodes netapi wbclient; do
+	install -m 644 source/pkgconfig/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+done
+install -m 644 source/lib/talloc/talloc.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+install -m 644 source/lib/tdb/tdb.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1846,11 +1864,12 @@ update-alternatives --auto mount.cifs
 %{_libdir}/libsmbclient.so
 %doc clean-docs/libsmbclient/*
 %{_mandir}/man7/libsmbclient.7*
+%{_libdir}/pkgconfig/smbclient.pc
 %else
 %exclude %{_includedir}/*
 %exclude %{_libdir}/libsmbclient.so
 %exclude %{_mandir}/man8/libsmbclient.8*
-%else
+%exclude %{_libdir}/pkgconfig/smbclient.pc
 %endif
 
 %if %build_system
@@ -1869,6 +1888,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libnetapi*.so
 %{_includedir}/netapi.h
+%{_libdir}/pkgconfig/netapi.pc
 
 %files -n %libsmbsharemodes
 %defattr(-,root,root)
@@ -1878,6 +1898,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libsmbsharemodes.so
 %{_includedir}/smb_share_modes.h
+%{_libdir}/pkgconfig/smbsharemodes.pc
 
 %files -n %libtalloc
 %defattr(-,root,root)
@@ -1887,6 +1908,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libtalloc.so
 %{_includedir}/talloc.h
+%{_libdir}/pkgconfig/talloc.pc
 
 %files -n %libtdb
 %defattr(-,root,root)
@@ -1896,6 +1918,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libtdb.so
 %{_includedir}/tdb.h
+%{_libdir}/pkgconfig/tdb.pc
 
 %files -n %libwbclient
 %defattr(-,root,root)
@@ -1905,6 +1928,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libwbclient.so
 %{_includedir}/wbclient.h
+%{_libdir}/pkgconfig/wbclient.pc
 
 #%files passdb-ldap
 #%defattr(-,root,root)
