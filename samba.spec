@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.2.3
-%define rel		3
+%define version		3.2.4
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -1331,6 +1331,9 @@ perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' $RPM_BUILD_ROOT/%{
 #%endif
 
 
+# cifs.upcall moved for no reason
+rm -f %{buildroot}/%{_sbindir}/cifs.upcall.old
+mv %{buildroot}/%{_sbindir}/cifs.upcall %{buildroot}/bin
 #install mount.cifs
 for i in {%{cifs_bin}};do
 #install -m755 source/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
