@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.2.4
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -947,6 +947,7 @@ URL:	http://www.samba.org
 Summary: CIFS filesystem mount helper
 Group: Networking/Other
 Conflicts:	%{name}-client <= 3.0.11-1mdk
+Requires:	keyutils > 1.2-%{mkrel 4}
 
 %description -n mount-cifs%{samba_major}
 This package provides the mount.cifs helper to mount cifs filesystems
@@ -1402,13 +1403,6 @@ do
     fi
 done		
 %endif
-rm -f %{buildroot}%{_sbindir}/mount.smbfs
-# Link smbmount to /sbin/mount.smb and /sbin/mount.smbfs
-#I don't think it's possible for make to do this ...
-(cd $RPM_BUILD_ROOT/sbin
-        ln -s ..%{_bindir}/smbmount%{alternative_major} mount.smb%{alternative_major}
-        ln -s ..%{_bindir}/smbmount%{alternative_major} mount.smbfs%{alternative_major}
-)
 # Server/common binaries are versioned only if not system samba:
 %if !%build_system
 for OLD in %{buildroot}/%{_bindir}/{%{commonbin},tdbtool} %{buildroot}/%{_bindir}/{%{serverbin}} %{buildroot}/%{_sbindir}/{%{serversbin},swat}
@@ -1780,7 +1774,7 @@ update-alternatives --auto mount.cifs
 #xclude %{_mandir}/man?/smbget*
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
-%(for i in /sbin/{%{client_sbin}}%{alternative_major};do echo $i|grep -v "smb.*m.*nt";done)
+#(for i in /sbin/{%{client_sbin}}%{alternative_major};do echo $i|grep -v "smb.*m.*nt";done)
 %else
 %exclude %{_bindir}/smb*m*nt%{samba_major}
 %exclude %{_mandir}/man8/smb*m*nt*.8*
