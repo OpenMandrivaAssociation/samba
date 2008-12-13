@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.2.4
-%define rel		3
+%define version		3.2.6
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -320,7 +320,6 @@ Patch23: samba-3.2.2-separate-modules.patch
 Patch24: samba-3.2.2-fix-cifsupcall-linkorder.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
-Patch26: samba-3.2.4-CVE-2008-4314.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -1081,9 +1080,8 @@ popd
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
-%patch24 -p1
+%patch24 -p1 -b .cifslinkorder
 %patch25 -p1 -b .fixldapexop
-%patch26 -p1 -b .CVE-2008-4314
 
 # patches from cvs/samba team
 pushd source
