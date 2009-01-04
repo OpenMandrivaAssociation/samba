@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.2.6
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -314,6 +314,8 @@ Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
+# (oe) http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=385389
+Patch20: samba-3.2.6-10_include_signalh.diff
 Patch21: samba-include_fix.diff
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Patch23: samba-3.2.2-separate-modules.patch
@@ -1078,6 +1080,7 @@ popd
 #FIXME
 #patch19 -p1
 %patch21 -p1
+%patch20 -p0
 %patch22 -p1
 %patch23 -p1
 %patch24 -p1 -b .cifslinkorder
