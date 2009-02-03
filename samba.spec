@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.2.7
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -280,7 +280,6 @@ Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
 Source98: http://www.samba.org/samba/ftp/samba-pubkey.asc
 URL:	http://www.samba.org
 Source1: samba.log
-Source2: samba.bash-completion
 Source3: samba.xinetd
 Source4: swat_48.png.bz2
 Source5: swat_32.png.bz2
@@ -1472,10 +1471,6 @@ The actual merge script is /usr/share/samba/scripts/smb-migrate.
 
 EOF
 
-# bash completion
-install -d -m 755 %{buildroot}%{_sysconfdir}/bash_completion.d
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/bash_completion.d/%{name}
-
 # Development pkgconfig files
 
 # 1. Generate the .pc files that are not done automatically
@@ -1777,7 +1772,6 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %(for i in %{_bindir}/{%{clientbin},eventlogadm}%{alternative_major};do echo $i;done)
 %(for i in %{_mandir}/man?/{%{clientbin}}%{alternative_major}.?.*;do echo $i|grep -v smbprint;done)
-%{_sysconfdir}/bash_completion.d/%{name}
 #xclude %{_mandir}/man?/smbget*
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
