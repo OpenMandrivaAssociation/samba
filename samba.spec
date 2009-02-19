@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.2.8
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -726,6 +726,8 @@ Group: Development/C
 Summary: Library implementing Samba's embedded database
 Provides: tdb-devel = %{version}-%{release}
 Requires: %libtdb
+# because /usr/include/tdb.h was moved from libsmbclient0-devel to libtdb-devel
+Conflics: %{mklibname smbclient 0 -d} < 3.2.6-3
 
 %description -n %tdbdevel
 Library implementing Samba's embedded database
