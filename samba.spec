@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.2.8
-%define rel		2
+%define rel		3
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -362,6 +362,7 @@ BuildRequires: keyutils-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
 Requires(pre): coreutils sed grep
+BuildConflicts: libcap-devel
 
 %description
 Samba provides an SMB server which can be used to provide
