@@ -727,7 +727,7 @@ Summary: Library implementing Samba's embedded database
 Provides: tdb-devel = %{version}-%{release}
 Requires: %libtdb
 # because /usr/include/tdb.h was moved from libsmbclient0-devel to libtdb-devel
-Conflics: %{mklibname smbclient 0 -d} < 3.2.6-3
+Conflicts: %{mklibname smbclient 0 -d} < 3.2.6-3
 
 %description -n %tdbdevel
 Library implementing Samba's embedded database
