@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.3.1
-%define rel		2
+%define rel		3
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -1868,7 +1868,7 @@ update-alternatives --auto mount.cifs
 %if %build_system
 %files -n %{libname}-devel
 %defattr(-,root,root)
-%{_includedir}/*
+%{_includedir}/libsmbclient.h
 %exclude %{_includedir}/tdb.h
 %{_libdir}/libsmbclient.so
 %doc clean-docs/libsmbclient/*
