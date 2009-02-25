@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.2.8
-%define rel		3
+%define version		3.3.1
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -231,7 +231,7 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin net,ntlm_auth,rpcclient,smbcacls,smbcquotas,smbpasswd,smbtree,testparm
 
-%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump,ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch
+%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump,ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch,ldbrename,sharesec
 %global serversbin nmbd,samba,smbd
 
 %global clientbin 	findsmb,nmblookup,smbclient,smbprint,smbspool,smbtar,smbget
@@ -1085,7 +1085,7 @@ popd
 %patch21 -p1
 %patch20 -p0
 %patch22 -p1
-%patch23 -p1
+#patch23 -p1
 %patch24 -p1 -b .cifslinkorder
 %patch25 -p1 -b .fixldapexop
 
@@ -1287,6 +1287,8 @@ for i in wins winbind; do
 done
 # Make link for wins and winbind resolvers
 ( cd $RPM_BUILD_ROOT/%{_lib}; ln -s libnss_wins.so libnss_wins.so.2; ln -s libnss_winbind.so libnss_winbind.so.2)
+install -d %{buildroot}/%{_libdir}/krb5/plugins
+install -m755 source/bin/winbind_krb5_locator.so %{buildroot}/%{_libdir}/krb5/plugins
 
 %if %{build_test}
 for i in {%{testbin}};do
@@ -1491,6 +1493,9 @@ done
 install -m 644 source/lib/talloc/talloc.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 install -m 644 source/lib/tdb/tdb.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 
+%if %build_winbind
+%find_lang pam_winbind
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1816,7 +1821,7 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %{_datadir}/%{name}/README.mdk.conf
 
 %if %build_winbind
-%files winbind
+%files winbind -f pam_winbind.lang
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/security/pam_winbind.conf
 %{_sbindir}/winbindd
@@ -1825,10 +1830,12 @@ update-alternatives --auto mount.cifs
 %attr(755,root,root) /%{_lib}/security/pam_winbind*
 %attr(755,root,root) /%{_lib}/libnss_winbind*
 %{_libdir}/%{name}/idmap
+%{_libdir}/krb5/plugins/winbind_krb5_locator.so
 %attr(-,root,root) %config(noreplace) %{_initrddir}/winbind
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
 %{_mandir}/man8/winbindd*.8*
 %{_mandir}/man7/pam_winbind.7*
+%{_mandir}/man7/winbind_krb5_locator.7.*
 %{_mandir}/man1/wbinfo*.1*
 
 %endif
