@@ -1180,7 +1180,6 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-ads=no	\
 %endif
                 --with-automount \
-                --with-smbmount \
                 --with-pam \
                 --with-pam_smbpass \
 %if %build_ldap
@@ -1212,7 +1211,7 @@ perl -pi -e 's/-g //g' Makefile
 
 perl -pi -e 's|-Wl,-rpath,%{_libdir}||g;s|-Wl,-rpath -Wl,%{_libdir}||g' Makefile
 
-make proto_exists
+make proto_exists || :
 %make all libsmbclient smbfilter wins %{?_with_test: torture debug2html bin/log2pcap} bin/smbget
 
 )
