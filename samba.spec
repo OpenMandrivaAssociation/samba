@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.3.1
-%define rel		3
+%define version		3.3.2
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -330,7 +330,10 @@ Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
 %endif
 Requires: pam >= 0.64, samba-common = %{version}
 BuildRequires: pam-devel readline-devel libncurses-devel popt-devel
-BuildRequires: libxml2-devel 
+BuildRequires: libxml2-devel
+# Samba 3.2 and later should be built with capabilities support:
+# http://lists.samba.org/archive/samba/2009-March/146821.html
+BuildRequires: libcap-devel
 BuildRequires: gnupg
 %if %build_pgsql
 BuildRequires: postgresql-devel
@@ -362,7 +365,6 @@ BuildRequires: keyutils-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
 Requires(pre): coreutils sed grep
-BuildConflicts: libcap-devel
 
 %description
 Samba provides an SMB server which can be used to provide
