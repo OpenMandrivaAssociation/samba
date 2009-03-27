@@ -1242,7 +1242,7 @@ perl -pi -e 's,-I./lib/talloc,,g;s,bin/libtalloc.so,,g;s,^(installlibs:: )instal
 perl -pi -e 's,-I./lib/tdb/include,,g;s,bin/libtdb.so,,g;s,^(installlibs:: )installlibtdb,$1,g' Makefile
 %endif
 %if !%build_ldb
-perl -pi -e 's,\$i\(BIN_PROGS4\),,g' Makefile
+perl -pi -e 's,\$\(BIN_PROGS4\),,g' Makefile
 %endif
 
 perl -pi -e 's|-Wl,-rpath,%{_libdir}||g;s|-Wl,-rpath -Wl,%{_libdir}||g' Makefile
