@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.3.2
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -79,6 +79,9 @@
 %define build_non_default 0
 
 # Default options
+%define build_talloc 1
+%define build_tdb 1
+%define build_ldb 1
 %define build_alternatives	0
 %define build_system	0
 %define build_acl 	1
@@ -96,6 +99,12 @@
 %define build_pgsql 	0
 
 # Set defaults for each version
+%if %mdkversion >= 200910
+%define build_talloc 0
+%define build_tdb 0
+%define build_ldb 0
+%endif
+
 %if %mdkversion >= 1000
 %define build_system	1
 %endif
@@ -231,7 +240,10 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin net,ntlm_auth,rpcclient,smbcacls,smbcquotas,smbpasswd,smbtree,testparm
 
-%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump,ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch,ldbrename,sharesec
+%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump,sharesec
+%if %build_ldb
+%global serverldbbin 	ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch,ldbrename
+%endif
 %global serversbin nmbd,samba,smbd
 
 %global clientbin 	findsmb,nmblookup,smbclient,smbprint,smbspool,smbtar,smbget
@@ -361,6 +373,15 @@ BuildRequires: libldap-devel krb5-devel
 %endif
 %if %mdkversion >= 200800
 BuildRequires: keyutils-devel
+%endif
+%if !%build_tdb
+BuildRequires: tdb-devel
+%endif
+%if !%build_ldb
+BuildRequires: ldb-devel
+%endif
+%if !%build_talloc
+BuildRequires: talloc-devel
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
@@ -702,6 +723,7 @@ Provides: smbsharemodes-devel = %{version}-%{release}
 %description -n %smbsharemodesdevel
 Samba Library for accessing smb share modes (locks etc.)
 
+%if %build_talloc
 %package -n %libtalloc
 Group: System/Libraries
 Summary: Library implementing Samba's memory allocator
@@ -716,7 +738,9 @@ Provides: talloc-devel = %{version}-%{release}
 
 %description -n %tallocdevel
 Library implementing Samba's memory allocator
+%endif
 
+%if %build_tdb
 %package -n %libtdb
 Group: System/Libraries
 Summary: Library implementing Samba's embedded database
@@ -734,6 +758,7 @@ Conflicts: %{mklibname smbclient 0 -d} < 3.2.6-3
 
 %description -n %tdbdevel
 Library implementing Samba's embedded database
+%endif
 
 %package -n %libwbclient
 Group: System/Libraries
@@ -1209,6 +1234,17 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 perl -pi -e 's/-g //g' Makefile
 %endif
 
+#Should be a patch instead?
+%if !%build_talloc
+perl -pi -e 's,-I./lib/talloc,,g;s,bin/libtalloc.so,,g;s,^(installlibs:: )installlibtalloc,$1,g' Makefile
+%endif
+%if !%build_tdb
+perl -pi -e 's,-I./lib/tdb/include,,g;s,bin/libtdb.so,,g;s,^(installlibs:: )installlibtdb,$1,g' Makefile
+%endif
+%if !%build_ldb
+perl -pi -e 's,\$i\(BIN_PROGS4\),,g' Makefile
+%endif
+
 perl -pi -e 's|-Wl,-rpath,%{_libdir}||g;s|-Wl,-rpath -Wl,%{_libdir}||g' Makefile
 
 make proto_exists || :
@@ -1417,13 +1453,13 @@ done
 %endif
 # Server/common binaries are versioned only if not system samba:
 %if !%build_system
-for OLD in %{buildroot}/%{_bindir}/{%{commonbin},tdbtool} %{buildroot}/%{_bindir}/{%{serverbin}} %{buildroot}/%{_sbindir}/{%{serversbin},swat}
+for OLD in %{buildroot}/%{_bindir}/{%{commonbin},tdbtool} %{buildroot}/%{_bindir}/{%{serverbin}%{?serverldbbin:,%serverldbbin}} %{buildroot}/%{_sbindir}/{%{serversbin},swat}
 do
     NEW=`echo ${OLD}%{alternative_major}`
     mv $OLD $NEW -f ||:
 done
 # And the man pages too:
-for OLD in %{buildroot}/%{_mandir}/man?/{%{commonbin},%{serverbin},%{serversbin},swat,{%testbin},smb.conf,lmhosts}*
+for OLD in %{buildroot}/%{_mandir}/man?/{%{commonbin},%{serverbin}%{?serverldbbin:,%serverldbbin},%{serversbin},swat,{%testbin},smb.conf,lmhosts}*
 do
     if [ -e $OLD ]
     then
@@ -1481,18 +1517,24 @@ EOF
 
 # 1. Generate the .pc files that are not done automatically
 # (NB: This does not work when done at the same time as configure above)
-for i in talloc tdb; do
+for i in  \
+%if %build_talloc
+talloc \
+%endif
+%if %build_tdb
+tdb \
+%endif
+; do
 	pushd source/lib/$i
 	./autogen.sh -V && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 	popd
+	install -m 644 source/lib/$i/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 done
 
 # 2. Install them
 for i in smbclient smbsharemodes netapi wbclient; do
 	install -m 644 source/pkgconfig/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 done
-install -m 644 source/lib/talloc/talloc.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
-install -m 644 source/lib/tdb/tdb.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 
 %if %build_winbind
 %find_lang pam_winbind
@@ -1708,7 +1750,7 @@ update-alternatives --auto mount.cifs
 %files server
 %defattr(-,root,root)
 %(for i in %{_sbindir}/{%{serversbin}}%{samba_major};do echo $i;done)
-%(for i in %{_bindir}/{%{serverbin}}%{samba_major};do echo $i;done)
+%(for i in %{_bindir}/{%{serverbin}%{?serverldbbin:,%serverldbbin}}%{samba_major};do echo $i;done)
 %attr(755,root,root) /%{_lib}/security/pam_smbpass*
 %dir %{_libdir}/%{name}/vfs
 %{_libdir}/%{name}/vfs/*.so
@@ -1729,7 +1771,10 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 #%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/samba-slapd.include
-%(for i in %{_mandir}/man?/{%{serverbin},%{serversbin}}%{samba_major}\.[0-9]*;do echo $i|grep -v mkntpwd;done)
+%(for i in %{_mandir}/man?/{%{serverbin}%{?serverldbbin:,%serverldbbin},%{serversbin}}%{samba_major}\.[0-9]*;do echo $i|grep -v mkntpwd;done)
+%if !%build_ldb
+%exclude %{_mandir}/man1/ldb*.1.*
+%endif
 %attr(775,root,adm) %dir %{_localstatedir}/lib/%{name}/netlogon
 %attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/profiles
 %attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/printers
@@ -1870,7 +1915,6 @@ update-alternatives --auto mount.cifs
 %files -n %{libname}-devel
 %defattr(-,root,root)
 %{_includedir}/libsmbclient.h
-%exclude %{_includedir}/tdb.h
 %{_libdir}/libsmbclient.so
 %doc clean-docs/libsmbclient/*
 %{_mandir}/man7/libsmbclient.7*
@@ -1910,6 +1954,7 @@ update-alternatives --auto mount.cifs
 %{_includedir}/smb_share_modes.h
 %{_libdir}/pkgconfig/smbsharemodes.pc
 
+%if %build_talloc
 %files -n %libtalloc
 %defattr(-,root,root)
 %{_libdir}/libtalloc.so.%{tallocmajor}*
@@ -1919,7 +1964,9 @@ update-alternatives --auto mount.cifs
 %{_libdir}/libtalloc.so
 %{_includedir}/talloc.h
 %{_libdir}/pkgconfig/talloc.pc
+%endif
 
+%if %build_tdb
 %files -n %libtdb
 %defattr(-,root,root)
 %{_libdir}/libtdb.so.%{tdbmajor}*
@@ -1929,6 +1976,7 @@ update-alternatives --auto mount.cifs
 %{_libdir}/libtdb.so
 %{_includedir}/tdb.h
 %{_libdir}/pkgconfig/tdb.pc
+%endif
 
 %files -n %libwbclient
 %defattr(-,root,root)
