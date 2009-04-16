@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.3.2
-%define rel		3
+%define version		3.3.3
+%define rel		0
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -82,6 +82,7 @@
 %define build_talloc 1
 %define build_tdb 1
 %define build_ldb 1
+%define build_ctdb 1
 %define build_alternatives	0
 %define build_system	0
 %define build_acl 	1
@@ -334,6 +335,8 @@ Patch24: samba-3.2.2-fix-cifsupcall-linkorder.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
 Patch26: samba-fix-linking-order.patch
+#https://bugzilla.samba.org/show_bug.cgi?id=6253
+Patch27: samba-3.3.2-fix-expire-policy.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -348,6 +351,10 @@ BuildRequires: libxml2-devel
 # http://lists.samba.org/archive/samba/2009-March/146821.html
 BuildRequires: libcap-devel
 BuildRequires: gnupg
+BuildRequires: avahi-client-devel
+%if %build_ctdb
+BuildRequires: ctdb-devel
+%endif
 %if %build_pgsql
 BuildRequires: postgresql-devel
 %endif
@@ -1117,6 +1124,7 @@ popd
 %patch24 -p1 -b .cifslinkorder
 %patch25 -p1 -b .fixldapexop
 %patch26 -p1 -b .linkingorder
+%patch27 -p1 -b .bug6253
 
 # patches from cvs/samba team
 pushd source
@@ -1203,6 +1211,9 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-logfilebase=/var/log/%{name} \
                 --with-pammodulesdir=%{_lib}/security/ \
                 --with-rootsbindir=/bin \
+%if %build_ctdb
+		--with-ctdb \
+%endif
 %if !%build_ads
 		--with-ads=no	\
 %endif
@@ -1537,6 +1548,10 @@ done
 for i in smbclient smbsharemodes netapi wbclient; do
 	install -m 644 source/pkgconfig/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 done
+
+%if !%build_ldb
+rm -f %{buildroot}/%{_bindir}/ldb*
+%endif
 
 %if %build_winbind
 %find_lang pam_winbind
