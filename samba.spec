@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.3.4
+%define version		3.3.5
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -1897,7 +1897,7 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %config(noreplace) %{_initrddir}/winbind
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
 %{_mandir}/man8/winbindd*.8*
-%{_mandir}/man7/pam_winbind.7*
+%{_mandir}/man8/pam_winbind.8*
 %{_mandir}/man7/winbind_krb5_locator.7.*
 %{_mandir}/man1/wbinfo*.1*
 
