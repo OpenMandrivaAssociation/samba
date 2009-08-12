@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.3.6
+%define version		3.3.7
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -1125,7 +1125,7 @@ popd
 %patch24 -p1 -b .cifslinkorder
 %patch25 -p1 -b .fixldapexop
 %patch26 -p1 -b .linkingorder
-%patch27 -p1 -b .bug6253
+#patch27 -p1 -b .bug6253
 
 # patches from cvs/samba team
 pushd source
