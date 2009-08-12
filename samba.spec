@@ -318,6 +318,7 @@ Source26:	wrepld.init
 Source27:	samba.pamd
 Source28:	samba.pamd0_9
 Source29:	system-auth-winbind.pamd
+Source30:	smb.conf
 
 
 %if !%have_pversion
@@ -1375,12 +1376,12 @@ install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}
 install -m755 examples/LDAP/convertSambaAccount $RPM_BUILD_ROOT/%{_datadir}/%{name}/scripts/
 
 # make a conf file for winbind from the default one:
-	cat packaging/Mandrake/smb.conf|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandrake/smb-winbind.conf
+	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandrake/smb-winbind.conf
         install -m644 packaging/Mandrake/smb-winbind.conf $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
-install -m644 packaging/Mandrake/smb.conf $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
-cat packaging/Mandrake/smb.conf | \
+install -m644 %{SOURCE30} $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
+cat %{SOURCE30} | \
 sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >$RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
 %if %build_cupspc
 perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
