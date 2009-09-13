@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.3.7
-%define rel		2
+%define version		3.4.1
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -11,7 +11,7 @@
 %define	wbclientmajor	0
 
 # samba vscan plugins dont link without:
-%define _disable_ld_no_undefined 1
+#define _disable_ld_no_undefined 1
 
 # CS3 is based on mdk10.0 and whoever told maintainers %mdkversion would be
 # monotonic lied
@@ -327,17 +327,16 @@ Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
-# (oe) http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=385389
-Patch20: samba-3.2.6-10_include_signalh.diff
 Patch21: samba-include_fix.diff
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Patch23: samba-3.2.8-separate-modules.patch
-Patch24: samba-3.2.2-fix-cifsupcall-linkorder.patch
+Patch24: samba-3.4.1-fix-cifsupcall-linkorder.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
-Patch26: samba-fix-linking-order.patch
-#https://bugzilla.samba.org/show_bug.cgi?id=6253
-Patch27: samba-3.3.2-fix-expire-policy.patch
+Patch26: samba-3.4-link-order.patch
+#https://bugzilla.samba.org/show_bug.cgi?id=6649, https://bugzilla.samba.org/attachment.cgi?id=4577
+Patch28: samba-3.4-libsmbclient-fix-invalid-network-response-for-eof.patch
+Patch29: samba-3.4-use-different-ldflags-plugins.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -568,6 +567,8 @@ Obsoletes: samba3-swat
 %else
 #Provides: samba-swat
 %endif
+Conflicts: %{name}-server < 3.4.0
+Suggests: %{name}-doc
 
 %description swat
 SWAT (the Samba Web Administration Tool) allows samba's smb.conf file
@@ -1110,7 +1111,7 @@ echo "Applying patches for current version: %{ver}"
 %patch11 -p1 -b .mdk
 #%patch14 -p1 -b .fixdocs
 #%patch15 -p1
-pushd source
+pushd source3
 #%patch17
 # XXX - andreas - doesn't apply to 3.0.25a and no new upstream version
 # (there were VFS changes in samba)
@@ -1119,16 +1120,16 @@ popd
 #FIXME
 #patch19 -p1
 %patch21 -p1
-%patch20 -p0
 %patch22 -p1
 #patch23 -p1
 %patch24 -p1 -b .cifslinkorder
-%patch25 -p1 -b .fixldapexop
+#patch25 -p1 -b .fixldapexop
 %patch26 -p1 -b .linkingorder
-#patch27 -p1 -b .bug6253
+#patch28 -p1 -b .bug6649
+%patch29 -p1 -b .ldflagsplugins
 
 # patches from cvs/samba team
-pushd source
+pushd source3
 popd
 %else
 # Version specific patches: upcoming version
@@ -1145,7 +1146,7 @@ echo "Appling patches which should only be applied to prereleases"
 # Fix quota compilation in glibc>2.3
 %if %mdkversion >= 910 && %mdkversion < 1000
 #grep "<linux/quota.h>" source/smbd/quotas.c >/dev/null && \
-perl -pi -e 's@<linux/quota.h>@<sys/quota.h>@' source/smbd/quotas.c
+perl -pi -e 's@<linux/quota.h>@<sys/quota.h>@' source3/smbd/quotas.c
 %endif
 
 cp %{SOURCE7} .
@@ -1173,7 +1174,7 @@ perl -pi -e 's/SAMBA_VERSION_MAJOR==2 && SAMBA_VERSION_RELEASE>=4/SAMBA_VERSION_
 
 # Edit some files when not building system samba:
 %if !%build_system
-perl -pi -e 's/%{pkg_name}/%{name}/g' source/auth/pampass.c
+perl -pi -e 's/%{pkg_name}/%{name}/g' source3/auth/pampass.c
 %endif
 
 #remove cvs internal files from docs:
@@ -1192,7 +1193,7 @@ ln -sf %{_datadir}/swat%{samba_major}/help/{Samba3-ByExample,Samba3-HOWTO,Samba3
 
 %build
 %serverbuild
-(cd source
+(cd source3
 CFLAGS="`echo "$RPM_OPT_FLAGS"|sed -e 's/-g//g'` -DLDAP_DEPRECATED"
 %if %gcc331
 CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
@@ -1242,6 +1243,9 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #_endif		
 #		--with-nisplussam \
 #                --with-fhs \
+
+# Remove -Wl,--no-undefined for plugins:
+perl -pi -e 's/^(LDPLUGINFLAGS=.*)-Wl,--no-undefined/$1/g' Makefile
 
 #Fix the make file so we don't create debug information on 9.2
 %if %mdkversion == 920
@@ -1294,7 +1298,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
 
-(cd source
+(cd source3
 make DESTDIR=$RPM_BUILD_ROOT install installclientlib installmodules)
 
 # we ship docs in the docs supackage, and lik it into swat, delete the extra copy:
@@ -1321,7 +1325,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts
 
-install -m755 source/bin/lib*.a $RPM_BUILD_ROOT%{_libdir}/
+install -m755 source3/bin/lib*.a $RPM_BUILD_ROOT%{_libdir}/
 
 # smbsh forgotten
 #install -m 755 source/bin/smbsh $RPM_BUILD_ROOT%{_bindir}/
@@ -1334,12 +1338,12 @@ install -m 644 %{vfsdir}/%{vscandir}/*/vscan-*.conf %{buildroot}/%{_sysconfdir}/
 #libnss_* still not handled by make:
 # Install the nsswitch library extension file
 for i in wins winbind; do
-  install -m755 source/nsswitch/libnss_${i}.so $RPM_BUILD_ROOT/%{_lib}/libnss_${i}.so
+  install -m755 nsswitch/libnss_${i}.so $RPM_BUILD_ROOT/%{_lib}/libnss_${i}.so
 done
 # Make link for wins and winbind resolvers
 ( cd $RPM_BUILD_ROOT/%{_lib}; ln -s libnss_wins.so libnss_wins.so.2; ln -s libnss_winbind.so libnss_winbind.so.2)
 install -d %{buildroot}/%{_libdir}/krb5/plugins
-install -m755 source/bin/winbind_krb5_locator.so %{buildroot}/%{_libdir}/krb5/plugins
+install -m755 source3/bin/winbind_krb5_locator.so %{buildroot}/%{_libdir}/krb5/plugins
 
 %if %{build_test}
 for i in {%{testbin}};do
@@ -1399,7 +1403,7 @@ rm -f %{buildroot}/%{_sbindir}/cifs.upcall.old
 mv %{buildroot}/%{_sbindir}/cifs.upcall %{buildroot}/bin
 #install mount.cifs
 for i in {%{cifs_bin}};do
-#install -m755 source/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
+#install -m755 source3/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
 mv %{buildroot}/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
 ln -s ../bin/${i}%{alternative_major} %{buildroot}/sbin/${i}%{alternative_major}
 done
@@ -1539,15 +1543,15 @@ talloc \
 tdb \
 %endif
 ; do
-	pushd source/lib/$i
+	pushd source3/lib/$i
 	./autogen.sh -V && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 	popd
-	install -m 644 source/lib/$i/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+	install -m 644 source3/lib/$i/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 done
 
 # 2. Install them
 for i in smbclient smbsharemodes netapi wbclient; do
-	install -m 644 source/pkgconfig/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+	install -m 644 source3/pkgconfig/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 done
 
 %if !%build_ldb
@@ -1775,7 +1779,6 @@ update-alternatives --auto mount.cifs
 %if %build_vscan
 %exclude %{_libdir}/%{name}/vfs/vscan*.so
 %endif
-%{_libdir}/samba/fi.msg
 %dir %{_libdir}/%{name}/pdb
 %{_libdir}/%{name}/auth
 #{_libdir}/%{name}/*.so
@@ -1838,6 +1841,8 @@ update-alternatives --auto mount.cifs
 %lang(nl) %{_libdir}/%{name}/nl.msg
 %lang(pl) %{_libdir}/%{name}/pl.msg
 %lang(tr) %{_libdir}/%{name}/tr.msg
+%lang(fi) %{_libdir}/%{name}/fi.msg
+%lang(ru) %{_libdir}/%{name}/ru.msg
 #%doc swat/README
 
 %files client
