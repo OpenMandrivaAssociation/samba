@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.4.2
+%define version		3.4.3
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -330,12 +330,8 @@ Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch21: samba-include_fix.diff
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Patch23: samba-3.2.8-separate-modules.patch
-Patch24: samba-3.4.1-fix-cifsupcall-linkorder.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
-Patch26: samba-3.4-link-order.patch
-#https://bugzilla.samba.org/show_bug.cgi?id=6649, https://bugzilla.samba.org/attachment.cgi?id=4577
-Patch28: samba-3.4-libsmbclient-fix-invalid-network-response-for-eof.patch
 Patch29: samba-3.4-use-different-ldflags-plugins.patch
 %else
 # Version specific patches: upcoming version
@@ -1122,10 +1118,7 @@ popd
 %patch21 -p1
 %patch22 -p1
 #patch23 -p1
-%patch24 -p1 -b .cifslinkorder
 #patch25 -p1 -b .fixldapexop
-%patch26 -p1 -b .linkingorder
-#patch28 -p1 -b .bug6649
 %patch29 -p1 -b .ldflagsplugins
 
 # patches from cvs/samba team
