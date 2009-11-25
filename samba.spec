@@ -1536,10 +1536,10 @@ talloc \
 tdb \
 %endif
 ; do
-	pushd source3/lib/$i
+	pushd lib/$i
 	./autogen.sh -V && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 	popd
-	install -m 644 source3/lib/$i/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+	install -m 644 lib/$i/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
 done
 
 # 2. Install them
