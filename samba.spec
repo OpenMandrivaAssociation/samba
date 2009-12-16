@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.4.3
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -333,6 +333,8 @@ Patch23: samba-3.2.8-separate-modules.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
 Patch29: samba-3.4-use-different-ldflags-plugins.patch
+# Samba bug 6880, https://bugzilla.samba.org/attachment.cgi?id=4933
+Patch30: samba-3.4.3-libsmbclient-fix-workgroup-enumeration.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -1120,6 +1122,7 @@ popd
 #patch23 -p1
 #patch25 -p1 -b .fixldapexop
 %patch29 -p1 -b .ldflagsplugins
+%patch30 -p1 -b .bug6880
 
 # patches from cvs/samba team
 pushd source3
