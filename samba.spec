@@ -348,6 +348,7 @@ BuildRequires: libxml2-devel
 BuildRequires: libcap-devel
 BuildRequires: gnupg
 BuildRequires: avahi-client-devel
+BuildRequires: libaio-devel
 %if %build_ctdb
 BuildRequires: ctdb-devel
 %endif
@@ -382,7 +383,7 @@ BuildRequires: keyutils-devel
 BuildRequires: tdb-devel
 %endif
 %if !%build_ldb
-BuildRequires: ldb-devel
+#BuildRequires: ldb-devel
 %endif
 %if !%build_talloc
 BuildRequires: talloc-devel
@@ -1208,6 +1209,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
                 --with-rootsbindir=/bin \
 %if %build_ctdb
 		--with-ctdb \
+		--with-cluster-support \
 %endif
 %if !%build_ads
 		--with-ads=no	\
@@ -1215,6 +1217,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
                 --with-automount \
                 --with-pam \
                 --with-pam_smbpass \
+		--with-aio-support \
 %if %build_ldap
 		--with-ldapsam \
 %endif
@@ -1227,6 +1230,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-shared-modules=idmap_rid,idmap_ad \
 		--with-cifsmount \
 		--with-cifsupcall \
+		--enable-avahi \
 		--program-suffix=%{samba_major} 
 #		--with-expsam=%build_expsam \
 #		--with-shared-modules=pdb_ldap,idmap_ldap \
