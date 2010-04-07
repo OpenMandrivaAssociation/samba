@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.4.7
+%define version		3.5.1
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -10,8 +10,10 @@
 %define tdbmajor	1
 %define	wbclientmajor	0
 
-# samba vscan plugins dont link without:
-#define _disable_ld_no_undefined 1
+# Samba has started using -Wl,z,nodefs upstream, without libtool (after patch
+# submission to them, handled in samba bug 6792. To allow
+# plugins to link now, we have to avoid any such flags by default
+%define _disable_ld_no_undefined 1
 
 # CS3 is based on mdk10.0 and whoever told maintainers %mdkversion would be
 # monotonic lied
@@ -241,7 +243,7 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin net,ntlm_auth,rpcclient,smbcacls,smbcquotas,smbpasswd,smbtree,testparm
 
-%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,tdbbackup,tdbdump,sharesec
+%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,sharesec
 %if %build_ldb
 %global serverldbbin 	ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch,ldbrename
 %endif
@@ -327,12 +329,11 @@ Patch11: samba-3.0-mandriva-packaging.patch
 Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
-Patch21: samba-include_fix.diff
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Patch23: samba-3.2.8-separate-modules.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
-Patch29: samba-3.4-use-different-ldflags-plugins.patch
+Patch30: samba-3.5-check-undefined-before-zdefs.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -476,7 +477,7 @@ URL:	http://www.samba.org
 Summary: Samba (SMB) client programs
 Group: Networking/Other
 Requires: %{name}-common = %{version}
-Requires: mount-cifs = %{version}
+Requires: mount-cifs >= %{version}
 %if %build_alternatives
 #Conflicts:	samba-client < 2.2.8a-9mdk
 %endif
@@ -1116,11 +1117,10 @@ pushd source3
 popd
 #FIXME
 #patch19 -p1
-%patch21 -p1
 %patch22 -p1
 #patch23 -p1
 #patch25 -p1 -b .fixldapexop
-%patch29 -p1 -b .ldflagsplugins
+%patch30 -p1 -b .checkflags
 
 # patches from cvs/samba team
 pushd source3
@@ -1229,6 +1229,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 %endif
 		--with-shared-modules=idmap_rid,idmap_ad \
 		--with-cifsmount \
+		--with-cifsumount \
 		--with-cifsupcall \
 		--enable-avahi \
 		--program-suffix=%{samba_major} 
@@ -1468,7 +1469,7 @@ done
 %endif
 # Server/common binaries are versioned only if not system samba:
 %if !%build_system
-for OLD in %{buildroot}/%{_bindir}/{%{commonbin},tdbtool} %{buildroot}/%{_bindir}/{%{serverbin}%{?serverldbbin:,%serverldbbin}} %{buildroot}/%{_sbindir}/{%{serversbin},swat}
+for OLD in %{buildroot}/%{_bindir}/{%{commonbin}} %{buildroot}/%{_bindir}/{%{serverbin}%{?serverldbbin:,%serverldbbin}} %{buildroot}/%{_sbindir}/{%{serversbin},swat}
 do
     NEW=`echo ${OLD}%{alternative_major}`
     mv $OLD $NEW -f ||:
@@ -1558,6 +1559,7 @@ rm -f %{buildroot}/%{_bindir}/ldb*
 %if %build_winbind
 %find_lang pam_winbind
 %endif
+%find_lang net
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1858,12 +1860,12 @@ update-alternatives --auto mount.cifs
 # Link of smbspool to CUPS
 %{_prefix}/lib*/cups/backend/smb%{alternative_major}
 
-%files common
+%files common -f net.lang
 %defattr(-,root,root)
 %dir /var/cache/%{name}
 %dir /var/log/%{name}
 %dir /var/run/%{name}
-%(for i in %{_bindir}/{%{commonbin},tdbtool}%{samba_major};do echo $i;done)
+%(for i in %{_bindir}/{%{commonbin}}%{samba_major};do echo $i;done)
 %(for i in %{_mandir}/man?/{%{commonbin}}%{samba_major}\.[0-9]*;do echo $i;done)
 #%{_libdir}/smbwrapper%{samba_major}.so
 %dir %{_libdir}/%{name}
@@ -1879,7 +1881,7 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_mandir}/man5/smb.conf*.5*
 %{_mandir}/man5/lmhosts*.5*
-%{_mandir}/man8/tdbtool.8*
+%exclude %{_mandir}/man8/tdb*.8*
 #%{_mandir}/man7/Samba*.7*
 %dir %{_datadir}/swat%{samba_major}
 %attr(0750,root,adm) %{_datadir}/%{name}/scripts/smb-migrate
@@ -1901,6 +1903,7 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
 %{_mandir}/man8/winbindd*.8*
 %{_mandir}/man8/pam_winbind.8*
+%{_mandir}/man5/pam_winbind.conf.5.*
 %{_mandir}/man7/winbind_krb5_locator.7.*
 %{_mandir}/man1/wbinfo*.1*
 
@@ -2006,6 +2009,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libwbclient.so
 %{_includedir}/wbclient.h
+%{_includedir}/wbc_async.h
 %{_libdir}/pkgconfig/wbclient.pc
 
 #%files passdb-ldap
