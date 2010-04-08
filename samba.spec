@@ -13,7 +13,9 @@
 # Samba has started using -Wl,z,nodefs upstream, without libtool (after patch
 # submission to them, handled in samba bug 6792. To allow
 # plugins to link now, we have to avoid any such flags by default
-%define _disable_ld_no_undefined 1
+#define _disable_ld_no_undefined 1
+# or, instead, filter them out of the right line in the Makefile, like before
+# see LDSHFLAGS_MODULES below
 
 # CS3 is based on mdk10.0 and whoever told maintainers %mdkversion would be
 # monotonic lied
@@ -1243,7 +1245,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #                --with-fhs \
 
 # Remove -Wl,--no-undefined for plugins:
-perl -pi -e 's/^(LDPLUGINFLAGS=.*)-Wl,--no-undefined/$1/g' Makefile
+perl -pi -e 's/^(LDSHFLAGS_MODULES=.*)-Wl,--no-undefined/$1/g' Makefile
 
 #Fix the make file so we don't create debug information on 9.2
 %if %mdkversion == 920
