@@ -351,7 +351,7 @@ BuildRequires: gnupg
 BuildRequires: avahi-client-devel
 BuildRequires: libaio-devel
 %if %build_ctdb
-BuildRequires: ctdb-devel
+BuildRequires: ctdb-devel > 1.0.77
 %endif
 %if %build_pgsql
 BuildRequires: postgresql-devel
