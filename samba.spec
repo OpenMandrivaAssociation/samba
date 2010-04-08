@@ -1245,7 +1245,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #                --with-fhs \
 
 # Remove -Wl,--no-undefined for plugins:
-perl -pi -e 's/^(LDSHFLAGS_MODULES=.*)-Wl,--no-undefined/$1/g' Makefile
+perl -pi -e 's/^(LDSHFLAGS_MODULES=.*)-Wl,--no-undefined(.*)/$1$2/g' Makefile
 
 #Fix the make file so we don't create debug information on 9.2
 %if %mdkversion == 920
