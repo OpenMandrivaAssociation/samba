@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.5.3
-%define rel		2
+%define rel		3
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -336,6 +336,7 @@ Patch23: samba-3.2.8-separate-modules.patch
 #https://bugzilla.samba.org/show_bug.cgi?id=5886 :
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
 Patch30: samba-3.5-check-undefined-before-zdefs.patch
+Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -1123,6 +1124,7 @@ popd
 #patch23 -p1
 #patch25 -p1 -b .fixldapexop
 %patch30 -p1 -b .checkflags
+%patch31 -p1 -b .nss_wins_log
 
 # patches from cvs/samba team
 pushd source3
