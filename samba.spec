@@ -337,6 +337,7 @@ Patch23: samba-3.2.8-separate-modules.patch
 Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
 Patch30: samba-3.5-check-undefined-before-zdefs.patch
 Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
+Patch32: samba-3.5.3-fix-not-string-literal-netdomjoin-gui.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -392,6 +393,8 @@ BuildRequires: tdb-devel
 %if !%build_talloc
 BuildRequires: talloc-devel
 %endif
+# for domain-join gui
+BuildRequires: gtk2-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Requires(pre): chkconfig mktemp psmisc
 Requires(pre): coreutils sed grep
@@ -998,6 +1001,13 @@ Requires:	keyutils > 1.2-%{mkrel 4}
 This package provides the mount.cifs helper to mount cifs filesystems
 using the cifs filesystem driver
 
+%package domainjoin-gui
+Summary: Domainjoin GUI
+Requires: samba-common = %{version}
+
+%description domainjoin-gui
+he samba-domainjoin-gui package includes a domainjoin gtk application.
+
 %prep
 
 # Allow users to query build options with --with options:
@@ -1125,6 +1135,7 @@ popd
 #patch25 -p1 -b .fixldapexop
 %patch30 -p1 -b .checkflags
 %patch31 -p1 -b .nss_wins_log
+%patch32 -p1 -b .not-string-literal
 
 # patches from cvs/samba team
 pushd source3
@@ -1271,7 +1282,7 @@ perl -pi -e 's|-Wl,-rpath,%{_libdir}||g;s|-Wl,-rpath -Wl,%{_libdir}||g' Makefile
 
 make proto_exists || :
 %make all libsmbclient smbfilter wins %{?_with_test: torture debug2html bin/log2pcap} bin/smbget
-
+make -C lib/netapi/examples
 )
 
 %if %build_vscan
@@ -1348,6 +1359,12 @@ done
 ( cd $RPM_BUILD_ROOT/%{_lib}; ln -s libnss_wins.so libnss_wins.so.2; ln -s libnss_winbind.so libnss_winbind.so.2)
 install -d %{buildroot}/%{_libdir}/krb5/plugins
 install -m755 source3/bin/winbind_krb5_locator.so %{buildroot}/%{_libdir}/krb5/plugins
+
+install -m 755 source3/lib/netapi/examples/bin/netdomjoin-gui $RPM_BUILD_ROOT/%{_sbindir}/netdomjoin-gui
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps/%{name}
+install -m 644 source3/lib/netapi/examples/netdomjoin-gui/samba.ico $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/samba.ico
+install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo.png
+install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo-small.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo-small.png
 
 %if %{build_test}
 for i in {%{testbin}};do
@@ -2187,6 +2204,14 @@ update-alternatives --auto mount.cifs
 /*bin/cifs.upcall%{alternative_major}
 %{_mandir}/man8/*mount.cifs*.8*
 %{_mandir}/man8/cifs.upcall*.8*
+
+%files domainjoin-gui
+%defattr(-,root,root)
+%{_sbindir}/netdomjoin-gui
+%dir %{_datadir}/pixmaps/samba
+%{_datadir}/pixmaps/samba/samba.ico
+%{_datadir}/pixmaps/samba/logo.png
+%{_datadir}/pixmaps/samba/logo-small.png
 
 #%exclude %{_mandir}/man1/smbsh*.1*
 #%exclude %{_mandir}/man1/editreg*
