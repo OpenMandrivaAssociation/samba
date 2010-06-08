@@ -1006,7 +1006,7 @@ Summary: Domainjoin GUI
 Requires: samba-common = %{version}
 
 %description domainjoin-gui
-he samba-domainjoin-gui package includes a domainjoin gtk application.
+The samba-domainjoin-gui package includes a domainjoin gtk application.
 
 %prep
 
