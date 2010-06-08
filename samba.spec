@@ -290,7 +290,7 @@ Name: %{pkg_name}%{samba_major}
 Version: %{real_version}
 Release: %{release}
 
-License: GPL
+License: GPLv3
 Group: System/Servers
 Source: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
 Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
@@ -1004,6 +1004,7 @@ using the cifs filesystem driver
 %package domainjoin-gui
 Summary: Domainjoin GUI
 Requires: samba-common = %{version}
+Group: System/Configuration/Other
 
 %description domainjoin-gui
 The samba-domainjoin-gui package includes a domainjoin gtk application.
