@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.5.3
-%define rel		3
+%define version		3.5.4
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -1136,7 +1136,7 @@ popd
 #patch25 -p1 -b .fixldapexop
 %patch30 -p1 -b .checkflags
 %patch31 -p1 -b .nss_wins_log
-%patch32 -p1 -b .not-string-literal
+#%patch32 -p1 -b .not-string-literal
 
 # patches from cvs/samba team
 pushd source3
