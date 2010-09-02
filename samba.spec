@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.5.4
-%define rel		1
+%define rel		2
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -540,6 +540,7 @@ URL:	http://www.samba.org
 Summary: Documentation for Samba servers and clients
 Group: System/Servers
 Requires: %{name}-common = %{version}
+BuildArch: noarch
 %if %build_system
 Obsoletes: samba3-doc
 Provides:  samba3-doc
