@@ -1,6 +1,6 @@
 %define pkg_name	samba
-%define version		3.5.4
-%define rel		2
+%define version		3.5.5
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
