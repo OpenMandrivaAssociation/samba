@@ -1587,21 +1587,21 @@ rm -f %{buildroot}/%{_bindir}/ldb*
 %find_lang net
 
 # these are provided by ldb-utils
-rm -f %{buildroot}%{_mandir}/man1/ldbadd.1*
-rm -f %{buildroot}%{_mandir}/man1/ldbdel.1*
-rm -f %{buildroot}%{_mandir}/man1/ldbedit.1*
-rm -f %{buildroot}%{_mandir}/man1/ldbmodify.1*
-rm -f %{buildroot}%{_mandir}/man1/ldbrename.1*
-rm -f %{buildroot}%{_mandir}/man1/ldbsearch.1*
+#rm -f %{buildroot}%{_mandir}/man1/ldbadd.1*
+#rm -f %{buildroot}%{_mandir}/man1/ldbdel.1*
+#rm -f %{buildroot}%{_mandir}/man1/ldbedit.1*
+#rm -f %{buildroot}%{_mandir}/man1/ldbmodify.1*
+#rm -f %{buildroot}%{_mandir}/man1/ldbrename.1*
+#rm -f %{buildroot}%{_mandir}/man1/ldbsearch.1*
 
 # these are provided by tdb-utils
-rm -f %{buildroot}%{_mandir}/man8/tdbbackup.8*
-rm -f %{buildroot}%{_mandir}/man8/tdbdump.8*
-rm -f %{buildroot}%{_mandir}/man8/tdbtool.8*
+#rm -f %{buildroot}%{_mandir}/man8/tdbbackup.8*
+#rm -f %{buildroot}%{_mandir}/man8/tdbdump.8*
+#rm -f %{buildroot}%{_mandir}/man8/tdbtool.8*
 
 # these are not built
-rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
-rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
+#rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
+#rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
