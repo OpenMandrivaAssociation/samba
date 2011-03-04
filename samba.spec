@@ -1833,7 +1833,7 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 #%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/samba-slapd.include
-%(for i in %{_mandir}/man?/{%{serverbin}%{?serverldbbin:,%serverldbbin},%{serversbin}}%{samba_major}\.[0-9]*;do echo $i|grep -v mkntpwd;done)
+%(for i in %{_mandir}/man?/{%{serverbin}%{?serverldbbin:,%serverldbbin},%{serversbin}}%{samba_major}\.[0-9]\\*;do echo $i|grep -v mkntpwd;done)
 %if !%build_ldb
 %exclude %{_mandir}/man1/ldb*.1.*
 %endif
@@ -1889,7 +1889,7 @@ update-alternatives --auto mount.cifs
 %files client
 %defattr(-,root,root)
 %(for i in %{_bindir}/{%{clientbin},eventlogadm}%{alternative_major};do echo $i;done)
-%(for i in %{_mandir}/man?/{%{clientbin}}%{alternative_major}.?.*;do echo $i|grep -v smbprint;done)
+%(for i in %{_mandir}/man?/{%{clientbin}}%{alternative_major}.\\?.\\*;do echo $i|grep -v smbprint;done)
 #xclude %{_mandir}/man?/smbget*
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
@@ -1908,7 +1908,7 @@ update-alternatives --auto mount.cifs
 %dir /var/log/%{name}
 %dir /var/run/%{name}
 %(for i in %{_bindir}/{%{commonbin}}%{samba_major};do echo $i;done)
-%(for i in %{_mandir}/man?/{%{commonbin}}%{samba_major}\.[0-9]*;do echo $i;done)
+%(for i in %{_mandir}/man?/{%{commonbin}}%{samba_major}\.[0-9]\\*;do echo $i;done)
 #%{_libdir}/smbwrapper%{samba_major}.so
 %dir %{_libdir}/%{name}
 %{_libdir}/%{name}/*.dat
