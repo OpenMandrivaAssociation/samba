@@ -1586,22 +1586,99 @@ rm -f %{buildroot}/%{_bindir}/ldb*
 %endif
 %find_lang net
 
+%ifarch alpha
+rm -f %{_bindir}/smb*m*nt%{samba_major}
+rm -f %{_mandir}/man8/smb*m*nt*.8*
+%endif
+
+%if !%build_system
+rm -f %{_libdir}/libsmbclient.so.*
+rm -f %{_includedir}/*
+rm -f %{_libdir}/libsmbclient.so
+rm -f %{_libdir}/lib*.a
+rm -f %{_mandir}/man8/libsmbclient.8*
+rm -f %{_libdir}/pkgconfig/smbclient.pc
+%endif
+
+%if %build_vscan
+rm -f %{buildroot} %{_libdir}/%{name}/vfs/vscan*.so
+%endif
+
+%if !%build_antivir && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-antivir.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-antivir.conf
+%endif
+
+%if !%build_clamav && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-clamav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-clamav.conf
+%endif
+
+%if !%build_fprot && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-fprotd.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fprotd.conf
+%endif
+
+%if !%build_fsav && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-fsav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fsav.conf
+%endif
+
+%if !%build_icap && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-icap.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-icap.conf
+%endif
+
+%if !%build_kaspersky && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-kavp.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-kavp.conf
+%endif
+
+%if !%build_mks && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-mksd.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-mks*.conf
+%endif
+
+%if !%build_nai && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-mcdaemon.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-mcdaemon.conf
+%endif
+
+%if !%build_openav && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-oav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-oav.conf
+%endif
+
+%if !%build_sophos && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-sophos.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-sophos.conf
+%endif
+
+%if !%build_symantec && %build_vscan
+rm -rf %{buildroot}%{_sysconfdir}/%{name}/vscan-symantec.conf
+%endif
+
+%if !%build_trend && %build_vscan
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-trend.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-trend.conf
+%endif
+
 # these are provided by ldb-utils
-#rm -f %{buildroot}%{_mandir}/man1/ldbadd.1*
-#rm -f %{buildroot}%{_mandir}/man1/ldbdel.1*
-#rm -f %{buildroot}%{_mandir}/man1/ldbedit.1*
-#rm -f %{buildroot}%{_mandir}/man1/ldbmodify.1*
-#rm -f %{buildroot}%{_mandir}/man1/ldbrename.1*
-#rm -f %{buildroot}%{_mandir}/man1/ldbsearch.1*
+rm -f %{buildroot}%{_mandir}/man1/ldbadd.1*
+rm -f %{buildroot}%{_mandir}/man1/ldbdel.1*
+rm -f %{buildroot}%{_mandir}/man1/ldbedit.1*
+rm -f %{buildroot}%{_mandir}/man1/ldbmodify.1*
+rm -f %{buildroot}%{_mandir}/man1/ldbrename.1*
+rm -f %{buildroot}%{_mandir}/man1/ldbsearch.1*
 
 # these are provided by tdb-utils
-#rm -f %{buildroot}%{_mandir}/man8/tdbbackup.8*
-#rm -f %{buildroot}%{_mandir}/man8/tdbdump.8*
-#rm -f %{buildroot}%{_mandir}/man8/tdbtool.8*
+rm -f %{buildroot}%{_mandir}/man8/tdbbackup.8*
+rm -f %{buildroot}%{_mandir}/man8/tdbdump.8*
+rm -f %{buildroot}%{_mandir}/man8/tdbtool.8*
 
 # these are not built
-#rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
-#rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
+rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
+rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1817,9 +1894,6 @@ update-alternatives --auto mount.cifs
 %attr(755,root,root) /%{_lib}/security/pam_smbpass*
 %dir %{_libdir}/%{name}/vfs
 %{_libdir}/%{name}/vfs/*.so
-%if %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan*.so
-%endif
 %dir %{_libdir}/%{name}/pdb
 %{_libdir}/%{name}/auth
 #{_libdir}/%{name}/*.so
@@ -1834,9 +1908,6 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 #%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/samba-slapd.include
 %(for i in %{_mandir}/man?/{%{serverbin}%{?serverldbbin:,%serverldbbin},%{serversbin}}%{samba_major}\.[0-9]\\*;do echo $i|grep -v mkntpwd;done)
-%if !%build_ldb
-%exclude %{_mandir}/man1/ldb*.1.*
-%endif
 %attr(775,root,adm) %dir %{_localstatedir}/lib/%{name}/netlogon
 %attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/profiles
 %attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/printers
@@ -1894,9 +1965,6 @@ update-alternatives --auto mount.cifs
 %{_mandir}/man5/smbgetrc%{alternative_major}.5*
 %ifnarch alpha
 #(for i in /sbin/{%{client_sbin}}%{alternative_major};do echo $i|grep -v "smb.*m.*nt";done)
-%else
-%exclude %{_bindir}/smb*m*nt%{samba_major}
-%exclude %{_mandir}/man8/smb*m*nt*.8*
 %endif
 %{_mandir}/man8/eventlogadm3.8*
 # Link of smbspool to CUPS
@@ -1923,7 +1991,6 @@ update-alternatives --auto mount.cifs
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_mandir}/man5/smb.conf*.5*
 %{_mandir}/man5/lmhosts*.5*
-%exclude %{_mandir}/man8/tdb*.8*
 #%{_mandir}/man7/Samba*.7*
 %dir %{_datadir}/swat%{samba_major}
 %attr(0750,root,adm) %{_datadir}/%{name}/scripts/smb-migrate
@@ -1962,18 +2029,12 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %(for i in %{_bindir}/{%{testbin}}%{samba_major};do echo $i;done)
 %{_mandir}/man1/vfstest%{samba_major}*.1*
-%exclude %{_mandir}/man1/log2pcap*.1*
-%else
-%exclude %{_mandir}/man1/vfstest%{samba_major}*.1*
-%exclude %{_mandir}/man1/log2pcap*.1*
 %endif
 
 %if %build_system
 %files -n %{libname}
 %defattr(-,root,root)
 %{_libdir}/libsmbclient.so.%{libsmbmajor}
-%else
-%exclude %{_libdir}/libsmbclient.so.*
 %endif
 
 %if %build_system
@@ -1984,19 +2045,12 @@ update-alternatives --auto mount.cifs
 %doc clean-docs/libsmbclient/*
 %{_mandir}/man7/libsmbclient.7*
 %{_libdir}/pkgconfig/smbclient.pc
-%else
-%exclude %{_includedir}/*
-%exclude %{_libdir}/libsmbclient.so
-%exclude %{_mandir}/man8/libsmbclient.8*
-%exclude %{_libdir}/pkgconfig/smbclient.pc
 %endif
 
 %if %build_system
 %files -n %{libname}-static-devel
 %defattr(-,root,root)
 %{_libdir}/lib*.a
-%else
-%exclude %{_libdir}/lib*.a
 %endif
 
 %files -n %libnetapi
@@ -2080,10 +2134,6 @@ update-alternatives --auto mount.cifs
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-antivir.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
-%if !%build_antivir && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-antivir.so
-%exclude %{_sysconfdir}/%{name}/vscan-antivir.conf
-%endif
 
 %if %build_clamav
 %files vscan-clamav
@@ -2091,10 +2141,6 @@ update-alternatives --auto mount.cifs
 %{_libdir}/%{name}/vfs/vscan-clamav.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-clamav.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
-%endif
-%if !%build_clamav && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-clamav.so
-%exclude %{_sysconfdir}/%{name}/vscan-clamav.conf
 %endif
 
 %if %build_fprot
@@ -2104,10 +2150,6 @@ update-alternatives --auto mount.cifs
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-fprotd.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
-%if !%build_fprot && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-fprotd.so
-%exclude %{_sysconfdir}/%{name}/vscan-fprotd.conf
-%endif
 
 %if %build_fsav
 %files vscan-fsecure
@@ -2115,10 +2157,6 @@ update-alternatives --auto mount.cifs
 %{_libdir}/%{name}/vfs/vscan-fsav.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-fsav.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
-%endif
-%if !%build_fsav && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-fsav.so
-%exclude %{_sysconfdir}/%{name}/vscan-fsav.conf
 %endif
 
 %if %build_icap
@@ -2128,11 +2166,6 @@ update-alternatives --auto mount.cifs
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-icap.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
-%if !%build_icap && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-icap.so
-%exclude %{_sysconfdir}/%{name}/vscan-icap.conf
-%endif
-
 
 %if %build_kaspersky
 %files vscan-kaspersky
@@ -2140,10 +2173,6 @@ update-alternatives --auto mount.cifs
 %{_libdir}/%{name}/vfs/vscan-kavp.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-kavp.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
-%endif
-%if !%build_kaspersky && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-kavp.so
-%exclude %{_sysconfdir}/%{name}/vscan-kavp.conf
 %endif
 
 %if %build_mks
@@ -2153,10 +2182,6 @@ update-alternatives --auto mount.cifs
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-mks*.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
-%if !%build_mks && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-mksd.so
-%exclude %{_sysconfdir}/%{name}/vscan-mks*.conf
-%endif
 
 %if %build_nai
 %files vscan-nai
@@ -2164,10 +2189,6 @@ update-alternatives --auto mount.cifs
 %{_libdir}/%{name}/vfs/vscan-mcdaemon.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-mcdaemon.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
-%endif
-%if !%build_nai && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-mcdaemon.so
-%exclude %{_sysconfdir}/%{name}/vscan-mcdaemon.conf
 %endif
 
 %if %build_openav
@@ -2177,10 +2198,6 @@ update-alternatives --auto mount.cifs
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-oav.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
-%if !%build_openav && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-oav.so
-%exclude %{_sysconfdir}/%{name}/vscan-oav.conf
-%endif
 
 %if %build_sophos
 %files vscan-sophos
@@ -2188,10 +2205,6 @@ update-alternatives --auto mount.cifs
 %{_libdir}/%{name}/vfs/vscan-sophos.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-sophos.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
-%endif
-%if !%build_sophos && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-sophos.so
-%exclude %{_sysconfdir}/%{name}/vscan-sophos.conf
 %endif
 
 %if %build_symantec
@@ -2201,9 +2214,6 @@ update-alternatives --auto mount.cifs
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-symantec.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
-%if !%build_symantec && %build_vscan
-%exclude %{_sysconfdir}/%{name}/vscan-symantec.conf
-%endif
 
 %if %build_trend
 %files vscan-trend
@@ -2211,10 +2221,6 @@ update-alternatives --auto mount.cifs
 %{_libdir}/%{name}/vfs/vscan-trend.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-trend.conf
 %doc %{vfsdir}/%{vscandir}/INSTALL
-%endif
-%if !%build_trend && %build_vscan
-%exclude %{_libdir}/%{name}/vfs/vscan-trend.so
-%exclude %{_sysconfdir}/%{name}/vscan-trend.conf
 %endif
 
 %files -n mount-cifs%{samba_major}
