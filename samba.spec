@@ -1602,65 +1602,65 @@ rm -f %{_libdir}/pkgconfig/smbclient.pc
 
 %if %build_vscan
 rm -f %{buildroot} %{_libdir}/%{name}/vfs/vscan*.so
-%endif
 
-%if !%build_antivir && %build_vscan
+%if !%build_antivir
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-antivir.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-antivir.conf
 %endif
 
-%if !%build_clamav && %build_vscan
+%if !%build_clamav
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-clamav.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-clamav.conf
 %endif
 
-%if !%build_fprot && %build_vscan
+%if !%build_fprot
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-fprotd.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fprotd.conf
 %endif
 
-%if !%build_fsav && %build_vscan
+%if !%build_fsav
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-fsav.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fsav.conf
 %endif
 
-%if !%build_icap && %build_vscan
+%if !%build_icap
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-icap.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-icap.conf
 %endif
 
-%if !%build_kaspersky && %build_vscan
+%if !%build_kaspersky
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-kavp.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-kavp.conf
 %endif
 
-%if !%build_mks && %build_vscan
+%if !%build_mks
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-mksd.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-mks*.conf
 %endif
 
-%if !%build_nai && %build_vscan
+%if !%build_nai
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-mcdaemon.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-mcdaemon.conf
 %endif
 
-%if !%build_openav && %build_vscan
+%if !%build_openav
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-oav.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-oav.conf
 %endif
 
-%if !%build_sophos && %build_vscan
+%if !%build_sophos
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-sophos.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-sophos.conf
 %endif
 
-%if !%build_symantec && %build_vscan
+%if !%build_symantec
 rm -rf %{buildroot}%{_sysconfdir}/%{name}/vscan-symantec.conf
 %endif
 
-%if !%build_trend && %build_vscan
+%if !%build_trend
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-trend.so
 rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-trend.conf
+%endif
 %endif
 
 # these are provided by ldb-utils
