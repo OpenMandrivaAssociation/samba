@@ -67,9 +67,14 @@ packages of Samba.
 
 %files common -f net.lang
 %defattr(-,root,root)
+%dir %_sysconfdir/samba
+%config(noreplace) %_sysconfdir/samba/smb.conf
+%config(noreplace) %_sysconfdir/samba/smb-winbind.conf
 %dir /var/cache/%{name}
 %dir /var/log/%{name}
 %dir /var/run/%{name}
+%dir /var/lib/samba
+/var/lib/samba/codepages
 %{_bindir}/net
 %{_bindir}/ntlm_auth
 %{_bindir}/rpcclient
@@ -163,7 +168,6 @@ docs directory for implementation details.
 %_sysconfdir/logrotate.d/samba
 %_sysconfdir/pam.d/samba
 %_initrddir/smb
-%config(noreplace) %_sysconfdir/samba/smb.conf
 %config(noreplace) %_sysconfdir/samba/smbusers
 %_sbindir/samba
 /%_lib/security/pam_smbpass.so
@@ -309,7 +313,6 @@ and group/user enumeration from a Windows or Samba domain controller.
 %defattr(-,root,root)
 %_sysconfdir/pam.d/system-auth-winbind
 %_initrddir/winbind
-%config(noreplace) %_sysconfdir/samba/smb-winbind.conf
 %_sysconfdir/security/pam_winbind.conf
 %_sbindir/winbind
 %{_sbindir}/winbindd
@@ -594,8 +597,7 @@ packages of Samba.
 #-----------------------------------------------
 
 %prep
-%setup -qDT
-%if 0
+%setup -q
 
 #make better doc trees:
 chmod -R a+rX examples docs *Manifest* README  Roadmap COPYING
@@ -609,13 +611,20 @@ cp docs/htmldocs/*.{html,css} clean-docs/samba-doc/docs/htmldocs
 %build
 pushd source3
 %serverbuild
-%configure2_5x --with-fhs --with-pammodulesdir=/%_lib/security \
-	--with-cifsmount=no --with-cifsumount=no --with-cifsupcall=no
+%configure2_5x --with-pammodulesdir=/%_lib/security \
+	--with-cifsmount=no --with-cifsumount=no --with-cifsupcall=no \
+	--with-configdir=%{_sysconfdir}/%{name} \
+	--with-logfilebase=/var/log/%{name} \
+	--sysconfdir=%{_sysconfdir}/%{name} \
+	--with-logfilebase=/var/log/%{name} \
+	--with-privatedir=%{_sysconfdir}/%{name} \
+	--with-lockdir=/var/cache/%{name} \
+	--with-piddir=/var/run
+	
 perl -pi -e 'if ( m/^LDSHFLAGS_MODULES/ ) { $_ =~ s/-Wl,--no-undefined//g;};' Makefile
 %make
 LD_LIBRARY_PATH=`pwd`/bin %make -C lib/netapi/examples
 popd
-%endif
 
 %install
 rm -fr %buildroot
