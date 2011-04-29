@@ -5,6 +5,18 @@ Release: %mkrel 1
 License: GPLv3
 Group: System/Servers
 Source: http://www.samba.org/samba/ftp/stable/samba-%{version}.tar.gz
+Source1:	samba.log
+Source3:	samba.xinetd
+Source20:	smbusers
+Source21:	smbprint
+Source23:	findsmb
+Source24:	smb.init
+Source25:	winbind.init
+Source26:	wrepld.init
+Source27:	samba.pamd
+Source28:	samba.pamd0_9
+Source29:	system-auth-winbind.pamd
+Source30:	smb.conf
 URL: http://www.samba.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: libacl-devel
@@ -55,6 +67,9 @@ packages of Samba.
 
 %files common -f net.lang
 %defattr(-,root,root)
+%dir /var/cache/%{name}
+%dir /var/log/%{name}
+%dir /var/run/%{name}
 %{_bindir}/net
 %{_bindir}/ntlm_auth
 %{_bindir}/rpcclient
@@ -105,6 +120,7 @@ update-alternatives --remove-all smbclient
 %{_bindir}/smbclient
 %{_bindir}/smbget
 %{_bindir}/smbspool
+%{_bindir}/smbprint
 %{_bindir}/smbtar
 %{_mandir}/man1/findsmb.1*
 %{_mandir}/man1/nmblookup.1*
@@ -144,6 +160,12 @@ docs directory for implementation details.
 
 %files server
 %defattr(-,root,root)
+%_sysconfdir/logrotate.d/samba
+%_sysconfdir/pam.d/samba
+%_initrddir/smb
+%config(noreplace) %_sysconfdir/samba/smb.conf
+%config(noreplace) %_sysconfdir/samba/smbusers
+%_sbindir/samba
 /%_lib/security/pam_smbpass.so
 %{_bindir}/pdbedit
 %{_bindir}/profiles
@@ -199,6 +221,30 @@ docs directory for implementation details.
 %{_mandir}/man8/vfs_streams_depot.8*
 %{_mandir}/man8/vfs_streams_xattr.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
+%attr(775,root,adm) %dir %{_localstatedir}/lib/%{name}/netlogon
+%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/profiles
+%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/printers
+%attr(2775,root,adm) %dir %{_localstatedir}/lib/%{name}/printers/*
+%attr(1777,root,root) %dir /var/spool/%{name}
+
+%preun server
+%_preun_service smb
+
+%post server
+%_post_service smb
+
+# Add a unix group for samba machine accounts
+groupadd -frg 421 machines
+
+# Migrate tdb's from /var/lock/samba (taken from official samba spec file):
+for i in /var/lock/samba/*.tdb
+do
+if [ -f $i ]; then
+	newname=`echo $i | sed -e's|var\/lock\/samba|var\/cache\/samba|'`
+	echo "Moving $i to $newname"
+	mv $i $newname
+fi
+done
 
 #-----------------------------------------------
 
@@ -221,6 +267,7 @@ Samba.
 
 %files swat
 %defattr(-,root,root)
+%{_sysconfdir}/xinetd.d/swat
 %{_sbindir}/swat
 %{_datadir}/samba/swat
 %{_mandir}/man8/swat*.8*
@@ -235,6 +282,18 @@ Samba.
 %lang(fi) %{_libdir}/%{name}/fi.msg
 %lang(ru) %{_libdir}/%{name}/ru.msg
 
+%post swat
+if [ -f /var/lock/subsys/xinetd ]; then
+        service xinetd reload >/dev/null 2>&1 || :
+fi
+
+%postun swat
+# Remove swat entry from xinetd
+if [ $1 = 0 -a -f %{_sysconfdir}/xinetd.conf ] ; then
+rm -f %{_sysconfdir}/xinetd.d/swat
+	service xinetd reload &>/dev/null || :
+fi
+
 #-----------------------------------------------
 
 %package winbind
@@ -248,6 +307,11 @@ and group/user enumeration from a Windows or Samba domain controller.
 
 %files winbind -f pam_winbind.lang
 %defattr(-,root,root)
+%_sysconfdir/pam.d/system-auth-winbind
+%_initrddir/winbind
+%config(noreplace) %_sysconfdir/samba/smb-winbind.conf
+%_sysconfdir/security/pam_winbind.conf
+%_sbindir/winbind
 %{_sbindir}/winbindd
 %{_bindir}/wbinfo
 /%{_lib}/security/pam_winbind*
@@ -259,6 +323,32 @@ and group/user enumeration from a Windows or Samba domain controller.
 %{_mandir}/man5/pam_winbind.conf.5.*
 %{_mandir}/man7/winbind_krb5_locator.7.*
 %{_mandir}/man1/wbinfo*.1*
+
+%post winbind
+if [ $1 = 1 ]; then
+    /sbin/chkconfig winbind on
+    cp -af %{_sysconfdir}/nsswitch.conf %{_sysconfdir}/nsswitch.conf.rpmsave
+    cp -af %{_sysconfdir}/nsswitch.conf %{_sysconfdir}/nsswitch.conf.rpmtemp
+    for i in passwd group;do
+        grep ^$i %{_sysconfdir}/nsswitch.conf |grep -v 'winbind' >/dev/null
+        if [ $? = 0 ];then
+            echo "Adding a winbind entry to the $i section of %{_sysconfdir}/nsswitch.conf"
+            awk '/^'$i'/ {print $0 " winbind"};!/^'$i'/ {print}' %{_sysconfdir}/nsswitch.conf.rpmtemp >%{_sysconfdir}/nsswitch.conf;
+	    cp -af %{_sysconfdir}/nsswitch.conf %{_sysconfdir}/nsswitch.conf.rpmtemp
+        else
+            echo "$i entry found in %{_sysconfdir}/nsswitch.conf"
+        fi
+    done
+    if [ -f %{_sysconfdir}/nsswitch.conf.rpmtemp ];then rm -f %{_sysconfdir}/nsswitch.conf.rpmtemp;fi
+fi
+
+%preun winbind
+if [ $1 = 0 ]; then
+	echo "Removing winbind entries from %{_sysconfdir}/nsswitch.conf"
+	perl -pi -e 's/ winbind//' %{_sysconfdir}/nsswitch.conf
+
+	/sbin/chkconfig winbind reset
+fi
 
 #------------------------------------------------	
 
@@ -446,6 +536,24 @@ IP addresses.
 %defattr(-,root,root)
 /%{_lib}/libnss_wins.so*
 
+%post -n %libnsswin
+if [ $1 = 1 ]; then
+    cp -af %{_sysconfdir}/nsswitch.conf %{_sysconfdir}/nsswitch.conf.rpmsave
+    grep '^hosts' %{_sysconfdir}/nsswitch.conf |grep -v 'wins' >/dev/null
+    if [ $? = 0 ];then
+        echo "Adding a wins entry to the hosts section of %{_sysconfdir}/nsswitch.conf"
+        awk '/^hosts/ {print $0 " wins"};!/^hosts/ {print}' %{_sysconfdir}/nsswitch.conf.rpmsave >%{_sysconfdir}/nsswitch.conf;
+    else
+        echo "wins entry found in %{_sysconfdir}/nsswitch.conf"
+    fi
+fi
+
+%preun -n %libnsswin
+if [ $1 = 0 ]; then
+	echo "Removing wins entry from %{_sysconfdir}/nsswitch.conf"
+	perl -pi -e 's/ wins//' %{_sysconfdir}/nsswitch.conf
+fi
+
 #-----------------------------------------------
 
 %package domainjoin-gui
@@ -487,7 +595,6 @@ packages of Samba.
 
 %prep
 %setup -qDT
-
 %if 0
 
 #make better doc trees:
@@ -509,9 +616,18 @@ perl -pi -e 'if ( m/^LDSHFLAGS_MODULES/ ) { $_ =~ s/-Wl,--no-undefined//g;};' Ma
 LD_LIBRARY_PATH=`pwd`/bin %make -C lib/netapi/examples
 popd
 %endif
+
 %install
 rm -fr %buildroot
 %makeinstall_std -C source3
+
+mkdir -p %buildroot/var/cache/%{name}
+mkdir -p %buildroot/var/log/%{name}
+mkdir -p %buildroot/var/run/%{name}
+mkdir -p %buildroot/var/spool/%{name}
+mkdir -p %buildroot/%{_localstatedir}/lib/%{name}/{netlogon,profiles,printers}
+mkdir -p %buildroot/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
+mkdir -p %buildroot/%{_localstatedir}/lib/%{name}/codepages/src
 
 # these are provided by ldb-utils
 rm -f %{buildroot}%{_mandir}/man1/ldb* %{buildroot}%{_bindir}/ldb*
@@ -547,6 +663,33 @@ mkdir -p %buildroot%{_datadir}/pixmaps/%{name}
 install -m 644 source3/lib/netapi/examples/netdomjoin-gui/samba.ico %buildroot/%{_datadir}/pixmaps/%{name}/samba.ico
 install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo.png %buildroot/%{_datadir}/pixmaps/%{name}/logo.png
 install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo-small.png %buildroot/%{_datadir}/pixmaps/%{name}/logo-small.png
+
+install -m644 %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/smbusers
+install -m755 %{SOURCE21} $RPM_BUILD_ROOT/%{_bindir}
+install -m755 %{SOURCE23} $RPM_BUILD_ROOT/%{_bindir}
+install -D -m755 %{SOURCE24} $RPM_BUILD_ROOT/%{_initrddir}/smb
+install -D -m755 %{SOURCE24} $RPM_BUILD_ROOT/%{_sbindir}/%{name}
+install -D -m755 %{SOURCE25} $RPM_BUILD_ROOT/%{_initrddir}/winbind
+install -D -m755 %{SOURCE25} $RPM_BUILD_ROOT/%{_sbindir}/winbind
+install -D -m644 %{SOURCE28} $RPM_BUILD_ROOT/%{_sysconfdir}/pam.d/%{name}
+install -D -m644 %{SOURCE29} $RPM_BUILD_ROOT/%{_sysconfdir}/pam.d/system-auth-winbind
+install -D -m644 %{SOURCE1} $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d/%{name}
+
+# install pam_winbind.conf sample file
+mkdir -p %{buildroot}%{_sysconfdir}/security
+install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}/security/pam_winbind.conf
+
+# make a conf file for winbind from the default one:
+cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandrake/smb-winbind.conf
+install -m644 packaging/Mandrake/smb-winbind.conf $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb-winbind.conf
+
+# Some inline fixes for smb.conf for non-winbind use
+install -m644 %{SOURCE30} $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
+cat %{SOURCE30} | \
+sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >$RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
+
+# xinetd support
+install -D -m644 %{SOURCE3} $RPM_BUILD_ROOT/%{_sysconfdir}/xinetd.d/swat
 
 %find_lang net
 %find_lang pam_winbind
