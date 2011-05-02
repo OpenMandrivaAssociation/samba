@@ -328,16 +328,11 @@ Source30:	smb.conf
 %if !%have_pversion
 # Version specific patches: current version
 Patch11: samba-3.0-mandriva-packaging.patch
-Patch18: http://samba.org/~metze/samba3-default-quota-ignore-error-01.diff
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
-Patch23: samba-3.2.8-separate-modules.patch
-#https://bugzilla.samba.org/show_bug.cgi?id=5886 :
-Patch25: samba-3.2.4-fix-ldap-passmod-exop.patch
 Patch30: samba-3.5-check-undefined-before-zdefs.patch
 Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
-Patch32: samba-3.5.3-fix-not-string-literal-netdomjoin-gui.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -1115,29 +1110,15 @@ fi
 %else
 %setup -q -n %{pkg_name}-%{source_ver}
 %endif
-#%patch111 -p1
 # Version specific patches: current version
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
-#%patch7 -p1 -b .lib64
-#%patch10 -p1 -b .rpcclient-libs
 %patch11 -p1 -b .mdk
-#%patch14 -p1 -b .fixdocs
-#%patch15 -p1
 pushd source3
-#%patch17
-# XXX - andreas - doesn't apply to 3.0.25a and no new upstream version
-# (there were VFS changes in samba)
-#%patch18
 popd
-#FIXME
-#patch19 -p1
 %patch22 -p1
-#patch23 -p1
-#patch25 -p1 -b .fixldapexop
 %patch30 -p1 -b .checkflags
 %patch31 -p1 -b .nss_wins_log
-#%patch32 -p1 -b .not-string-literal
 
 # patches from cvs/samba team
 pushd source3
@@ -1146,8 +1127,6 @@ popd
 # Version specific patches: upcoming version
 echo "Applying patches for new versions: %{pversion}"
 %endif
-
-#%patch12 -p1 -b .gcc4
 
 # Limbo patches
 %if %have_pversion && %have_pre
