@@ -350,6 +350,7 @@ BuildRequires: libcap-devel
 BuildRequires: gnupg
 BuildRequires: avahi-client-devel
 BuildRequires: libaio-devel
+BuildRequires: libuuid-devel
 %if %build_ctdb
 BuildRequires: ctdb-devel > 1.0.77
 %endif
