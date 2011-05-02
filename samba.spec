@@ -333,6 +333,7 @@ Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Patch30: samba-3.5-check-undefined-before-zdefs.patch
 Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
+Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -1119,6 +1120,7 @@ popd
 %patch22 -p1
 %patch30 -p1 -b .checkflags
 %patch31 -p1 -b .nss_wins_log
+%patch33 -p1 -b .netapilinking
 
 # patches from cvs/samba team
 pushd source3
@@ -1203,6 +1205,16 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-logfilebase=/var/log/%{name} \
                 --with-pammodulesdir=%{_lib}/security/ \
                 --with-rootsbindir=/bin \
+%if %build_talloc
+		--with-libtalloc=yes \
+%else
+		--enable-external-libtalloc=yes \
+%endif
+%if %build_tdb
+		--with-libtdb = yes \
+%else
+		--enable-external-libtdb=yes \
+%endif		
 %if %build_ctdb
 		--with-ctdb \
 		--with-cluster-support \
@@ -1228,6 +1240,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-cifsumount \
 		--with-cifsupcall \
 		--enable-avahi \
+		--with-dnsupdate \
 		--program-suffix=%{samba_major} 
 #		--with-expsam=%build_expsam \
 #		--with-shared-modules=pdb_ldap,idmap_ldap \
