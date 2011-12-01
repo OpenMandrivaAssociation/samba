@@ -1297,19 +1297,19 @@ make -C %{vfsdir}/%{vscandir} symantec
 %endif
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT
+rm -rf %{buildroot}
+mkdir -p %{buildroot}
 
 #Ensure all docs are readable
 chmod a+r docs -R
 
 # Any entries here mean samba makefile is *really* broken:
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}
+mkdir -p %{buildroot}/%{_datadir}
+mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 
 (cd source3
-make DESTDIR=$RPM_BUILD_ROOT install installclientlib installmodules)
+make DESTDIR=%{buildroot} install installclientlib installmodules)
 
 # we ship docs in the docs supackage, and lik it into swat, delete the extra copy:
 rm -Rf %{buildroot}/%{_datadir}/swat/using_samba
@@ -1318,27 +1318,27 @@ rm -Rf %{buildroot}/%{_datadir}/swat/using_samba
 
 
 #need to stay
-mkdir -p $RPM_BUILD_ROOT/{sbin,bin}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/{logrotate.d,pam.d,xinetd.d}
-mkdir -p $RPM_BUILD_ROOT/%{_initrddir}
-mkdir -p $RPM_BUILD_ROOT/var/cache/%{name}
-mkdir -p $RPM_BUILD_ROOT/var/log/%{name}
-mkdir -p $RPM_BUILD_ROOT/var/run/%{name}
-mkdir -p $RPM_BUILD_ROOT/var/spool/%{name}
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/{netlogon,profiles,printers}
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/%{name}/codepages/src
-mkdir -p $RPM_BUILD_ROOT/%{_lib}/security
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/pkgconfig
-mkdir -p $RPM_BUILD_ROOT%{_sbindir}
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/vfs
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts
+mkdir -p %{buildroot}/{sbin,bin}
+mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d,xinetd.d}
+mkdir -p %{buildroot}/%{_initrddir}
+mkdir -p %{buildroot}/var/cache/%{name}
+mkdir -p %{buildroot}/var/log/%{name}
+mkdir -p %{buildroot}/var/run/%{name}
+mkdir -p %{buildroot}/var/spool/%{name}
+mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/{netlogon,profiles,printers}
+mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
+mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/codepages/src
+mkdir -p %{buildroot}/%{_lib}/security
+mkdir -p %{buildroot}%{_libdir}/pkgconfig
+mkdir -p %{buildroot}%{_sbindir}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
+mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
 
-install -m755 source3/bin/lib*.a $RPM_BUILD_ROOT%{_libdir}/
+install -m755 source3/bin/lib*.a %{buildroot}%{_libdir}/
 
 # smbsh forgotten
-#install -m 755 source/bin/smbsh $RPM_BUILD_ROOT%{_bindir}/
+#install -m 755 source/bin/smbsh %{buildroot}%{_bindir}/
 
 %if %build_vscan
 %makeinstall_std -C %{vfsdir}/%{vscandir}
@@ -1348,64 +1348,64 @@ install -m 644 %{vfsdir}/%{vscandir}/*/vscan-*.conf %{buildroot}/%{_sysconfdir}/
 #libnss_* still not handled by make:
 # Install the nsswitch library extension file
 for i in wins winbind; do
-  install -m755 nsswitch/libnss_${i}.so $RPM_BUILD_ROOT/%{_lib}/libnss_${i}.so
+  install -m755 nsswitch/libnss_${i}.so %{buildroot}/%{_lib}/libnss_${i}.so
 done
 # Make link for wins and winbind resolvers
-( cd $RPM_BUILD_ROOT/%{_lib}; ln -s libnss_wins.so libnss_wins.so.2; ln -s libnss_winbind.so libnss_winbind.so.2)
+( cd %{buildroot}/%{_lib}; ln -s libnss_wins.so libnss_wins.so.2; ln -s libnss_winbind.so libnss_winbind.so.2)
 install -d %{buildroot}/%{_libdir}/krb5/plugins
 install -m755 source3/bin/winbind_krb5_locator.so %{buildroot}/%{_libdir}/krb5/plugins
 
-install -m 755 source3/lib/netapi/examples/bin/netdomjoin-gui $RPM_BUILD_ROOT/%{_sbindir}/netdomjoin-gui
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps/%{name}
-install -m 644 source3/lib/netapi/examples/netdomjoin-gui/samba.ico $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/samba.ico
-install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo.png
-install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo-small.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo-small.png
+install -m 755 source3/lib/netapi/examples/bin/netdomjoin-gui %{buildroot}/%{_sbindir}/netdomjoin-gui
+mkdir -p %{buildroot}%{_datadir}/pixmaps/%{name}
+install -m 644 source3/lib/netapi/examples/netdomjoin-gui/samba.ico %{buildroot}/%{_datadir}/pixmaps/%{name}/samba.ico
+install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo.png %{buildroot}/%{_datadir}/pixmaps/%{name}/logo.png
+install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo-small.png %{buildroot}/%{_datadir}/pixmaps/%{name}/logo-small.png
 
 %if %{build_test}
 for i in {%{testbin}};do
-  #install -m755 source/bin/${i} $RPM_BUILD_ROOT/%{_bindir}/${i}%{samba_major}
+  #install -m755 source/bin/${i} %{buildroot}/%{_bindir}/${i}%{samba_major}
 done
 %endif
 
 # Install other stuff
 
-#        install -m644 examples/VFS/recycle/recycle.conf $RPM_BUILD_ROOT%{_sysconfdir}/samba/
-        install -m644 %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/smbusers
-        install -m755 %{SOURCE21} $RPM_BUILD_ROOT/%{_bindir}
-        #install -m755 %{SOURCE22} $RPM_BUILD_ROOT/usr/bin
-        install -m755 %{SOURCE23} $RPM_BUILD_ROOT/%{_bindir}
-        install -m755 %{SOURCE24} $RPM_BUILD_ROOT/%{_initrddir}/smb%{samba_major}
-        install -m755 %{SOURCE24} $RPM_BUILD_ROOT/%{_sbindir}/%{name}
-	install -m755 %{SOURCE25} $RPM_BUILD_ROOT/%{_initrddir}/winbind
-	install -m755 %{SOURCE25} $RPM_BUILD_ROOT/%{_sbindir}/winbind
-#	install -m755 %{SOURCE26} $RPM_BUILD_ROOT/%{_initrddir}/wrepld%{samba_major}
+#        install -m644 examples/VFS/recycle/recycle.conf %{buildroot}%{_sysconfdir}/samba/
+        install -m644 %{SOURCE20} %{buildroot}%{_sysconfdir}/%{name}/smbusers
+        install -m755 %{SOURCE21} %{buildroot}/%{_bindir}
+        #install -m755 %{SOURCE22} %{buildroot}/usr/bin
+        install -m755 %{SOURCE23} %{buildroot}/%{_bindir}
+        install -m755 %{SOURCE24} %{buildroot}/%{_initrddir}/smb%{samba_major}
+        install -m755 %{SOURCE24} %{buildroot}/%{_sbindir}/%{name}
+	install -m755 %{SOURCE25} %{buildroot}/%{_initrddir}/winbind
+	install -m755 %{SOURCE25} %{buildroot}/%{_sbindir}/winbind
+#	install -m755 %{SOURCE26} %{buildroot}/%{_initrddir}/wrepld%{samba_major}
 %if %mdkversion < 200700
-        install -m644 %{SOURCE27} $RPM_BUILD_ROOT/%{_sysconfdir}/pam.d/%{name}
+        install -m644 %{SOURCE27} %{buildroot}/%{_sysconfdir}/pam.d/%{name}
 %else
-        install -m644 %{SOURCE28} $RPM_BUILD_ROOT/%{_sysconfdir}/pam.d/%{name}
+        install -m644 %{SOURCE28} %{buildroot}/%{_sysconfdir}/pam.d/%{name}
 %endif
-	install -m644 %{SOURCE29} $RPM_BUILD_ROOT/%{_sysconfdir}/pam.d/system-auth-winbind
+	install -m644 %{SOURCE29} %{buildroot}/%{_sysconfdir}/pam.d/system-auth-winbind
 #
-        install -m644 %{SOURCE1} $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d/%{name}
-#	install -m644 packaging/Mandrake/samba-slapd-include.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/samba-slapd.include
+        install -m644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
+#	install -m644 packaging/Mandrake/samba-slapd-include.conf %{buildroot}%{_sysconfdir}/%{name}/samba-slapd.include
 
 # install pam_winbind.conf sample file
 mkdir -p %{buildroot}%{_sysconfdir}/security
 install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}/security/pam_winbind.conf
 
-install -m755 examples/LDAP/convertSambaAccount $RPM_BUILD_ROOT/%{_datadir}/%{name}/scripts/
+install -m755 examples/LDAP/convertSambaAccount %{buildroot}/%{_datadir}/%{name}/scripts/
 
 # make a conf file for winbind from the default one:
 	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandrake/smb-winbind.conf
-        install -m644 packaging/Mandrake/smb-winbind.conf $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb-winbind.conf
+        install -m644 packaging/Mandrake/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
-install -m644 %{SOURCE30} $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
+install -m644 %{SOURCE30} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 cat %{SOURCE30} | \
-sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >$RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
+sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >%{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 %if %build_cupspc
-perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf
-perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb-winbind.conf
+perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 %endif
 
 #%if !%build_system
@@ -1424,17 +1424,17 @@ mv %{buildroot}/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
 ln -s ../bin/${i}%{alternative_major} %{buildroot}/sbin/${i}%{alternative_major}
 done
 
-        echo 127.0.0.1 localhost > $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/lmhosts
+        echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
 
 # Link smbspool to CUPS (does not require installed CUPS)
 
-        mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/cups/backend
-        ln -s %{_bindir}/smbspool%{alternative_major} $RPM_BUILD_ROOT/%{_prefix}/lib/cups/backend/smb%{alternative_major}
+        mkdir -p %{buildroot}/%{_prefix}/lib/cups/backend
+        ln -s %{_bindir}/smbspool%{alternative_major} %{buildroot}/%{_prefix}/lib/cups/backend/smb%{alternative_major}
 
 # xinetd support
 
-        mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/xinetd.d
-        install -m644 %{SOURCE3} $RPM_BUILD_ROOT/%{_sysconfdir}/xinetd.d/swat%{samba_major}
+        mkdir -p %{buildroot}/%{_sysconfdir}/xinetd.d
+        install -m644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/xinetd.d/swat%{samba_major}
 
 # menu support
 
@@ -1451,18 +1451,18 @@ StartupNotify=true
 Categories=X-MandrivaLinux-System-Configuration-Networking;
 EOF
 
-mkdir -p $RPM_BUILD_ROOT%{_liconsdir} $RPM_BUILD_ROOT%{_iconsdir} $RPM_BUILD_ROOT%{_miconsdir}
+mkdir -p %{buildroot}%{_liconsdir} %{buildroot}%{_iconsdir} %{buildroot}%{_miconsdir}
 
 # install html man pages for swat
 install -d %{buildroot}/%{_datadir}/swat%{samba_major}/help/manpages
 #install -m644 docs/htmldocs/manpages-3/* %{buildroot}/%{_datadir}/swat%{samba_major}/help/manpages
 
-bzcat %{SOURCE4} > $RPM_BUILD_ROOT%{_liconsdir}/swat%{samba_major}.png
-bzcat %{SOURCE5} > $RPM_BUILD_ROOT%{_iconsdir}/swat%{samba_major}.png
-bzcat %{SOURCE6} > $RPM_BUILD_ROOT%{_miconsdir}/swat%{samba_major}.png
+bzcat %{SOURCE4} > %{buildroot}%{_liconsdir}/swat%{samba_major}.png
+bzcat %{SOURCE5} > %{buildroot}%{_iconsdir}/swat%{samba_major}.png
+bzcat %{SOURCE6} > %{buildroot}%{_miconsdir}/swat%{samba_major}.png
 
-bzcat %{SOURCE10}> $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts/print-pdf
-bzcat %{SOURCE11}> $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts/smb-migrate
+bzcat %{SOURCE10}> %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
+bzcat %{SOURCE11}> %{buildroot}%{_datadir}/%{name}/scripts/smb-migrate
 
 # Fix configs when not building system samba:
 
@@ -1506,13 +1506,13 @@ do
 done		
 # Replace paths in config files and init scripts:
 for i in smb ;do
-	perl -pi -e 's,/subsys/'$i',/subsys/'$i'%{samba_major},g' $RPM_BUILD_ROOT/%{_initrddir}/${i}%{samba_major}
+	perl -pi -e 's,/subsys/'$i',/subsys/'$i'%{samba_major},g' %{buildroot}/%{_initrddir}/${i}%{samba_major}
 done
 for i in %{_sysconfdir}/%{name}/smb.conf %{_initrddir}/smb%{samba_major} %{_sbindir}/%{name} %{_initrddir}/winbind /%{_sysconfdir}/logrotate.d/%{name} /%{_sysconfdir}/xinetd.d/swat%{samba_major} %{_initrddir}/wrepld%{samba_major}; do
-	perl -pi -e 's,/%{pkg_name},/%{name},g; s,smbd,%{_sbindir}/smbd%{samba_major},g; s,nmbd,%{_sbindir}/nmbd%{samba_major},g; s,/usr/sbin/swat,%{_sbindir}/swat%{samba_major},g;s,wrepld,%{_sbindir}/wrepld%{samba_major},g' $RPM_BUILD_ROOT/$i;
+	perl -pi -e 's,/%{pkg_name},/%{name},g; s,smbd,%{_sbindir}/smbd%{samba_major},g; s,nmbd,%{_sbindir}/nmbd%{samba_major},g; s,/usr/sbin/swat,%{_sbindir}/swat%{samba_major},g;s,wrepld,%{_sbindir}/wrepld%{samba_major},g' %{buildroot}/$i;
 done
 # Fix xinetd file for swat:
-perl -pi -e 's,/usr/sbin,%{_sbindir},g' $RPM_BUILD_ROOT/%{_sysconfdir}/xinetd.d/swat%{samba_major}
+perl -pi -e 's,/usr/sbin,%{_sbindir},g' %{buildroot}/%{_sysconfdir}/xinetd.d/swat%{samba_major}
 %endif
 
 #Clean up unpackaged files:
@@ -1524,10 +1524,10 @@ rm -f %{buildroot}/%{_mandir}/man1/testprns*
 
 # (sb) make a smb.conf.clean we can use for the merge, since an existing
 # smb.conf won't get overwritten
-cp $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smb.conf $RPM_BUILD_ROOT/%{_datadir}/%{name}/smb.conf.clean
+cp %{buildroot}/%{_sysconfdir}/%{name}/smb.conf %{buildroot}/%{_datadir}/%{name}/smb.conf.clean
 
 # (sb) leave a README.mdk.conf to explain what has been done
-cat << EOF > $RPM_BUILD_ROOT/%{_datadir}/%{name}/README.mdk.conf
+cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.mdk.conf
 In order to facilitate upgrading an existing samba install, and merging
 previous configuration data with any new syntax used by samba3, a merge
 script has attempted to combine your local configuration data with the
@@ -1562,12 +1562,12 @@ tdb \
 	pushd lib/$i
 	./autogen.sh -V && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 	popd
-	install -m 644 lib/$i/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+	install -m 644 lib/$i/$i.pc %{buildroot}%{_libdir}/pkgconfig/
 done
 
 # 2. Install them
 for i in smbclient smbsharemodes netapi wbclient; do
-	install -m 644 source3/pkgconfig/$i.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/
+	install -m 644 source3/pkgconfig/$i.pc %{buildroot}%{_libdir}/pkgconfig/
 done
 
 %if !%build_ldb
@@ -1674,7 +1674,7 @@ rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
 rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %post server
 
