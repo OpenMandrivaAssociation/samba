@@ -369,9 +369,9 @@ BuildRequires: libacl-devel
 BuildRequires: cups-devel
 %else
 %ifarch x86_64
-BuildRequires: libcups-devel >= 1.2.0-0.5361.0mdk cups-common
+BuildRequires: cups-devel cups-common
 %else
-BuildRequires: libcups-devel cups-common
+BuildRequires: cups-devel cups-common
 %endif
 %endif
 BuildRequires: libldap-devel
