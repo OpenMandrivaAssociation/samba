@@ -1,3 +1,6 @@
+%define _build_pkgcheck_set %{nil}
+%define _build_pkgcheck_srpm %{nil}
+
 %define pkg_name	samba
 %define version		3.5.14
 %define rel		1
@@ -342,7 +345,7 @@ Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 %if %have_pversion && %have_pre
 %endif
 Requires: pam >= 0.64, samba-common = %{version}
-BuildRequires: pam-devel readline-devel libncurses-devel popt-devel
+BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
 BuildRequires: libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
 # http://lists.samba.org/archive/samba/2009-March/146821.html
@@ -363,7 +366,7 @@ BuildRequires: mysql-devel
 %endif
 %endif
 %if %build_acl
-BuildRequires: libacl-devel
+BuildRequires: acl-devel
 %endif
 %if %build_mdk72
 BuildRequires: cups-devel
