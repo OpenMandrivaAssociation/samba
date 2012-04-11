@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.5.12
+%define version		3.5.14
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
