@@ -2,7 +2,7 @@
 %define _build_pkgcheck_srpm %{nil}
 
 %define pkg_name	samba
-%define version		3.6.4
+%define version		3.6.5
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
