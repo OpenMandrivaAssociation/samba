@@ -2,7 +2,7 @@
 %define _build_pkgcheck_srpm %{nil}
 
 %define pkg_name	samba
-%define version		3.5.15
+%define version		3.6.4
 %define rel		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -12,6 +12,16 @@
 %define	tallocmajor	1
 %define tdbmajor	1
 %define	wbclientmajor	0
+ 
+%define check_sig() export GNUPGHOME=%{_tmppath}/rpm-gpghome \
+if [ -d "$GNUPGHOME" ] \
+then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1 \
+fi \
+install -d -m700 $GNUPGHOME \
+gpg --import %{1} \
+gpg --trust-model always --verify %{2} %{?3} \
+rm -Rf $GNUPGHOME \
+
 
 # Samba has started using -Wl,z,nodefs upstream, without libtool (after patch
 # submission to them, handled in samba bug 6792. To allow
@@ -20,19 +30,10 @@
 # or, instead, filter them out of the right line in the Makefile, like before
 # see LDSHFLAGS_MODULES below
 
-# CS3 is based on mdk10.0 and whoever told maintainers %mdkversion would be
-# monotonic lied
-%if %mdkversion == 300
-%define mdkversion 1000
-%define distversion C30
-%endif
-
-%{?!mdkversion: %define mdkversion %(perl -pe '/(\d+)\.(\d)\.?(\d)?/; $_="$1$2".($3||0)' /etc/mandrake-release)}
-%{!?mkrel:%define mkrel(c:) %{-c:0.%{-c*}.}%{!?_with_unstable:%(perl -e '$_="%{1}";m/(.\*\\D\+)?(\\d+)$/;$rel=${2}-1;re;print "$1$rel";').%{?subrel:%subrel}%{!?subrel:1}.%{?distversion:%distversion}%{?!distversion:%(echo $[%{mdkversion}/10])}}%{?_with_unstable:%{1}}%{?distsuffix:%distsuffix}%{?!distsuffix:mdk}}
-%{?!mkver:%define mkver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
-
 %{!?lib: %global lib lib}
 %{!?mklibname: %global mklibname(ds) %lib%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}}
+
+%{?!mkver:%global mkver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
 
 %define libname %mklibname smbclient %libsmbmajor
 %define libnetapi %mklibname netapi %netapimajor
@@ -78,20 +79,13 @@
 %{?_with_vscan: %define build_vscan 1}
 %endif
 
-# We now do detection of the Mandrake release we are building on:
-%define build_mdk82 %(if [ `awk '{print $4}' /etc/mandrake-release` = 8.2 ];then echo 1; else echo 0; fi)
-%define build_mdk81 %(if [ `awk '{print $4}' /etc/mandrake-release` = 8.1 ];then echo 1; else echo 0; fi)
-%define build_mdk80 %(if [ `awk '{print $4}' /etc/mandrake-release` = 8.0 ];then echo 1; else echo 0; fi)
-%define build_mdk72 %(if [ `awk '{print $4}' /etc/mandrake-release` = 7.2 ];then echo 1; else echo 0; fi)
-%define build_non_default 0
-
 # Default options
-%define build_talloc 1
-%define build_tdb 1
-%define build_ldb 1
+%define build_talloc 0
+%define build_tdb 0
+%define build_ldb 0
 %define build_ctdb 1
-%define build_alternatives	0
-%define build_system	0
+%define build_alternatives	1
+%define build_system	1
 %define build_acl 	1
 %define build_winbind 	1
 %define build_wins 	1
@@ -100,57 +94,11 @@
 %define build_scanners	0
 %define build_test	0
 # CUPS supports functionality for 'printcap name = cups' (9.0 and later):
-%define build_cupspc	0
+%define build_cupspc	1
 # %_{pre,postun}_service are provided by rpm-helper in 9.0 and later
 %define have_rpmhelper	1
 %define build_mysql	0
 %define build_pgsql 	0
-
-# Set defaults for each version
-%if %mdkversion >= 200910
-%define build_talloc 0
-%define build_tdb 0
-%define build_ldb 0
-%endif
-
-%if %mdkversion >= 1000
-%define build_system	1
-%endif
-
-%if %mdkversion >= 920
-%define build_alternatives	1
-%endif
-
-%if %mdkversion >= 910
-%define build_cupspc	1
-%endif
-
-%if %build_mdk82
-%define have_rpmhelper	0
-%endif
-
-%if %build_mdk81
-%define build_winbind	0
-%define build_wins	0
-%define have_rpmhelper	0
-%endif
-
-%if %build_mdk80
-%define build_acl	0
-%define build_winbind	0
-%define build_wins	0
-%define build_ads	0
-%define have_rpmhelper	1
-%endif
-
-%if %build_mdk72
-%define build_acl	0
-%define build_winbind	0
-%define build_wins	0
-%define build_ads	0
-%define have_rpmhelper	1
-%endif
-
 
 # Allow commandline option overrides (borrowed from Vince's qmail srpm):
 # To use it, do rpm [-ba|--rebuild] --with 'xxx'
@@ -248,7 +196,7 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin net,ntlm_auth,rpcclient,smbcacls,smbcquotas,smbpasswd,smbtree,testparm
 
-%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,sharesec
+%global serverbin 	pdbedit,profiles,smbcontrol,smbstatus,sharesec,smbta-util
 %if %build_ldb
 %global serverldbbin 	ldbadd,ldbdel,ldbedit,ldbmodify,ldbsearch,ldbrename
 %endif
@@ -256,11 +204,6 @@
 
 %global clientbin 	findsmb,nmblookup,smbclient,smbprint,smbspool,smbtar,smbget
 %global client_sbin 	mount.smb,mount.smbfs
-%if %mdkversion >= 200800
-%global cifs_bin	mount.cifs,umount.cifs,cifs.upcall
-%else
-%global cifs_bin	mount.cifs,umount.cifs
-%endif
 %global client_man	man1/findsmb.1,man1/nmblookup.1,man1/smbclient.1,man1/smbget.1,man1/smbtar.1,man5/smbgetrc.5,man8/smbspool.8
 
 %global testbin 	debug2html,smbtorture,msgtest,masktest,locktest,locktest2,nsstest,vfstest
@@ -270,9 +213,6 @@
 %else
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
 %endif
-
-#Workaround missing macros in 8.x:
-%{!?perl_vendorlib: %{expand: %%global perl_vendorlib %{perl_sitearch}/../}}
 
 # Determine whether this is the system samba or not.
 %if %build_system
@@ -290,7 +230,7 @@
 Summary: Samba SMB server
 Name: %{pkg_name}%{samba_major}
 
-Version: %{real_version}
+Version: %{source_ver}
 Release: %{release}
 
 License: GPLv3
@@ -301,18 +241,18 @@ Source98: http://www.samba.org/samba/ftp/samba-pubkey.asc
 URL:	http://www.samba.org
 Source1: samba.log
 Source3: samba.xinetd
-Source4: swat_48.png.bz2
-Source5: swat_32.png.bz2
-Source6: swat_16.png.bz2
-Source7: README.%{name}-mandrake-rpm
+Source4: swat_48.png
+Source5: swat_32.png
+Source6: swat_16.png
+Source7: README.%{name}-mandriva-rpm
 Source8: samba-vscan-%{vscanver}.tar.gz
 %if %build_vscan
 %endif
-%if %build_vscan && %mdkversion >= 920
+%if %build_vscan
 BuildRequires: file-devel
 %endif
-Source10: samba-print-pdf.sh.bz2
-Source11: smb-migrate.bz2
+Source10: samba-print-pdf.sh
+Source11: smb-migrate
 
 #Sources that used to be in packaging patch:
 Source20:	smbusers
@@ -333,7 +273,6 @@ Source30:	smb.conf
 Patch11: samba-3.0-mandriva-packaging.patch
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
-Patch22: samba-3.0.30-fix-recursive-ac-macro.patch
 Patch30: samba-3.5-check-undefined-before-zdefs.patch
 Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
 Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
@@ -355,7 +294,7 @@ BuildRequires: avahi-client-devel
 BuildRequires: libaio-devel
 BuildRequires: libuuid-devel
 %if %build_ctdb
-BuildRequires: ctdb-devel > 1.0.77
+BuildRequires: ctdb-devel >= 1.0.114.4
 %endif
 %if %build_pgsql
 BuildRequires: postgresql-devel
@@ -368,22 +307,12 @@ BuildRequires: mysql-devel
 %if %build_acl
 BuildRequires: acl-devel
 %endif
-%if %build_mdk72
-BuildRequires: cups-devel
-%else
-%ifarch x86_64
 BuildRequires: cups-devel cups-common
-%else
-BuildRequires: cups-devel cups-common
-%endif
-%endif
 BuildRequires: libldap-devel
 %if %build_ads
 BuildRequires: libldap-devel krb5-devel
 %endif
-%if %mdkversion >= 200800
 BuildRequires: keyutils-devel
-%endif
 %if !%build_tdb
 BuildRequires: tdb-devel
 %endif
@@ -429,7 +358,7 @@ docs directory for implementation details.
 %endif
 %if %build_non_default
 WARNING: This RPM was built with command-line options. Please
-see README.%{name}-mandrake-rpm in the documentation for
+see README.%{name}-mandriva-rpm in the documentation for
 more information.
 %endif
 
@@ -437,6 +366,7 @@ more information.
 URL:	http://www.samba.org
 Summary: Samba (SMB) server programs
 Requires: %{name}-common = %{version}
+Requires: %libwbclient >= %{version}
 %if %have_rpmhelper
 Requires(pre):		rpm-helper
 %endif
@@ -483,7 +413,7 @@ URL:	http://www.samba.org
 Summary: Samba (SMB) client programs
 Group: Networking/Other
 Requires: %{name}-common = %{version}
-Requires: mount-cifs >= %{version}
+Requires: cifs-utils >= 4.4
 %if %build_alternatives
 #Conflicts:	samba-client < 2.2.8a-9mdk
 %endif
@@ -496,9 +426,6 @@ Obsoletes: smbfs
 %endif
 %if !%build_system && %build_alternatives
 Provides: samba-client
-%endif
-%ifarch x86_64
-Conflicts:	cups < 1.2.0-0.5361.0mdk
 %endif
 
 %description client
@@ -991,17 +918,6 @@ A vfs-module for samba to implement on-access scanning using the
 Trend antivirus software (which must be installed to use this).
 %endif
 
-%package -n mount-cifs%{samba_major}
-URL:	http://www.samba.org
-Summary: CIFS filesystem mount helper
-Group: Networking/Other
-Conflicts:	%{name}-client <= 3.0.11-1mdk
-Requires:	keyutils > 1.2-%{mkrel 4}
-
-%description -n mount-cifs%{samba_major}
-This package provides the mount.cifs helper to mount cifs filesystems
-using the cifs filesystem driver
-
 %package domainjoin-gui
 Summary: Domainjoin GUI
 Requires: samba-common = %{version}
@@ -1083,32 +999,10 @@ echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 
 
 #Try and validate signatures on source:
-export GNUPGHOME=%{_tmppath}/samba-gpghome
-if [ -d "$GNUPGHOME" ]
-then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1
-fi
-install -d -m700 $GNUPGHOME
-gpg --import %{SOURCE98}
-VERIFYSOURCE=`basename %{SOURCE0}`
-VERIFYSOURCE=%{_tmppath}/${VERIFYSOURCE%%.gz}
+VERIFYSOURCE=%{SOURCE0}
+VERIFYSOURCE=${VERIFYSOURCE%%.gz}
 gzip -dc %{SOURCE0} > $VERIFYSOURCE
-pushd %{_tmppath}
-cp %{SOURCE99} .
-gpg --trust-model always --verify `basename %{SOURCE99}`
-VERIFIED=$?
-rm -f `basename %{SOURCE99}`
-popd
-rm -Rf $GNUPGHOME
-
-rm -f $VERIFYSOURCE
-if [ "$VERIFIED" -eq 0 ]
-then
-	echo "Verification of %{SOURCE0} against %{SOURCE99} with key %{SOURCE98} succeeded"
-else
-	echo "Source verification failed!" >&2
-	exit 1
-fi
-
+%check_sig %{SOURCE98} %{SOURCE99} $VERIFYSOURCE
 
 %if %build_vscan
 %setup -q -a 8 -n %{pkg_name}-%{source_ver}
@@ -1121,10 +1015,9 @@ echo "Applying patches for current version: %{ver}"
 %patch11 -p1 -b .mdk
 pushd source3
 popd
-%patch22 -p1
 %patch30 -p1 -b .checkflags
-%patch31 -p1 -b .nss_wins_log
-%patch33 -p1 -b .netapilinking
+#patch31 -p1 -b .nss_wins_log
+%patch33 -p1 -b .netapi_link
 
 # patches from cvs/samba team
 pushd source3
@@ -1137,12 +1030,6 @@ echo "Applying patches for new versions: %{pversion}"
 # Limbo patches
 %if %have_pversion && %have_pre
 echo "Appling patches which should only be applied to prereleases"
-%endif
-
-# Fix quota compilation in glibc>2.3
-%if %mdkversion >= 910 && %mdkversion < 1000
-#grep "<linux/quota.h>" source/smbd/quotas.c >/dev/null && \
-perl -pi -e 's@<linux/quota.h>@<sys/quota.h>@' source3/smbd/quotas.c
 %endif
 
 cp %{SOURCE7} .
@@ -1220,7 +1107,6 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--enable-external-libtdb=yes \
 %endif		
 %if %build_ctdb
-		--with-ctdb \
 		--with-cluster-support \
 %endif
 %if !%build_ads
@@ -1240,9 +1126,6 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-acl-support      \
 %endif
 		--with-shared-modules=idmap_rid,idmap_ad \
-		--with-cifsmount \
-		--with-cifsumount \
-		--with-cifsupcall \
 		--enable-avahi \
 		--with-dnsupdate \
 		--program-suffix=%{samba_major} 
@@ -1259,11 +1142,6 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 grep ^LDSHFLAGS_MODULES Makefile
 perl -pi -e 'if ( m/^LDSHFLAGS_MODULES/ ) { $_ =~ s/-Wl,--no-undefined//g;};' Makefile
 grep ^LDSHFLAGS_MODULES Makefile
-
-#Fix the make file so we don't create debug information on 9.2
-%if %mdkversion == 920
-perl -pi -e 's/-g //g' Makefile
-%endif
 
 #Should be a patch instead?
 %if !%build_talloc
@@ -1382,15 +1260,10 @@ done
 	install -m755 %{SOURCE25} %{buildroot}/%{_initrddir}/winbind
 	install -m755 %{SOURCE25} %{buildroot}/%{_sbindir}/winbind
 #	install -m755 %{SOURCE26} %{buildroot}/%{_initrddir}/wrepld%{samba_major}
-%if %mdkversion < 200700
-        install -m644 %{SOURCE27} %{buildroot}/%{_sysconfdir}/pam.d/%{name}
-%else
         install -m644 %{SOURCE28} %{buildroot}/%{_sysconfdir}/pam.d/%{name}
-%endif
 	install -m644 %{SOURCE29} %{buildroot}/%{_sysconfdir}/pam.d/system-auth-winbind
 #
         install -m644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
-#	install -m644 packaging/Mandrake/samba-slapd-include.conf %{buildroot}%{_sysconfdir}/%{name}/samba-slapd.include
 
 # install pam_winbind.conf sample file
 mkdir -p %{buildroot}%{_sysconfdir}/security
@@ -1399,8 +1272,8 @@ install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}
 install -m755 examples/LDAP/convertSambaAccount %{buildroot}/%{_datadir}/%{name}/scripts/
 
 # make a conf file for winbind from the default one:
-	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandrake/smb-winbind.conf
-        install -m644 packaging/Mandrake/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
+	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandriva/smb-winbind.conf
+        install -m644 packaging/Mandriva/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
 install -m644 %{SOURCE30} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
@@ -1416,16 +1289,6 @@ perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sy
 #perl -pi -e 's,%{_datadir}/samba,%{_datadir}/%{name},g' %{buildroot}/%{_sysconfdir}/%{name}/smb*.conf
 #%endif
 
-
-# cifs.upcall moved for no reason
-rm -f %{buildroot}/%{_sbindir}/cifs.upcall.old
-mv %{buildroot}/%{_sbindir}/cifs.upcall %{buildroot}/bin
-#install mount.cifs
-for i in {%{cifs_bin}};do
-#install -m755 source3/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
-mv %{buildroot}/bin/${i} %{buildroot}/bin/${i}%{alternative_major}
-ln -s ../bin/${i}%{alternative_major} %{buildroot}/sbin/${i}%{alternative_major}
-done
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
 
@@ -1460,24 +1323,24 @@ mkdir -p %{buildroot}%{_liconsdir} %{buildroot}%{_iconsdir} %{buildroot}%{_micon
 install -d %{buildroot}/%{_datadir}/swat%{samba_major}/help/manpages
 #install -m644 docs/htmldocs/manpages-3/* %{buildroot}/%{_datadir}/swat%{samba_major}/help/manpages
 
-bzcat %{SOURCE4} > %{buildroot}%{_liconsdir}/swat%{samba_major}.png
-bzcat %{SOURCE5} > %{buildroot}%{_iconsdir}/swat%{samba_major}.png
-bzcat %{SOURCE6} > %{buildroot}%{_miconsdir}/swat%{samba_major}.png
+install %{SOURCE4} %{buildroot}%{_liconsdir}/swat%{samba_major}.png
+install %{SOURCE5} %{buildroot}%{_iconsdir}/swat%{samba_major}.png
+install %{SOURCE6} %{buildroot}%{_miconsdir}/swat%{samba_major}.png
 
-bzcat %{SOURCE10}> %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
-bzcat %{SOURCE11}> %{buildroot}%{_datadir}/%{name}/scripts/smb-migrate
+install %{SOURCE10} %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
+install %{SOURCE11} %{buildroot}%{_datadir}/%{name}/scripts/smb-migrate
 
 # Fix configs when not building system samba:
 
 #Client binaries will have suffixes while we use alternatives, even
 # if we are system samba
 %if !%build_system || %build_alternatives
-for OLD in %{buildroot}/%{_bindir}/{%{clientbin},eventlogadm} %{buildroot}/bin/{%{cifs_bin}} %{buildroot}/%{_prefix}/lib/cups/backend/smb
+for OLD in %{buildroot}/%{_bindir}/{%{clientbin},eventlogadm} %{buildroot}/%{_prefix}/lib/cups/backend/smb
 do
     NEW=`echo ${OLD}%{alternative_major}`
     [ -e $OLD ] && mv -f $OLD $NEW
 done
-for OLD in %{buildroot}/%{_mandir}/man?/{%{clientbin},eventlogadm}* %{buildroot}/%{_mandir}/man?/{%{cifs_bin}}*
+for OLD in %{buildroot}/%{_mandir}/man?/{%{clientbin},eventlogadm}* 
 do
     if [ -e $OLD ]
     then
@@ -1575,7 +1438,22 @@ done
 
 %if !%build_ldb
 rm -f %{buildroot}/%{_bindir}/ldb*
+rm -fr %{buildroot}%{_mandir}/man1/ldbadd.1
+rm -fr %{buildroot}%{_mandir}/man1/ldbdel.1
+rm -fr %{buildroot}%{_mandir}/man1/ldbedit.1
+rm -fr %{buildroot}%{_mandir}/man1/ldbmodify.1
+rm -fr %{buildroot}%{_mandir}/man1/ldbrename.1
+rm -fr %{buildroot}%{_mandir}/man1/ldbsearch.1
 %endif
+
+%if %{build_test}
+rm -fr %{buildroot}%{_mandir}/man1/log2pcap*.1*
+%else
+rm -fr %{buildroot}%{_mandir}/man1/vfstest%{samba_major}*.1*
+rm -fr %{buildroot}%{_mandir}/man1/log2pcap*.1*
+%endif
+
+rm -fr %{buildroot}%{_mandir}/man8/tdb*.8*
 
 %if %build_winbind
 %find_lang pam_winbind
@@ -1724,6 +1602,7 @@ fi
 # And not loose our machine account SID
 [ -f %{_sysconfdir}/MACHINE.SID ] && mv -f %{_sysconfdir}/MACHINE.SID %{_sysconfdir}/%{name}/ ||:
 
+# FIXME: Can be removed in mandriva ?
 %triggerpostun common -- samba-common < 3.0.1-3mdk
 # (sb) merge any existing smb.conf with new syntax file
 if [ $1 = 2 ]; then
@@ -1811,9 +1690,6 @@ fi
 if [ -f /var/lock/subsys/xinetd ]; then
         service xinetd reload >/dev/null 2>&1 || :
 fi
-%if %mdkversion < 200900
-%update_menus
-%endif
 
 %postun swat
 
@@ -1825,25 +1701,12 @@ fi
 
 if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || true ; fi
 
-%if %mdkversion < 200900
-%clean_menus
-%endif
-
-%if %build_system
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
-%endif
-
 %if %build_alternatives
 %post client
 
 update-alternatives --install %{_bindir}/smbclient smbclient \
 %{_bindir}/smbclient%{alternative_major} 10 \
-$(for i in {/sbin/{%{client_sbin}},%{_bindir}/{%{clientbin},eventlogadm}};do
+$(for i in %{_bindir}/{%{clientbin},eventlogadm};do
 j=`basename $i`
 [ "$j" = "smbclient" ] || \
 echo -n " --slave ${i} ${j} ${i}%{alternative_major}";done) \
@@ -1860,28 +1723,6 @@ update-alternatives --auto smbclient
 %triggerpostun client -- samba-client, samba2-client
 [ ! -e %{_bindir}/smbclient ] && update-alternatives --auto smbclient || :
 %endif
-
-%if %build_alternatives
-%post -n mount-cifs%{samba_major}
-update-alternatives --install /bin/mount.cifs mount.cifs \
-/bin/mount.cifs%{alternative_major} 10 \
---slave /sbin/mount.cifs smount.cifs /sbin/mount.cifs%{alternative_major} \
---slave /bin/umount.cifs umount.cifs /bin/umount.cifs%{alternative_major} \
---slave /sbin/umount.cifs sumount.cifs /sbin/umount.cifs%{alternative_major} \
---slave /sbin/cifs.upcall cifs.upcall /sbin/cifs.upcall%{alternative_major} \
---slave %{_mandir}/man8/mount.cifs.8%{_extension} mount.cifs.8 %{_mandir}/man8/mount.cifs%{alternative_major}.8%{_extension} \
---slave %{_mandir}/man8/umount.cifs.8%{_extension} umount.cifs.8 %{_mandir}/man8/umount.cifs%{alternative_major}.8%{_extension} \
---slave %{_mandir}/man8/cifs.upcall.8%{_extension} cifs.upcall.8 %{_mandir}/man8/cifs.upcall%{alternative_major}.8%{_extension} \
-|| update-alternatives --auto mount.cifs
-
-%preun -n mount-cifs%{samba_major}
-[ $1 = 0 ] && update-alternatives --remove mount.cifs /bin/mount.cifs%{alternative_major} ||:
-
-%triggerpostun -n mount-cifs%{samba_major} -- %{name}-client < 3.0.11-1mdk
-update-alternatives --auto mount.cifs
-
-%endif
-
 
 %files server
 %defattr(-,root,root)
@@ -1920,7 +1761,7 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %doc README COPYING Manifest Read-Manifest-Now
 %doc WHATSNEW.txt Roadmap
-%doc README.%{name}-mandrake-rpm
+%doc README.%{name}-mandriva-rpm
 %doc clean-docs/samba-doc/docs/*
 %doc clean-docs/samba-doc/examples
 #%attr(-,root,root) %{_datadir}/swat%{samba_major}/using_samba/
@@ -2011,7 +1852,6 @@ update-alternatives --auto mount.cifs
 %{_mandir}/man5/pam_winbind.conf.5.*
 %{_mandir}/man7/winbind_krb5_locator.7.*
 %{_mandir}/man1/wbinfo*.1*
-
 %endif
 
 %if %build_wins
@@ -2101,7 +1941,6 @@ update-alternatives --auto mount.cifs
 %defattr(-,root,root)
 %{_libdir}/libwbclient.so
 %{_includedir}/wbclient.h
-%{_includedir}/wbc_async.h
 %{_libdir}/pkgconfig/wbclient.pc
 
 #%files passdb-ldap
@@ -2219,13 +2058,6 @@ update-alternatives --auto mount.cifs
 %doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
 
-%files -n mount-cifs%{samba_major}
-%defattr(-,root,root)
-%attr(4755,root,root) /*bin/*mount.cifs%{alternative_major}
-/*bin/cifs.upcall%{alternative_major}
-%{_mandir}/man8/*mount.cifs*.8*
-%{_mandir}/man8/cifs.upcall*.8*
-
 %files domainjoin-gui
 %defattr(-,root,root)
 %{_sbindir}/netdomjoin-gui
@@ -2233,9 +2065,3 @@ update-alternatives --auto mount.cifs
 %{_datadir}/pixmaps/samba/samba.ico
 %{_datadir}/pixmaps/samba/logo.png
 %{_datadir}/pixmaps/samba/logo-small.png
-
-#%exclude %{_mandir}/man1/smbsh*.1*
-#%exclude %{_mandir}/man1/editreg*
-
-# todo:
-# fix alternatives for mount.cifs
