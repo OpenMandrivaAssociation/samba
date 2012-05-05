@@ -12,7 +12,7 @@
 %define	tallocmajor	1
 %define tdbmajor	1
 %define	wbclientmajor	0
- 
+
 %define check_sig() export GNUPGHOME=%{_tmppath}/rpm-gpghome \
 if [ -d "$GNUPGHOME" ] \
 then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1 \
@@ -33,7 +33,7 @@ rm -Rf $GNUPGHOME \
 %{!?lib: %global lib lib}
 %{!?mklibname: %global mklibname(ds) %lib%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}}
 
-%{?!mkver:%global mkver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
+%{?!mkver:%define mkver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
 
 %define libname %mklibname smbclient %libsmbmajor
 %define libnetapi %mklibname netapi %netapimajor
