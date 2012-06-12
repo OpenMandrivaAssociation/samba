@@ -4,6 +4,7 @@
 %define pkg_name	samba
 %define version		3.6.5
 %define rel		3
+%define epoch		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
@@ -56,7 +57,7 @@ rm -Rf $GNUPGHOME \
 
 %if %have_pversion
 %define source_ver 	%{pversion}
-%define rel %mkrel 2.%{prelease}
+%define rel 2.%{prelease}
 # Don't abort for stupid reasons on builds from tarballs:
 %global	_unpackaged_files_terminate_build	0
 %global	_missing_doc_files_terminate_build	0
@@ -66,7 +67,7 @@ rm -Rf $GNUPGHOME \
 
 %define prerel %mkver -r %rel %source_ver
 %define real_version %mkver %source_ver
-%define release %mkrel %prerel
+%define release %prerel
 %define have_pre %([ "%version" == "%source_ver" ]; echo $?)
 
 # Check to see if we are running a build from a tarball release from samba.org
@@ -232,6 +233,7 @@ Name: %{pkg_name}%{samba_major}
 
 Version: %{source_ver}
 Release: %{release}
+Epoch:	%{epoch}
 
 License: GPLv3
 Group: System/Servers
@@ -606,8 +608,8 @@ SMB shares.
 URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
 Group:		Development/C
-Provides:	libsmbclient-devel = %{version}-%{release}
-Requires:       %{libname} = %{version}-%{release}
+Provides:	libsmbclient-devel = %{epoch}:%{version}-%{release}
+Requires:       %{libname} = %{epoch}:%{version}-%{release}
 
 %description -n %{libname}-devel
 This package contains the development files for the SMB client
@@ -623,8 +625,8 @@ the development of other software to access SMB shares.
 URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
 Group:          Development/C
-Provides:       libsmbclient-static-devel = %{version}-%{release}
-Requires:       %{libname}-devel = %{version}-%{release}
+Provides:       libsmbclient-static-devel = %{epoch}:%{version}-%{release}
+Requires:       %{libname}-devel = %{epoch}:%{version}-%{release}
 
 %description -n %{libname}-static-devel
 This package contains the static development files for the SMB
@@ -645,7 +647,7 @@ Samba library for accessing functions in 'net' binary
 %package -n %netapidevel
 Group: Development/C
 Summary: Samba library for accessing functions in 'net' binary
-Provides: netapi-devel = %{version}-%{release}
+Provides: netapi-devel = %{epoch}:%{version}-%{release}
 
 %description -n %netapidevel
 Samba library for accessing functions in 'net' binary
@@ -660,7 +662,7 @@ Samba Library for accessing smb share modes (locks etc.)
 %package -n %smbsharemodesdevel
 Group: Development/C
 Summary: Samba Library for accessing smb share modes (locks etc.)
-Provides: smbsharemodes-devel = %{version}-%{release}
+Provides: smbsharemodes-devel = %{epoch}:%{version}-%{release}
 
 %description -n %smbsharemodesdevel
 Samba Library for accessing smb share modes (locks etc.)
@@ -676,7 +678,7 @@ Library implementing Samba's memory allocator
 %package -n %tallocdevel
 Group: Development/C
 Summary: Library implementing Samba's memory allocator
-Provides: talloc-devel = %{version}-%{release}
+Provides: talloc-devel = %{epoch}:%{version}-%{release}
 
 %description -n %tallocdevel
 Library implementing Samba's memory allocator
@@ -693,7 +695,7 @@ Library implementing Samba's embedded database
 %package -n %tdbdevel
 Group: Development/C
 Summary: Library implementing Samba's embedded database
-Provides: tdb-devel = %{version}-%{release}
+Provides: tdb-devel = %{epoch}:%{version}-%{release}
 Requires: %libtdb
 # because /usr/include/tdb.h was moved from libsmbclient0-devel to libtdb-devel
 Conflicts: %{mklibname smbclient 0 -d} < 3.2.6-3
@@ -712,7 +714,7 @@ Library providing access to winbindd
 %package -n %wbclientdevel
 Group: Development/C
 Summary: Library providing access to winbindd
-Provides: wbclient-devel = %{version}-%{release}
+Provides: wbclient-devel = %{epoch}:%{version}-%{release}
 Requires: %libwbclient >= %{version}
 
 %description -n %wbclientdevel
@@ -740,7 +742,7 @@ Library providing access to winbindd
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for MySQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{version}-%{release}
+Requires:	%{name}-server = %{epoch}:%{version}-%{release}
 %endif
 %endif
 %ifnarch alpha
@@ -766,7 +768,7 @@ database
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for PostgreSQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{version}-%{release}
+Requires:	%{name}-server = %{epoch}:%{version}-%{release}
 #endif
 #ifnarch alpha && %build_system
 %endif
