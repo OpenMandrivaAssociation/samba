@@ -3,7 +3,7 @@
 
 %define pkg_name	samba
 %define version		3.6.5
-%define rel		3
+%define rel		4
 %define epoch		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
@@ -285,7 +285,7 @@ Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 # samba CVS)
 %if %have_pversion && %have_pre
 %endif
-Requires: pam >= 0.64, samba-common = %{version}
+Requires: pam >= 0.64, samba-common = %{epoch}:%{version}
 BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
 BuildRequires: libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
@@ -367,8 +367,8 @@ more information.
 %package server
 URL:	http://www.samba.org
 Summary: Samba (SMB) server programs
-Requires: %{name}-common = %{version}
-Requires: %libwbclient >= %{version}
+Requires: %{name}-common = %{epoch}:%{version}
+Requires: %libwbclient >= %{epoch}:%{version}
 %if %have_rpmhelper
 Requires(pre):		rpm-helper
 %endif
@@ -414,7 +414,7 @@ docs directory for implementation details.
 URL:	http://www.samba.org
 Summary: Samba (SMB) client programs
 Group: Networking/Other
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 Requires: cifs-utils >= 4.4
 %if %build_alternatives
 #Conflicts:	samba-client < 2.2.8a-9mdk
@@ -468,7 +468,7 @@ packages of Samba.
 URL:	http://www.samba.org
 Summary: Documentation for Samba servers and clients
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 BuildArch: noarch
 %if %build_system
 Obsoletes: samba3-doc
@@ -490,7 +490,7 @@ packages of Samba.
 %package swat
 URL:	http://www.samba.org
 Summary: The Samba Web Administration Tool
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Requires: xinetd
 Group: System/Servers
 %if %build_system
@@ -525,7 +525,7 @@ Samba.
 URL:	http://www.samba.org
 Summary: Samba-winbind daemon, utilities and documentation
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 %endif
 %if %build_winbind && !%build_system
 Conflicts: samba-winbind
@@ -547,7 +547,7 @@ and group/user enumeration from a Windows or Samba domain controller.
 URL:	http://www.samba.org
 Summary: Name Service Switch service for WINS
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 Requires(pre): glibc
 %endif
 %if %build_wins && !%build_system
@@ -570,7 +570,7 @@ IP addresses.
 URL:	http://www.samba.org
 Summary: Debugging and benchmarking tools for samba
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 %endif
 %if %build_system && %build_test
 Provides:  samba3-test samba3-debug
@@ -715,7 +715,7 @@ Library providing access to winbindd
 Group: Development/C
 Summary: Library providing access to winbindd
 Provides: wbclient-devel = %{epoch}:%{version}-%{release}
-Requires: %libwbclient >= %{version}
+Requires: %libwbclient >= %{epoch}:%{version}
 
 %description -n %wbclientdevel
 Library providing access to winbindd
@@ -789,7 +789,7 @@ database
 %package vscan-antivir
 Summary: On-access virus scanning for samba using Antivir
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-antivir
 A vfs-module for samba to implement on-access scanning using the
@@ -801,7 +801,7 @@ Antivir antivirus scanner daemon.
 %package vscan-clamav
 Summary: On-access virus scanning for samba using Clam Antivirus
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 Requires: clamd
 %description vscan-clamav
@@ -813,7 +813,7 @@ Clam antivirus scanner daemon.
 %package vscan-fprot
 Summary: On-access virus scanning for samba using FPROT
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-fprot
 A vfs-module for samba to implement on-access scanning using the
@@ -824,7 +824,7 @@ FPROT antivirus software (which must be installed to use this).
 %package vscan-fsecure
 Summary: On-access virus scanning for samba using F-Secure
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-fsecure
 A vfs-module for samba to implement on-access scanning using the
@@ -835,7 +835,7 @@ F-Secure antivirus software (which must be installed to use this).
 %package vscan-icap
 Summary: On-access virus scanning for samba using ICAP
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-icap
 %description vscan-icap
 A vfs-module for samba to implement on-access scanning using
@@ -846,7 +846,7 @@ ICAP-capable antivirus software.
 %package vscan-kaspersky
 Summary: On-access virus scanning for samba using Kaspersky
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-kaspersky
 A vfs-module for samba to implement on-access scanning using the
@@ -857,7 +857,7 @@ Kaspersky antivirus software (which must be installed to use this).
 %package vscan-mks
 Summary: On-access virus scanning for samba using MKS
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-mks
 A vfs-module for samba to implement on-access scanning using the
@@ -868,7 +868,7 @@ MKS antivirus software (which must be installed to use this).
 %package vscan-nai
 Summary: On-access virus scanning for samba using NAI McAfee
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-nai
 A vfs-module for samba to implement on-access scanning using the
@@ -879,7 +879,7 @@ NAI McAfee antivirus software (which must be installed to use this).
 %package vscan-openav
 Summary: On-access virus scanning for samba using OpenAntivirus
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-openav
 A vfs-module for samba to implement on-access scanning using the
@@ -890,7 +890,7 @@ OpenAntivirus antivirus software (which must be installed to use this).
 %package vscan-sophos
 Summary: On-access virus scanning for samba using Sophos
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-sophos
 A vfs-module for samba to implement on-access scanning using the
@@ -901,7 +901,7 @@ Sophos antivirus software (which must be installed to use this).
 %package vscan-symantec
 Summary: On-access virus scanning for samba using Symantec
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 Autoreq: 0
 %description vscan-symantec
@@ -914,7 +914,7 @@ Symantec antivirus software (which must be installed to use this).
 %package vscan-trend
 Summary: On-access virus scanning for samba using Trend
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-trend
 A vfs-module for samba to implement on-access scanning using the
@@ -923,7 +923,7 @@ Trend antivirus software (which must be installed to use this).
 
 %package domainjoin-gui
 Summary: Domainjoin GUI
-Requires: samba-common = %{version}
+Requires: samba-common = %{epoch}:%{version}
 Group: System/Configuration/Other
 
 %description domainjoin-gui
