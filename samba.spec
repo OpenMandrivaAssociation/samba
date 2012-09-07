@@ -2,7 +2,7 @@
 %define _build_pkgcheck_srpm %{nil}
 
 %define pkg_name	samba
-%define version		3.6.5
+%define version		3.6.7
 %define rel		4
 %define epoch		1
 #define	subrel		1
@@ -237,7 +237,7 @@ Epoch:	%{epoch}
 
 License: GPLv3
 Group: System/Servers
-Source: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
+Source0: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
 Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
 Source98: http://www.samba.org/samba/ftp/samba-pubkey.asc
 URL:	http://www.samba.org
