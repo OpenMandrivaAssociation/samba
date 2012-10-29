@@ -367,16 +367,12 @@ Requires: %libwbclient >= %{version}
 Requires(pre):		rpm-helper
 %endif
 Group: Networking/Other
-%if %build_system
 Provides: samba
 Obsoletes: samba
 Provides:  samba-server-ldap
 Obsoletes: samba-server-ldap
 Provides:  samba3-server
 Obsoletes: samba3-server
-%else
-#Provides: samba-server
-%endif
 
 %description server
 Samba-server provides a SMB server which can be used to provide
@@ -400,9 +396,6 @@ docs directory for implementation details.
 %if %have_pversion
 %message_bugzilla samba3-server
 %endif
-%if !%build_system
-%message_system
-%endif
 
 %package client
 URL:	http://www.samba.org
@@ -413,16 +406,10 @@ Requires: cifs-utils >= 4.4
 %if %build_alternatives
 #Conflicts:	samba-client < 2.2.8a-9mdk
 %endif
-%if %build_system
 Provides:  samba3-client
 Obsoletes: samba3-client
 Obsoletes: smbfs
-%else
-#Provides: samba-client
-%endif
-%if !%build_system && %build_alternatives
 Provides: samba-client
-%endif
 
 %description client
 Samba-client provides some SMB clients, which complement the built-in
@@ -431,32 +418,22 @@ printing to SMB printers.
 %if %have_pversion
 %message_bugzilla samba3-client
 %endif
-%if !%build_system
-%message_system
-%endif
 
 %package common
 URL:	http://www.samba.org
 Summary: Files used by both Samba servers and clients
 Group: System/Servers
 Conflicts: %{name}-server < 3.6.6-2
-%if %build_system
 Provides:  samba-common-ldap
 Obsoletes: samba-common-ldap
 Provides:  samba3-common
 Obsoletes: samba3-common
-%else
-#Provides: samba-common
-%endif
 
 %description common
 Samba-common provides files necessary for both the server and client
 packages of Samba.
 %if %have_pversion
 %message_bugzilla samba3-common
-%endif
-%if !%build_system
-%message_system
 %endif
 
 %package doc
@@ -465,21 +442,14 @@ Summary: Documentation for Samba servers and clients
 Group: System/Servers
 Requires: %{name}-common = %{version}
 BuildArch: noarch
-%if %build_system
 Obsoletes: samba3-doc
 Provides:  samba3-doc
-%else
-#Provides: samba-doc
-%endif
 
 %description doc
 Samba-doc provides documentation files for both the server and client
 packages of Samba.
 %if %have_pversion
 %message_bugzilla samba3-doc
-%endif
-%if !%build_system
-%message_system
 %endif
 
 %package swat
@@ -488,14 +458,10 @@ Summary: The Samba Web Administration Tool
 Requires: %{name}-server = %{version}
 Requires: xinetd
 Group: System/Servers
-%if %build_system
 Provides:  samba-swat-ldap
 Obsoletes: samba-swat-ldap
 Provides:  samba3-swat
 Obsoletes: samba3-swat
-%else
-#Provides: samba-swat
-%endif
 Conflicts: %{name}-server < 3.4.0
 Suggests: %{name}-doc
 
@@ -511,9 +477,6 @@ Samba.
 %if %have_pversion
 %message_bugzilla samba3-swat
 %endif
-%if !%build_system
-%message_system
-%endif
 
 %if %build_winbind
 %package winbind
@@ -522,9 +485,7 @@ Summary: Samba-winbind daemon, utilities and documentation
 Group: System/Servers
 Requires: %{name}-common = %{version}
 %endif
-%if %build_winbind && !%build_system
-Conflicts: samba-winbind
-%endif
+
 %if %build_winbind
 %description winbind
 Provides the winbind daemon and testing tools to allow authentication 
@@ -532,9 +493,6 @@ and group/user enumeration from a Windows or Samba domain controller.
 %endif
 %if %have_pversion
 %message_bugzilla samba3-winbind
-%endif
-%if !%build_system
-%message_system
 %endif
 
 %if %build_wins
@@ -545,9 +503,7 @@ Group: System/Servers
 Requires: %{name}-common = %{version}
 Requires(pre): glibc
 %endif
-%if %build_wins && !%build_system
-Conflicts: nss_wins
-%endif
+
 %if %build_wins
 %description -n nss_wins%{samba_major}
 Provides the libnss_wins shared library which resolves NetBIOS names to 
@@ -555,9 +511,6 @@ IP addresses.
 %endif
 %if %have_pversion
 %message_bugzilla nss_wins3
-%endif
-%if !%build_system
-%message_system
 %endif
 
 %if %build_test
@@ -567,14 +520,10 @@ Summary: Debugging and benchmarking tools for samba
 Group: System/Servers
 Requires: %{name}-common = %{version}
 %endif
-%if %build_system && %build_test
 Provides:  samba3-test samba3-debug
 Obsoletes: samba3-test samba3-debug
-%endif
-%if !%build_system && %{build_test}
 Provides: samba-test samba3-debug
 Obsoletes: samba3-debug
-%endif
 %if %{build_test}
 
 %description test
@@ -582,7 +531,6 @@ This package provides tools for benchmarking samba, and debugging
 the correct operation of tools against smb servers.
 %endif
 
-%if %build_system
 %package -n %{libname}
 URL:		http://www.samba.org
 Summary: 	SMB Client Library
@@ -594,11 +542,7 @@ This package contains the SMB client library, part of the samba
 suite of networking software, allowing other software to access
 SMB shares.
 %endif
-%if %have_pversion && %build_system
-%message_bugzilla %{libname}
-%endif
 
-%if %build_system
 %package -n %{libname}-devel
 URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
@@ -611,11 +555,7 @@ This package contains the development files for the SMB client
 library, part of the samba suite of networking software, allowing
 the development of other software to access SMB shares.
 %endif
-%if %have_pversion && %build_system
-%message_bugzilla %{libname}-devel
-%endif
 
-%if %build_system
 %package -n %{libname}-static-devel
 URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
@@ -627,10 +567,6 @@ Requires:       %{libname}-devel = %{version}-%{release}
 This package contains the static development files for the SMB
 client library, part of the samba suite of networking software,
 allowing the development of other software to access SMB shares.
-%endif
-%if %have_pversion && %build_system
-%message_bugzilla %{libname}-devel
-%endif
 
 %package -n %libnetapi
 Summary: Samba library for accessing functions in 'net' binary
@@ -727,9 +663,6 @@ Library providing access to winbindd
 #_if %have_pversion
 #_message_bugzilla samba3-passdb-ldap
 #_endif
-#_if !%build_system
-#_message_system
-#_endif
 
 %ifnarch alpha
 %if %{build_mysql}
@@ -741,7 +674,7 @@ Requires:	%{name}-server = %{version}-%{release}
 %endif
 %endif
 %ifnarch alpha
-%if %build_system && %{build_mysql}
+%if %{build_mysql}
 Obsoletes:	samba3-passdb-mysql 
 Provides:	samba3-passdb-mysql 
 %endif
@@ -767,7 +700,7 @@ Requires:	%{name}-server = %{version}-%{release}
 #endif
 #ifnarch alpha && %build_system
 %endif
-%if %build_system && %{build_pgsql}
+%if %{build_pgsql}
 Obsoletes:	samba3-passdb-pgsql
 Provides:	samba3-passdb-pgsql
 %endif
@@ -1058,9 +991,8 @@ popd
 %endif
 
 # Edit some files when not building system samba:
-%if !%build_system
 perl -pi -e 's/%{pkg_name}/%{name}/g' source3/auth/pampass.c
-%endif
+
 
 #remove cvs internal files from docs:
 find docs examples -name '.cvsignore' -exec rm -f {} \;
@@ -1134,8 +1066,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #		--with-expsam=%build_expsam \
 #		--with-shared-modules=pdb_ldap,idmap_ldap \
 #		--with-manpages-langs=en,ja,pl	\
-#_if !%build_system
-#                --with-smbwrapper \
+#               --with-smbwrapper \
 #_endif		
 #		--with-nisplussam \
 #                --with-fhs \
