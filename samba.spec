@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.6.8
-%define rel		5
+%define rel		1
 #define	subrel		1
 %define vscanver 	0.1.3
 %define libsmbmajor	0
@@ -541,7 +541,7 @@ Provides:	libsmbclient
 This package contains the SMB client library, part of the samba
 suite of networking software, allowing other software to access
 SMB shares.
-%endif
+
 
 %package -n %{libname}-devel
 URL:		http://www.samba.org
