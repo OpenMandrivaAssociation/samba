@@ -554,7 +554,7 @@ Requires:       %{libname} = %{version}-%{release}
 This package contains the development files for the SMB client
 library, part of the samba suite of networking software, allowing
 the development of other software to access SMB shares.
-%endif
+
 
 %package -n %{libname}-static-devel
 URL:            http://www.samba.org
