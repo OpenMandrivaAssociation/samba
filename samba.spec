@@ -1,19 +1,15 @@
-%define _build_pkgcheck_set %{nil}
-%define _build_pkgcheck_srpm %{nil}
-
 %define pkg_name	samba
-%define version		3.6.7
-%define rel		4
-%define epoch		1
+%define version		3.6.8
+%define rel		1
 #define	subrel		1
-%define vscanver 	0.3.6c-beta5
+%define vscanver 	0.1.3
 %define libsmbmajor	0
 %define netapimajor	0
 %define smbsharemodesmajor	0
 %define	tallocmajor	1
 %define tdbmajor	1
 %define	wbclientmajor	0
-
+ 
 %define check_sig() export GNUPGHOME=%{_tmppath}/rpm-gpghome \
 if [ -d "$GNUPGHOME" ] \
 then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1 \
@@ -34,7 +30,7 @@ rm -Rf $GNUPGHOME \
 %{!?lib: %global lib lib}
 %{!?mklibname: %global mklibname(ds) %lib%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}}
 
-%{?!mkver:%define mkver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
+%{?!mga_ver:%global mga_ver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
 
 %define libname %mklibname smbclient %libsmbmajor
 %define libnetapi %mklibname netapi %netapimajor
@@ -57,7 +53,7 @@ rm -Rf $GNUPGHOME \
 
 %if %have_pversion
 %define source_ver 	%{pversion}
-%define rel 2.%{prelease}
+%define rel %mkrel 1.%{prelease}
 # Don't abort for stupid reasons on builds from tarballs:
 %global	_unpackaged_files_terminate_build	0
 %global	_missing_doc_files_terminate_build	0
@@ -65,16 +61,15 @@ rm -Rf $GNUPGHOME \
 %define source_ver 	%{version}
 %endif
 
-%define prerel %mkver -r %rel %source_ver
-%define real_version %mkver %source_ver
-%define release %prerel
+%define prerel %mga_ver -r %rel %source_ver
+%define real_version %mga_ver %source_ver
+%define release %mkrel %prerel
 %define have_pre %([ "%version" == "%source_ver" ]; echo $?)
 
 # Check to see if we are running a build from a tarball release from samba.org
 # (%have_pversion) If so, disable vscan, unless explicitly requested
 # (--with vscan).
-#FIXME
-%define build_vscan 	0
+%define build_vscan 	1
 %if %have_pversion
 %define build_vscan 	0
 %{?_with_vscan: %define build_vscan 1}
@@ -158,19 +153,19 @@ rm -Rf $GNUPGHOME \
 %if %build_vscan
 # These we build by default
 %global build_clamav 	1
-%global build_icap 	1
+%global build_icap 	0
+%global build_fsav 	1
+%global build_sophos 	1
 %endif
 %if %build_vscan && %build_scanners
 # These scanners are built if scanners are selected
 # symantec requires their library present and must be selected 
 # individually
 %global build_fprot 	1
-%global build_fsav 	1
 %global build_kaspersky 1
 %global build_mks 	1
 %global build_nai 	1
 %global build_openav	1
-%global build_sophos 	1
 %global build_trend 	1
 %endif
 %if %build_vscan
@@ -181,12 +176,12 @@ rm -Rf $GNUPGHOME \
 %{?_with_sophos: %{expand: %%global build_sophos 1}}
 #%{?_with_symantec: %{expand: %%global build_symantec 1}}
 %{?_with_trend: %{expand: %%global build_trend 1}}
-%global vscandir samba-vscan-%{vscanver}
+%global vscandir samba-virusfilter-%{vscanver}
 %endif
 %global vfsdir examples.bin/VFS
 
 #Standard texts for descriptions:
-%define message_bugzilla() %(echo -e -n "Please file bug reports for this package at Mandriva bugzilla \\n(http://qa.mandriva.com) under the product name %{1}")
+%define message_bugzilla() %(echo -e -n "Please file bug reports for this package at Mageia bugzilla \\n(http://bugs.mageia.org) under the product name %{1}")
 %define message_system %(echo -e -n "NOTE: These packages of samba-%{version}, are provided, parallel installable\\nwith samba-2.2.x, to allow easy migration from samba-2.2.x to samba-%{version},\\nbut are not officially supported")
 
 #check gcc version to disable some optimisations on gcc-3.3.1
@@ -232,22 +227,21 @@ Summary: Samba SMB server
 Name: %{pkg_name}%{samba_major}
 
 Version: %{source_ver}
-Release: %{release}
-Epoch:	%{epoch}
+Release: %mkrel %rel
 
 License: GPLv3
 Group: System/Servers
-Source0: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
-Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
-Source98: http://www.samba.org/samba/ftp/samba-pubkey.asc
+Source: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.gz
+Source99: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.asc
+Source98: http://ftp.samba.org/pub/samba/samba-pubkey.asc
 URL:	http://www.samba.org
 Source1: samba.log
 Source3: samba.xinetd
 Source4: swat_48.png
 Source5: swat_32.png
 Source6: swat_16.png
-Source7: README.%{name}-mandriva-rpm
-Source8: samba-vscan-%{vscanver}.tar.gz
+Source7: README.%{name}-mageia-rpm
+Source8: https://github.com/downloads/fumiyas/samba-virusfilter/samba-virusfilter-%{vscanver}.tar.bz2
 %if %build_vscan
 %endif
 %if %build_vscan
@@ -272,7 +266,7 @@ Source30:	smb.conf
 
 %if !%have_pversion
 # Version specific patches: current version
-Patch11: samba-3.0-mandriva-packaging.patch
+Patch11: samba-3.0-mageia-packaging.patch
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
 Patch30: samba-3.5-check-undefined-before-zdefs.patch
@@ -285,8 +279,8 @@ Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 # samba CVS)
 %if %have_pversion && %have_pre
 %endif
-Requires: pam >= 0.64, samba-common = %{epoch}:%{version}
-BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
+Requires: pam >= 0.64, samba-common = %{version}
+BuildRequires: pam-devel readline-devel libncurses-devel popt-devel
 BuildRequires: libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
 # http://lists.samba.org/archive/samba/2009-March/146821.html
@@ -307,9 +301,9 @@ BuildRequires: mysql-devel
 %endif
 %endif
 %if %build_acl
-BuildRequires: acl-devel
+BuildRequires: libacl-devel
 %endif
-BuildRequires: cups-devel cups-common
+BuildRequires: libcups-devel cups-common
 BuildRequires: libldap-devel
 %if %build_ads
 BuildRequires: libldap-devel krb5-devel
@@ -360,15 +354,15 @@ docs directory for implementation details.
 %endif
 %if %build_non_default
 WARNING: This RPM was built with command-line options. Please
-see README.%{name}-mandriva-rpm in the documentation for
+see README.%{name}-mageia-rpm in the documentation for
 more information.
 %endif
 
 %package server
 URL:	http://www.samba.org
 Summary: Samba (SMB) server programs
-Requires: %{name}-common = %{epoch}:%{version}
-Requires: %libwbclient >= %{epoch}:%{version}
+Requires: %{name}-common = %{version}
+Requires: %libwbclient >= %{version}
 %if %have_rpmhelper
 Requires(pre):		rpm-helper
 %endif
@@ -414,7 +408,7 @@ docs directory for implementation details.
 URL:	http://www.samba.org
 Summary: Samba (SMB) client programs
 Group: Networking/Other
-Requires: %{name}-common = %{epoch}:%{version}
+Requires: %{name}-common = %{version}
 Requires: cifs-utils >= 4.4
 %if %build_alternatives
 #Conflicts:	samba-client < 2.2.8a-9mdk
@@ -445,6 +439,7 @@ printing to SMB printers.
 URL:	http://www.samba.org
 Summary: Files used by both Samba servers and clients
 Group: System/Servers
+Conflicts: %{name}-server < 3.6.6-2
 %if %build_system
 Provides:  samba-common-ldap
 Obsoletes: samba-common-ldap
@@ -468,7 +463,7 @@ packages of Samba.
 URL:	http://www.samba.org
 Summary: Documentation for Samba servers and clients
 Group: System/Servers
-Requires: %{name}-common = %{epoch}:%{version}
+Requires: %{name}-common = %{version}
 BuildArch: noarch
 %if %build_system
 Obsoletes: samba3-doc
@@ -490,7 +485,7 @@ packages of Samba.
 %package swat
 URL:	http://www.samba.org
 Summary: The Samba Web Administration Tool
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Requires: xinetd
 Group: System/Servers
 %if %build_system
@@ -525,7 +520,7 @@ Samba.
 URL:	http://www.samba.org
 Summary: Samba-winbind daemon, utilities and documentation
 Group: System/Servers
-Requires: %{name}-common = %{epoch}:%{version}
+Requires: %{name}-common = %{version}
 %endif
 %if %build_winbind && !%build_system
 Conflicts: samba-winbind
@@ -547,7 +542,7 @@ and group/user enumeration from a Windows or Samba domain controller.
 URL:	http://www.samba.org
 Summary: Name Service Switch service for WINS
 Group: System/Servers
-Requires: %{name}-common = %{epoch}:%{version}
+Requires: %{name}-common = %{version}
 Requires(pre): glibc
 %endif
 %if %build_wins && !%build_system
@@ -570,7 +565,7 @@ IP addresses.
 URL:	http://www.samba.org
 Summary: Debugging and benchmarking tools for samba
 Group: System/Servers
-Requires: %{name}-common = %{epoch}:%{version}
+Requires: %{name}-common = %{version}
 %endif
 %if %build_system && %build_test
 Provides:  samba3-test samba3-debug
@@ -608,8 +603,8 @@ SMB shares.
 URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
 Group:		Development/C
-Provides:	libsmbclient-devel = %{epoch}:%{version}-%{release}
-Requires:       %{libname} = %{epoch}:%{version}-%{release}
+Provides:	libsmbclient-devel = %{version}-%{release}
+Requires:       %{libname} = %{version}-%{release}
 
 %description -n %{libname}-devel
 This package contains the development files for the SMB client
@@ -625,8 +620,8 @@ the development of other software to access SMB shares.
 URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
 Group:          Development/C
-Provides:       libsmbclient-static-devel = %{epoch}:%{version}-%{release}
-Requires:       %{libname}-devel = %{epoch}:%{version}-%{release}
+Provides:       libsmbclient-static-devel = %{version}-%{release}
+Requires:       %{libname}-devel = %{version}-%{release}
 
 %description -n %{libname}-static-devel
 This package contains the static development files for the SMB
@@ -647,7 +642,7 @@ Samba library for accessing functions in 'net' binary
 %package -n %netapidevel
 Group: Development/C
 Summary: Samba library for accessing functions in 'net' binary
-Provides: netapi-devel = %{epoch}:%{version}-%{release}
+Provides: netapi-devel = %{version}-%{release}
 
 %description -n %netapidevel
 Samba library for accessing functions in 'net' binary
@@ -662,7 +657,7 @@ Samba Library for accessing smb share modes (locks etc.)
 %package -n %smbsharemodesdevel
 Group: Development/C
 Summary: Samba Library for accessing smb share modes (locks etc.)
-Provides: smbsharemodes-devel = %{epoch}:%{version}-%{release}
+Provides: smbsharemodes-devel = %{version}-%{release}
 
 %description -n %smbsharemodesdevel
 Samba Library for accessing smb share modes (locks etc.)
@@ -678,7 +673,7 @@ Library implementing Samba's memory allocator
 %package -n %tallocdevel
 Group: Development/C
 Summary: Library implementing Samba's memory allocator
-Provides: talloc-devel = %{epoch}:%{version}-%{release}
+Provides: talloc-devel = %{version}-%{release}
 
 %description -n %tallocdevel
 Library implementing Samba's memory allocator
@@ -695,7 +690,7 @@ Library implementing Samba's embedded database
 %package -n %tdbdevel
 Group: Development/C
 Summary: Library implementing Samba's embedded database
-Provides: tdb-devel = %{epoch}:%{version}-%{release}
+Provides: tdb-devel = %{version}-%{release}
 Requires: %libtdb
 # because /usr/include/tdb.h was moved from libsmbclient0-devel to libtdb-devel
 Conflicts: %{mklibname smbclient 0 -d} < 3.2.6-3
@@ -714,8 +709,8 @@ Library providing access to winbindd
 %package -n %wbclientdevel
 Group: Development/C
 Summary: Library providing access to winbindd
-Provides: wbclient-devel = %{epoch}:%{version}-%{release}
-Requires: %libwbclient >= %{epoch}:%{version}
+Provides: wbclient-devel = %{version}-%{release}
+Requires: %libwbclient >= %{version}
 
 %description -n %wbclientdevel
 Library providing access to winbindd
@@ -742,7 +737,7 @@ Library providing access to winbindd
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for MySQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{epoch}:%{version}-%{release}
+Requires:	%{name}-server = %{version}-%{release}
 %endif
 %endif
 %ifnarch alpha
@@ -768,7 +763,7 @@ database
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for PostgreSQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{epoch}:%{version}-%{release}
+Requires:	%{name}-server = %{version}-%{release}
 #endif
 #ifnarch alpha && %build_system
 %endif
@@ -789,7 +784,7 @@ database
 %package vscan-antivir
 Summary: On-access virus scanning for samba using Antivir
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-antivir
 A vfs-module for samba to implement on-access scanning using the
@@ -798,22 +793,28 @@ Antivir antivirus scanner daemon.
 
 
 %if %build_clamav
-%package vscan-clamav
+%package virusfilter-clamav
 Summary: On-access virus scanning for samba using Clam Antivirus
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+URL: https://github.com/fumiyas/samba-virusfilter
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
+Provides: %{name}-virusfilter
 Requires: clamd
-%description vscan-clamav
-A vfs-module for samba to implement on-access scanning using the
-Clam antivirus scanner daemon.
+%description virusfilter-clamav
+This is a Samba VFS module to scan and filter virus files on Samba file
+services with an anti-virus scanner.
+
+This package includes the VFS module supporting:
+* ClamAV (clamd daemon) http://www.clamav.net
+
 %endif
 
 %if %build_fprot
 %package vscan-fprot
 Summary: On-access virus scanning for samba using FPROT
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-fprot
 A vfs-module for samba to implement on-access scanning using the
@@ -821,21 +822,27 @@ FPROT antivirus software (which must be installed to use this).
 %endif
 
 %if %build_fsav
-%package vscan-fsecure
+%package virusfilter-fsecure
 Summary: On-access virus scanning for samba using F-Secure
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+URL: https://github.com/fumiyas/samba-virusfilter
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
-%description vscan-fsecure
-A vfs-module for samba to implement on-access scanning using the
-F-Secure antivirus software (which must be installed to use this).
+Provides: %{name}-virusfilter
+%description virusfilter-fsecure
+This is a Samba VFS module to scan and filter virus files on Samba file
+services with an anti-virus scanner.
+
+This package provides the VFS module supporting:
+* F-Secure Anti-Virus (fsavd daemon) http://www.f-secure.com
+
 %endif
 
 %if %build_icap
 %package vscan-icap
 Summary: On-access virus scanning for samba using ICAP
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-icap
 %description vscan-icap
 A vfs-module for samba to implement on-access scanning using
@@ -846,7 +853,7 @@ ICAP-capable antivirus software.
 %package vscan-kaspersky
 Summary: On-access virus scanning for samba using Kaspersky
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-kaspersky
 A vfs-module for samba to implement on-access scanning using the
@@ -857,7 +864,7 @@ Kaspersky antivirus software (which must be installed to use this).
 %package vscan-mks
 Summary: On-access virus scanning for samba using MKS
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-mks
 A vfs-module for samba to implement on-access scanning using the
@@ -868,7 +875,7 @@ MKS antivirus software (which must be installed to use this).
 %package vscan-nai
 Summary: On-access virus scanning for samba using NAI McAfee
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-nai
 A vfs-module for samba to implement on-access scanning using the
@@ -879,7 +886,7 @@ NAI McAfee antivirus software (which must be installed to use this).
 %package vscan-openav
 Summary: On-access virus scanning for samba using OpenAntivirus
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-openav
 A vfs-module for samba to implement on-access scanning using the
@@ -887,21 +894,25 @@ OpenAntivirus antivirus software (which must be installed to use this).
 %endif
 
 %if %build_sophos
-%package vscan-sophos
+%package virusfilter-sophos
 Summary: On-access virus scanning for samba using Sophos
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+URL: https://github.com/fumiyas/samba-virusfilter
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
-%description vscan-sophos
-A vfs-module for samba to implement on-access scanning using the
-Sophos antivirus software (which must be installed to use this).
+%description virusfilter-sophos
+This is a Samba VFS module to scan and filter virus files on Samba file
+services with an anti-virus scanner.
+
+This package includes the VFS module supporting:
+* Sophos Anti-Virus (savdid daemon) http://www.sophos.com
 %endif
 
 %if %build_symantec
 %package vscan-symantec
 Summary: On-access virus scanning for samba using Symantec
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 Autoreq: 0
 %description vscan-symantec
@@ -914,7 +925,7 @@ Symantec antivirus software (which must be installed to use this).
 %package vscan-trend
 Summary: On-access virus scanning for samba using Trend
 Group: System/Servers
-Requires: %{name}-server = %{epoch}:%{version}
+Requires: %{name}-server = %{version}
 Provides: %{name}-vscan
 %description vscan-trend
 A vfs-module for samba to implement on-access scanning using the
@@ -923,7 +934,7 @@ Trend antivirus software (which must be installed to use this).
 
 %package domainjoin-gui
 Summary: Domainjoin GUI
-Requires: samba-common = %{epoch}:%{version}
+Requires: samba-common = %{version}
 Group: System/Configuration/Other
 
 %description domainjoin-gui
@@ -1015,7 +1026,7 @@ gzip -dc %{SOURCE0} > $VERIFYSOURCE
 # Version specific patches: current version
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
-%patch11 -p1 -b .mdk
+%patch11 -p1 -b .mga
 pushd source3
 popd
 %patch30 -p1 -b .checkflags
@@ -1041,21 +1052,9 @@ cp %{SOURCE7} .
 cp -a examples examples.bin
 
 %if %build_vscan
-cp -a %{vscandir} %{vfsdir}
-#fix stupid directory names:
-#mv %{vfsdir}/%{vscandir}/openantivirus %{vfsdir}/%{vscandir}/oav
-# Inline replacement of config dir
-for av in antivir clamav fprotd fsav icap kavp mksd mcdaemon oav sophos symantec trend
- do
-	[ -e %{vfsdir}/%{vscandir}/*/vscan-$av.h ] && perl -pi -e \
-	's,^#define PARAMCONF "/etc/samba,#define PARAMCONF "/etc/%{name},' \
-	%{vfsdir}/%{vscandir}/*/vscan-$av.h
-done
-#Inline edit vscan header:
-perl -pi -e 's/^# define SAMBA_VERSION_MAJOR 2/# define SAMBA_VERSION_MAJOR 3/g;s/# define SAMBA_VERSION_MINOR 2/# define SAMBA_VERSION_MINOR 0/g' %{vfsdir}/%{vscandir}/include/vscan-global.h
-# dunno why samba-vscan keeps copmatability with ancient versions
-# of samba but breaks  on samba versions with alpha chars in the name ...
-perl -pi -e 's/SAMBA_VERSION_MAJOR==2 && SAMBA_VERSION_RELEASE>=4/SAMBA_VERSION_MAJOR==2/g' %{vfsdir}/%{vscandir}/*/vscan-*.c
+pushd samba-virusfilter-%{vscanver}
+perl -pi -e 's,/var/run/clamav/clamd.ctl,/var/lib/clamav/clamd.socket,g' clamav/svf-clamav.c
+popd
 %endif
 
 # Edit some files when not building system samba:
@@ -1087,7 +1086,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 ./autogen.sh
 # Don't use --with-fhs now, since it overrides libdir, it sets configdir, 
 # lockdir,piddir logfilebase,privatedir and swatdir
-%configure      --prefix=%{_prefix} \
+%configure2_5x  --prefix=%{_prefix} \
                 --sysconfdir=%{_sysconfdir}/%{name} \
                 --localstatedir=/var \
                 --with-modulesdir=%{_libdir}/%{name} \
@@ -1166,10 +1165,8 @@ make -C lib/netapi/examples
 
 %if %build_vscan
 echo -e "\n\nBuild antivirus VFS modules\n\n"
-pushd %{vfsdir}/%{vscandir}
-%configure
-#sed -i -e 's,openantivirus,oav,g' Makefile
-sed -i -e 's,^\(.*clamd socket name.*=\).*,\1 /var/lib/clamav/clamd.socket,g' clamav/vscan-clamav.conf
+pushd %{vscandir}
+%configure --with-samba-source=../
 make
 popd
 %endif
@@ -1225,10 +1222,17 @@ install -m755 source3/bin/lib*.a %{buildroot}%{_libdir}/
 #install -m 755 source/bin/smbsh %{buildroot}%{_bindir}/
 
 %if %build_vscan
-%makeinstall_std -C %{vfsdir}/%{vscandir}
-install -m 644 %{vfsdir}/%{vscandir}/*/vscan-*.conf %{buildroot}/%{_sysconfdir}/%{name}
+%makeinstall_std -C %{vscandir}
+install -m 644 %{vscandir}/etc/*.conf.example %{buildroot}/%{_sysconfdir}/%{name}
+for i in %{buildroot}/%{_sysconfdir}/%{name}/*.example
+do mv $i ${i%%.example}
+done
+#mv %{buildroot}/%{_datadir}/%{name}/bin/svf-notify %{buildroot}/%{_datadir}/%{name}/scripts
+# script uses ksh, which we don't have
+rm %{buildroot}/%{_datadir}/%{name}/bin/svf-notify
+perl -pi -e 's,%{_datadir}/%{name}/bin,%{_datadir}/%{name}/scripts,g' %{buildroot}/%{_sysconfdir}/%{name}/smb.svf-*.conf
 %endif
-	
+
 #libnss_* still not handled by make:
 # Install the nsswitch library extension file
 for i in wins winbind; do
@@ -1275,8 +1279,8 @@ install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}
 install -m755 examples/LDAP/convertSambaAccount %{buildroot}/%{_datadir}/%{name}/scripts/
 
 # make a conf file for winbind from the default one:
-	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandriva/smb-winbind.conf
-        install -m644 packaging/Mandriva/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
+	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mageia/smb-winbind.conf
+        install -m644 packaging/Mageia/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
 install -m644 %{SOURCE30} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
@@ -1308,7 +1312,7 @@ perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sy
 # menu support
 
 mkdir -p %{buildroot}/%{_datadir}/applications
-cat > %{buildroot}/%{_datadir}/applications/mandriva-%{name}-swat.desktop << EOF
+cat > %{buildroot}/%{_datadir}/applications/mageia-%{name}-swat.desktop << EOF
 [Desktop Entry]
 Name=Samba Configuration (SWAT)
 Comment=The Swat Samba Administration Tool
@@ -1395,8 +1399,8 @@ rm -f %{buildroot}/%{_mandir}/man1/testprns*
 # smb.conf won't get overwritten
 cp %{buildroot}/%{_sysconfdir}/%{name}/smb.conf %{buildroot}/%{_datadir}/%{name}/smb.conf.clean
 
-# (sb) leave a README.mdk.conf to explain what has been done
-cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.mdk.conf
+# (sb) leave a README.mga.conf to explain what has been done
+cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.mga.conf
 In order to facilitate upgrading an existing samba install, and merging
 previous configuration data with any new syntax used by samba3, a merge
 script has attempted to combine your local configuration data with the
@@ -1478,7 +1482,7 @@ rm -f %{_libdir}/pkgconfig/smbclient.pc
 %endif
 
 %if %build_vscan
-rm -f %{buildroot} %{_libdir}/%{name}/vfs/vscan*.so
+#rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan*.so
 
 %if !%build_antivir
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-antivir.so
@@ -1486,8 +1490,8 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-antivir.conf
 %endif
 
 %if !%build_clamav
-rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-clamav.so
-rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-clamav.conf
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/svf-clamav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/smb.svf-clamav.conf
 %endif
 
 %if !%build_fprot
@@ -1496,8 +1500,8 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fprotd.conf
 %endif
 
 %if !%build_fsav
-rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-fsav.so
-rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fsav.conf
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/svf-fsav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/smb.svf-fsav.conf
 %endif
 
 %if !%build_icap
@@ -1526,8 +1530,8 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-oav.conf
 %endif
 
 %if !%build_sophos
-rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-sophos.so
-rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-sophos.conf
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/svf-sophos.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/smb.svf-sophos.conf
 %endif
 
 %if !%build_symantec
@@ -1605,7 +1609,7 @@ fi
 # And not loose our machine account SID
 [ -f %{_sysconfdir}/MACHINE.SID ] && mv -f %{_sysconfdir}/MACHINE.SID %{_sysconfdir}/%{name}/ ||:
 
-# FIXME: Can be removed in mandriva ?
+# FIXME: Can be removed in mageia ?
 %triggerpostun common -- samba-common < 3.0.1-3mdk
 # (sb) merge any existing smb.conf with new syntax file
 if [ $1 = 2 ]; then
@@ -1615,13 +1619,13 @@ if [ $1 = 2 ]; then
 	echo "Upgrade: merging previous smb.conf..."
 	if [ -f %{_datadir}/%{name}/smb.conf.clean ]; then
 		cp %{_datadir}/%{name}/smb.conf.clean %{_sysconfdir}/%{name}/smb.conf
-		cp %{_datadir}/%{name}/README.mdk.conf %{_sysconfdir}/%{name}/
+		cp %{_datadir}/%{name}/README.mga.conf %{_sysconfdir}/%{name}/
 		%{_datadir}/%{name}/scripts/smb-migrate commit
 	fi
 fi
 
 %postun common
-if [ -f %{_sysconfdir}/%{name}/README.mdk.conf ];then rm -f %{_sysconfdir}/%{name}/README.mdk.conf;fi
+if [ -f %{_sysconfdir}/%{name}/README.mga.conf ];then rm -f %{_sysconfdir}/%{name}/README.mga.conf;fi
 
 %if %build_winbind
 %post winbind
@@ -1755,8 +1759,8 @@ update-alternatives --auto smbclient
 %attr(1777,root,root) %dir /var/spool/%{name}
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
-%attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
-%attr(0755,root,root) %{_datadir}/%{name}/scripts/convertSambaAccount
+%attr(0755,root,root) %{_datadir}/%{name}/scripts/*
+%exclude %{_datadir}/%{name}/scripts/smb-migrate
 %{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/vfs_*.8*
 
@@ -1764,7 +1768,7 @@ update-alternatives --auto smbclient
 %defattr(-,root,root)
 %doc README COPYING Manifest Read-Manifest-Now
 %doc WHATSNEW.txt Roadmap
-%doc README.%{name}-mandriva-rpm
+%doc README.%{name}-mageia-rpm
 %doc clean-docs/samba-doc/docs/*
 %doc clean-docs/samba-doc/examples
 #%attr(-,root,root) %{_datadir}/swat%{samba_major}/using_samba/
@@ -1775,7 +1779,7 @@ update-alternatives --auto smbclient
 %config(noreplace) %{_sysconfdir}/xinetd.d/swat%{samba_major}
 #%attr(-,root,root) /sbin/*
 %{_sbindir}/swat%{samba_major}
-%{_datadir}/applications/mandriva-%{name}-swat.desktop
+%{_datadir}/applications/mageia-%{name}-swat.desktop
 %{_miconsdir}/*.png
 %{_liconsdir}/*.png
 %{_iconsdir}/*.png
@@ -1835,7 +1839,7 @@ update-alternatives --auto smbclient
 %dir %{_datadir}/swat%{samba_major}
 %attr(0750,root,adm) %{_datadir}/%{name}/scripts/smb-migrate
 %attr(-,root,root) %{_datadir}/%{name}/smb.conf.clean
-%attr(-,root,root) %{_datadir}/%{name}/README.mdk.conf
+%attr(-,root,root) %{_datadir}/%{name}/README.mga.conf
 
 %if %build_winbind
 %files winbind -f pam_winbind.lang
@@ -1970,15 +1974,13 @@ update-alternatives --auto smbclient
 %defattr(-,root,root)
 %{_libdir}/%{name}/vfs/vscan-antivir.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-antivir.conf
-%doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
 
 %if %build_clamav
-%files vscan-clamav
+%files virusfilter-clamav
 %defattr(-,root,root)
-%{_libdir}/%{name}/vfs/vscan-clamav.so
-%config(noreplace) %{_sysconfdir}/%{name}/vscan-clamav.conf
-%doc %{vfsdir}/%{vscandir}/INSTALL
+%{_libdir}/%{name}/vfs/svf-clamav.so
+%config(noreplace) %{_sysconfdir}/%{name}/smb.svf-clamav.conf
 %endif
 
 %if %build_fprot
@@ -1990,11 +1992,10 @@ update-alternatives --auto smbclient
 %endif
 
 %if %build_fsav
-%files vscan-fsecure
+%files virusfilter-fsecure
 %defattr(-,root,root)
-%{_libdir}/%{name}/vfs/vscan-fsav.so
-%config(noreplace) %{_sysconfdir}/%{name}/vscan-fsav.conf
-%doc %{vfsdir}/%{vscandir}/INSTALL
+%{_libdir}/%{name}/vfs/svf-fsav.so
+%config(noreplace) %{_sysconfdir}/%{name}/smb.svf-fsav.conf
 %endif
 
 %if %build_icap
@@ -2038,11 +2039,10 @@ update-alternatives --auto smbclient
 %endif
 
 %if %build_sophos
-%files vscan-sophos
+%files virusfilter-sophos
 %defattr(-,root,root)
-%{_libdir}/%{name}/vfs/vscan-sophos.so
-%config(noreplace) %{_sysconfdir}/%{name}/vscan-sophos.conf
-%doc %{vfsdir}/%{vscandir}/INSTALL
+%{_libdir}/%{name}/vfs/svf-sophos.so
+%config(noreplace) %{_sysconfdir}/%{name}/smb.svf-sophos.conf
 %endif
 
 %if %build_symantec
@@ -2068,3 +2068,102 @@ update-alternatives --auto smbclient
 %{_datadir}/pixmaps/samba/samba.ico
 %{_datadir}/pixmaps/samba/logo.png
 %{_datadir}/pixmaps/samba/logo-small.png
+
+
+
+%changelog
+
+* Wed Sep 19 2012 fwang <fwang> 3.6.8-1.mga3
++ Revision: 296015
+- new version 3.6.8
+
+* Fri Aug 17 2012 buchan <buchan> 3.6.7-1.mga3
++ Revision: 281805
+- New version 3.6.7
+
+* Sat Jun 30 2012 colin <colin> 3.6.6-3.mga3
++ Revision: 265421
+- Rebuild for new Kerberos
+
+* Tue Jun 26 2012 fwang <fwang> 3.6.6-2.mga3
++ Revision: 263984
+- add conflicts to ease upgrade
+- fix conflicts
+- should use configure2_5x
+
+* Tue Jun 26 2012 fwang <fwang> 3.6.6-1.mga3
++ Revision: 263801
+- new verison 3.6.6
+
+* Sun May 06 2012 luigiwalser <luigiwalser> 3.6.5-2.mga2
++ Revision: 234797
+- libwbcilent-devel should require libwbclient
+
+* Tue May 01 2012 buchan <buchan> 3.6.5-1.mga2
++ Revision: 234453
+- Switch from samba-vscan to samba-virusfilter, and enable building it by default
+- New version 3.6.5
+
+* Tue Apr 10 2012 pterjan <pterjan> 3.6.4-1.mga2
++ Revision: 230141
+- Update to 3.6.4 (Security release for CVE-2012-1182)
+
+  + buchan <buchan>
+    - New version 3.6.3
+
+* Fri Jan 13 2012 buchan <buchan> 3.6.1-1.mga2
++ Revision: 195676
+- New version 3.6.1
+- Drop mount-cifs subpackage
+- Force versioned dependency on libwbclient in server
+- BR newer ctdb-devel
+- macro-ise signature checking
+
+* Tue Dec 20 2011 buchan <buchan> 3.5.12-1.mga2
++ Revision: 184853
+- 3.5.12
+- Fix dangling symlinks to tools we no longer ship
+
+  + fwang <fwang>
+    - fix initscript
+    - new version 3.5.11
+    - new version 3.5.10
+
+* Fri May 13 2011 buchan <buchan> 3.5.8-1.mga1
++ Revision: 97979
+- Explicitly request external tdb and talloc
+- Try and fix netapi example linking
+- Enable dns updates
+- Remove some old patches
+- Fix CFLAGS manipulation
+
+* Thu May 05 2011 saispo <saispo> 3.5.5-3.mga1
++ Revision: 95047
+- Bump release
+- Fix typo in patch34
+- Fix bug #1152 and CVE-2011-0719
+
+* Mon Apr 18 2011 dams <dams> 3.5.5-2.mga1
++ Revision: 87809
+- clean smb.conf (from MDVGROUP to MGAGROUP
+- clean smb.conf (from MDVGROUP to MGAGROUP
+
+  + rtp <rtp>
+    - Add missing library when linking against libnetapi in examples
+
+* Thu Jan 13 2011 dmorgan <dmorgan> 3.5.5-1.mga1
++ Revision: 9014
+- fix file ext
+- Fix rm files
+- More file lisdt fixing
+- Fix file list
+- Fix file list and remove mdk occurencies
+- Disable mgaver, need to be fixed
+- Do not use real_version for now, does not work on the BS
+- Add back missing macro
+- More mandriva/Mandrake clean
+- Remove mandriva macros
+
+  + kharec <kharec>
+    - imported package samba
+
