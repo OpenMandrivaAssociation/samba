@@ -53,7 +53,7 @@ rm -Rf $GNUPGHOME \
 
 %if %have_pversion
 %define source_ver 	%{pversion}
-%define rel %mkrel 1.%{prelease}
+%define rel 1.%{prelease}
 # Don't abort for stupid reasons on builds from tarballs:
 %global	_unpackaged_files_terminate_build	0
 %global	_missing_doc_files_terminate_build	0
