@@ -1,6 +1,6 @@
 %define pkg_name	samba
 %define version		3.6.9
-%define rel		1
+%define rel		5
 #define	subrel		1
 %define vscanver 	0.1.3
 %define libsmbmajor	0
@@ -227,7 +227,7 @@ Summary: Samba SMB server
 Name: %{pkg_name}%{samba_major}
 
 Version: %{source_ver}
-Release: %mkrel %rel
+Release: %rel
 
 License: GPLv3
 Group: System/Servers
