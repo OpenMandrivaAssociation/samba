@@ -3,7 +3,7 @@
 
 %define pkg_name	samba
 %define version		3.6.9
-%define rel		1
+%define rel		2	
 %define epoch		1
 #define	subrel		1
 %define vscanver 	0.3.6c-beta5
