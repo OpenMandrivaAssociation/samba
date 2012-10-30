@@ -1138,7 +1138,6 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #_if !%build_system
 #                --with-smbwrapper \
 #_endif		
-		--without-nisplugsam \
 		--without-nis
 #                --with-fhs \
 
