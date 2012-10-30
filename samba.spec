@@ -1131,14 +1131,15 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 		--with-shared-modules=idmap_rid,idmap_ad \
 		--enable-avahi \
 		--with-dnsupdate \
-		--program-suffix=%{samba_major} 
+		--program-suffix=%{samba_major} \
 #		--with-expsam=%build_expsam \
 #		--with-shared-modules=pdb_ldap,idmap_ldap \
 #		--with-manpages-langs=en,ja,pl	\
 #_if !%build_system
 #                --with-smbwrapper \
 #_endif		
-#		--with-nisplussam \
+		--without-nisplugsam \
+		--without-without-nisplug-home
 #                --with-fhs \
 
 # Remove -Wl,--no-undefined for plugins:
