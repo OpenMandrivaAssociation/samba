@@ -63,7 +63,7 @@ rm -Rf $GNUPGHOME \
 
 %define prerel %mga_ver -r %rel %source_ver
 %define real_version %mga_ver %source_ver
-%define release %mkrel %prerel
+%define release %prerel
 %define have_pre %([ "%version" == "%source_ver" ]; echo $?)
 
 # Check to see if we are running a build from a tarball release from samba.org
