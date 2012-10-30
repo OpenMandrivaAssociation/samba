@@ -266,12 +266,12 @@ Source30:	smb.conf
 
 %if !%have_pversion
 # Version specific patches: current version
-Patch11: samba-3.0-mageia-packaging.patch
+#Patch11: samba-3.0-mageia-packaging.patch
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
-Patch30: samba-3.5-check-undefined-before-zdefs.patch
+# Patch30: samba-3.5-check-undefined-before-zdefs.patch
 Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
-Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
+# Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -959,12 +959,12 @@ gzip -dc %{SOURCE0} > $VERIFYSOURCE
 # Version specific patches: current version
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
-%patch11 -p1 -b .mga
+# %patch11 -p1 -b .mga
 pushd source3
 popd
 %patch30 -p1 -b .checkflags
 #patch31 -p1 -b .nss_wins_log
-%patch33 -p1 -b .netapi_link
+#%patch33 -p1 -b .netapi_link
 
 # patches from cvs/samba team
 pushd source3
