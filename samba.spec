@@ -1,15 +1,19 @@
+%define _build_pkgcheck_set %{nil}
+%define _build_pkgcheck_srpm %{nil}
+
 %define pkg_name	samba
 %define version		3.6.9
-%define rel		5
+%define rel		1
+%define epoch		1
 #define	subrel		1
-%define vscanver 	0.1.3
+%define vscanver 	0.3.6c-beta5
 %define libsmbmajor	0
 %define netapimajor	0
 %define smbsharemodesmajor	0
 %define	tallocmajor	1
 %define tdbmajor	1
 %define	wbclientmajor	0
- 
+
 %define check_sig() export GNUPGHOME=%{_tmppath}/rpm-gpghome \
 if [ -d "$GNUPGHOME" ] \
 then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1 \
@@ -30,7 +34,7 @@ rm -Rf $GNUPGHOME \
 %{!?lib: %global lib lib}
 %{!?mklibname: %global mklibname(ds) %lib%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}}
 
-%{?!mga_ver:%global mga_ver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
+%{?!mkver:%define mkver(r:) %{-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "0.$pre." if $pre =~ /\\w\{2,\}/;print "%{-r*}"')}%{!-r:%(perl -e '$_="%{1}";m/(((\\d\\.?)+)(\\w\*))(.\*)/;$pre=$4;print "$2";print $pre if $pre !~ /\\w{2,}/')}}
 
 %define libname %mklibname smbclient %libsmbmajor
 %define libnetapi %mklibname netapi %netapimajor
@@ -53,7 +57,7 @@ rm -Rf $GNUPGHOME \
 
 %if %have_pversion
 %define source_ver 	%{pversion}
-%define rel 1.%{prelease}
+%define rel 2.%{prelease}
 # Don't abort for stupid reasons on builds from tarballs:
 %global	_unpackaged_files_terminate_build	0
 %global	_missing_doc_files_terminate_build	0
@@ -61,15 +65,16 @@ rm -Rf $GNUPGHOME \
 %define source_ver 	%{version}
 %endif
 
-%define prerel %mga_ver -r %rel %source_ver
-%define real_version %mga_ver %source_ver
+%define prerel %mkver -r %rel %source_ver
+%define real_version %mkver %source_ver
 %define release %prerel
 %define have_pre %([ "%version" == "%source_ver" ]; echo $?)
 
 # Check to see if we are running a build from a tarball release from samba.org
 # (%have_pversion) If so, disable vscan, unless explicitly requested
 # (--with vscan).
-%define build_vscan 	1
+#FIXME
+%define build_vscan 	0
 %if %have_pversion
 %define build_vscan 	0
 %{?_with_vscan: %define build_vscan 1}
@@ -153,19 +158,19 @@ rm -Rf $GNUPGHOME \
 %if %build_vscan
 # These we build by default
 %global build_clamav 	1
-%global build_icap 	0
-%global build_fsav 	1
-%global build_sophos 	1
+%global build_icap 	1
 %endif
 %if %build_vscan && %build_scanners
 # These scanners are built if scanners are selected
 # symantec requires their library present and must be selected 
 # individually
 %global build_fprot 	1
+%global build_fsav 	1
 %global build_kaspersky 1
 %global build_mks 	1
 %global build_nai 	1
 %global build_openav	1
+%global build_sophos 	1
 %global build_trend 	1
 %endif
 %if %build_vscan
@@ -176,12 +181,12 @@ rm -Rf $GNUPGHOME \
 %{?_with_sophos: %{expand: %%global build_sophos 1}}
 #%{?_with_symantec: %{expand: %%global build_symantec 1}}
 %{?_with_trend: %{expand: %%global build_trend 1}}
-%global vscandir samba-virusfilter-%{vscanver}
+%global vscandir samba-vscan-%{vscanver}
 %endif
 %global vfsdir examples.bin/VFS
 
 #Standard texts for descriptions:
-%define message_bugzilla() %(echo -e -n "Please file bug reports for this package at Mageia bugzilla \\n(http://bugs.mageia.org) under the product name %{1}")
+%define message_bugzilla() %(echo -e -n "Please file bug reports for this package at Mandriva bugzilla \\n(http://qa.mandriva.com) under the product name %{1}")
 %define message_system %(echo -e -n "NOTE: These packages of samba-%{version}, are provided, parallel installable\\nwith samba-2.2.x, to allow easy migration from samba-2.2.x to samba-%{version},\\nbut are not officially supported")
 
 #check gcc version to disable some optimisations on gcc-3.3.1
@@ -227,21 +232,22 @@ Summary: Samba SMB server
 Name: %{pkg_name}%{samba_major}
 
 Version: %{source_ver}
-Release: %rel
+Release: %{release}
+Epoch:	%{epoch}
 
 License: GPLv3
 Group: System/Servers
-Source: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.gz
-Source99: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.asc
-Source98: http://ftp.samba.org/pub/samba/samba-pubkey.asc
+Source: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.gz
+Source99: http://www.samba.org/samba/ftp/stable/samba-%{source_ver}.tar.asc
+Source98: http://www.samba.org/samba/ftp/samba-pubkey.asc
 URL:	http://www.samba.org
 Source1: samba.log
 Source3: samba.xinetd
 Source4: swat_48.png
 Source5: swat_32.png
 Source6: swat_16.png
-Source7: README.%{name}-mageia-rpm
-Source8: https://github.com/downloads/fumiyas/samba-virusfilter/samba-virusfilter-%{vscanver}.tar.bz2
+Source7: README.%{name}-mandriva-rpm
+Source8: samba-vscan-%{vscanver}.tar.gz
 %if %build_vscan
 %endif
 %if %build_vscan
@@ -266,12 +272,12 @@ Source30:	smb.conf
 
 %if !%have_pversion
 # Version specific patches: current version
-#Patch11: samba-3.0-mageia-packaging.patch
+Patch11: samba-3.0-mandriva-packaging.patch
 # https://bugzilla.samba.org/show_bug.cgi?id=3571, bug 21387
 Patch19: samba-3.0.21c-swat-fr-translaction.patch
-# Patch30: samba-3.5-check-undefined-before-zdefs.patch
+Patch30: samba-3.5-check-undefined-before-zdefs.patch
 Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
-# Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
+Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 %else
 # Version specific patches: upcoming version
 %endif
@@ -279,8 +285,8 @@ Patch31: samba-3.5.3-fix-nss-wins-syslog.patch
 # samba CVS)
 %if %have_pversion && %have_pre
 %endif
-Requires: pam >= 0.64, samba-common = %{version}
-BuildRequires: pam-devel readline-devel libncurses-devel popt-devel
+Requires: pam >= 0.64, samba-common = %{epoch}:%{version}
+BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
 BuildRequires: libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
 # http://lists.samba.org/archive/samba/2009-March/146821.html
@@ -301,9 +307,9 @@ BuildRequires: mysql-devel
 %endif
 %endif
 %if %build_acl
-BuildRequires: libacl-devel
+BuildRequires: acl-devel
 %endif
-BuildRequires: libcups-devel cups-common
+BuildRequires: cups-devel cups-common
 BuildRequires: libldap-devel
 %if %build_ads
 BuildRequires: libldap-devel krb5-devel
@@ -354,25 +360,29 @@ docs directory for implementation details.
 %endif
 %if %build_non_default
 WARNING: This RPM was built with command-line options. Please
-see README.%{name}-mageia-rpm in the documentation for
+see README.%{name}-mandriva-rpm in the documentation for
 more information.
 %endif
 
 %package server
 URL:	http://www.samba.org
 Summary: Samba (SMB) server programs
-Requires: %{name}-common = %{version}
-Requires: %libwbclient >= %{version}
+Requires: %{name}-common = %{epoch}:%{version}
+Requires: %libwbclient >= %{epoch}:%{version}
 %if %have_rpmhelper
 Requires(pre):		rpm-helper
 %endif
 Group: Networking/Other
+%if %build_system
 Provides: samba
 Obsoletes: samba
 Provides:  samba-server-ldap
 Obsoletes: samba-server-ldap
 Provides:  samba3-server
 Obsoletes: samba3-server
+%else
+#Provides: samba-server
+%endif
 
 %description server
 Samba-server provides a SMB server which can be used to provide
@@ -396,20 +406,29 @@ docs directory for implementation details.
 %if %have_pversion
 %message_bugzilla samba3-server
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %package client
 URL:	http://www.samba.org
 Summary: Samba (SMB) client programs
 Group: Networking/Other
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 Requires: cifs-utils >= 4.4
 %if %build_alternatives
 #Conflicts:	samba-client < 2.2.8a-9mdk
 %endif
+%if %build_system
 Provides:  samba3-client
 Obsoletes: samba3-client
 Obsoletes: smbfs
+%else
+#Provides: samba-client
+%endif
+%if !%build_system && %build_alternatives
 Provides: samba-client
+%endif
 
 %description client
 Samba-client provides some SMB clients, which complement the built-in
@@ -418,16 +437,22 @@ printing to SMB printers.
 %if %have_pversion
 %message_bugzilla samba3-client
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %package common
 URL:	http://www.samba.org
 Summary: Files used by both Samba servers and clients
 Group: System/Servers
-Conflicts: %{name}-server < 3.6.6-2
+%if %build_system
 Provides:  samba-common-ldap
 Obsoletes: samba-common-ldap
 Provides:  samba3-common
 Obsoletes: samba3-common
+%else
+#Provides: samba-common
+%endif
 
 %description common
 Samba-common provides files necessary for both the server and client
@@ -435,15 +460,22 @@ packages of Samba.
 %if %have_pversion
 %message_bugzilla samba3-common
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %package doc
 URL:	http://www.samba.org
 Summary: Documentation for Samba servers and clients
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 BuildArch: noarch
+%if %build_system
 Obsoletes: samba3-doc
 Provides:  samba3-doc
+%else
+#Provides: samba-doc
+%endif
 
 %description doc
 Samba-doc provides documentation files for both the server and client
@@ -451,17 +483,24 @@ packages of Samba.
 %if %have_pversion
 %message_bugzilla samba3-doc
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %package swat
 URL:	http://www.samba.org
 Summary: The Samba Web Administration Tool
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Requires: xinetd
 Group: System/Servers
+%if %build_system
 Provides:  samba-swat-ldap
 Obsoletes: samba-swat-ldap
 Provides:  samba3-swat
 Obsoletes: samba3-swat
+%else
+#Provides: samba-swat
+%endif
 Conflicts: %{name}-server < 3.4.0
 Suggests: %{name}-doc
 
@@ -477,15 +516,20 @@ Samba.
 %if %have_pversion
 %message_bugzilla samba3-swat
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %if %build_winbind
 %package winbind
 URL:	http://www.samba.org
 Summary: Samba-winbind daemon, utilities and documentation
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 %endif
-
+%if %build_winbind && !%build_system
+Conflicts: samba-winbind
+%endif
 %if %build_winbind
 %description winbind
 Provides the winbind daemon and testing tools to allow authentication 
@@ -494,16 +538,21 @@ and group/user enumeration from a Windows or Samba domain controller.
 %if %have_pversion
 %message_bugzilla samba3-winbind
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %if %build_wins
 %package -n nss_wins%{samba_major}
 URL:	http://www.samba.org
 Summary: Name Service Switch service for WINS
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 Requires(pre): glibc
 %endif
-
+%if %build_wins && !%build_system
+Conflicts: nss_wins
+%endif
 %if %build_wins
 %description -n nss_wins%{samba_major}
 Provides the libnss_wins shared library which resolves NetBIOS names to 
@@ -512,18 +561,25 @@ IP addresses.
 %if %have_pversion
 %message_bugzilla nss_wins3
 %endif
+%if !%build_system
+%message_system
+%endif
 
 %if %build_test
 %package test
 URL:	http://www.samba.org
 Summary: Debugging and benchmarking tools for samba
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{epoch}:%{version}
 %endif
+%if %build_system && %build_test
 Provides:  samba3-test samba3-debug
 Obsoletes: samba3-test samba3-debug
+%endif
+%if !%build_system && %{build_test}
 Provides: samba-test samba3-debug
 Obsoletes: samba3-debug
+%endif
 %if %{build_test}
 
 %description test
@@ -531,6 +587,7 @@ This package provides tools for benchmarking samba, and debugging
 the correct operation of tools against smb servers.
 %endif
 
+%if %build_system
 %package -n %{libname}
 URL:		http://www.samba.org
 Summary: 	SMB Client Library
@@ -541,32 +598,44 @@ Provides:	libsmbclient
 This package contains the SMB client library, part of the samba
 suite of networking software, allowing other software to access
 SMB shares.
+%endif
+%if %have_pversion && %build_system
+%message_bugzilla %{libname}
+%endif
 
-
+%if %build_system
 %package -n %{libname}-devel
 URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
 Group:		Development/C
-Provides:	libsmbclient-devel = %{version}-%{release}
-Requires:       %{libname} = %{version}-%{release}
+Provides:	libsmbclient-devel = %{epoch}:%{version}-%{release}
+Requires:       %{libname} = %{epoch}:%{version}-%{release}
 
 %description -n %{libname}-devel
 This package contains the development files for the SMB client
 library, part of the samba suite of networking software, allowing
 the development of other software to access SMB shares.
+%endif
+%if %have_pversion && %build_system
+%message_bugzilla %{libname}-devel
+%endif
 
-
+%if %build_system
 %package -n %{libname}-static-devel
 URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
 Group:          Development/C
-Provides:       libsmbclient-static-devel = %{version}-%{release}
-Requires:       %{libname}-devel = %{version}-%{release}
+Provides:       libsmbclient-static-devel = %{epoch}:%{version}-%{release}
+Requires:       %{libname}-devel = %{epoch}:%{version}-%{release}
 
 %description -n %{libname}-static-devel
 This package contains the static development files for the SMB
 client library, part of the samba suite of networking software,
 allowing the development of other software to access SMB shares.
+%endif
+%if %have_pversion && %build_system
+%message_bugzilla %{libname}-devel
+%endif
 
 %package -n %libnetapi
 Summary: Samba library for accessing functions in 'net' binary
@@ -578,7 +647,7 @@ Samba library for accessing functions in 'net' binary
 %package -n %netapidevel
 Group: Development/C
 Summary: Samba library for accessing functions in 'net' binary
-Provides: netapi-devel = %{version}-%{release}
+Provides: netapi-devel = %{epoch}:%{version}-%{release}
 
 %description -n %netapidevel
 Samba library for accessing functions in 'net' binary
@@ -593,7 +662,7 @@ Samba Library for accessing smb share modes (locks etc.)
 %package -n %smbsharemodesdevel
 Group: Development/C
 Summary: Samba Library for accessing smb share modes (locks etc.)
-Provides: smbsharemodes-devel = %{version}-%{release}
+Provides: smbsharemodes-devel = %{epoch}:%{version}-%{release}
 
 %description -n %smbsharemodesdevel
 Samba Library for accessing smb share modes (locks etc.)
@@ -609,7 +678,7 @@ Library implementing Samba's memory allocator
 %package -n %tallocdevel
 Group: Development/C
 Summary: Library implementing Samba's memory allocator
-Provides: talloc-devel = %{version}-%{release}
+Provides: talloc-devel = %{epoch}:%{version}-%{release}
 
 %description -n %tallocdevel
 Library implementing Samba's memory allocator
@@ -626,7 +695,7 @@ Library implementing Samba's embedded database
 %package -n %tdbdevel
 Group: Development/C
 Summary: Library implementing Samba's embedded database
-Provides: tdb-devel = %{version}-%{release}
+Provides: tdb-devel = %{epoch}:%{version}-%{release}
 Requires: %libtdb
 # because /usr/include/tdb.h was moved from libsmbclient0-devel to libtdb-devel
 Conflicts: %{mklibname smbclient 0 -d} < 3.2.6-3
@@ -645,8 +714,8 @@ Library providing access to winbindd
 %package -n %wbclientdevel
 Group: Development/C
 Summary: Library providing access to winbindd
-Provides: wbclient-devel = %{version}-%{release}
-Requires: %libwbclient >= %{version}
+Provides: wbclient-devel = %{epoch}:%{version}-%{release}
+Requires: %libwbclient >= %{epoch}:%{version}
 
 %description -n %wbclientdevel
 Library providing access to winbindd
@@ -663,6 +732,9 @@ Library providing access to winbindd
 #_if %have_pversion
 #_message_bugzilla samba3-passdb-ldap
 #_endif
+#_if !%build_system
+#_message_system
+#_endif
 
 %ifnarch alpha
 %if %{build_mysql}
@@ -670,11 +742,11 @@ Library providing access to winbindd
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for MySQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{version}-%{release}
+Requires:	%{name}-server = %{epoch}:%{version}-%{release}
 %endif
 %endif
 %ifnarch alpha
-%if %{build_mysql}
+%if %build_system && %{build_mysql}
 Obsoletes:	samba3-passdb-mysql 
 Provides:	samba3-passdb-mysql 
 %endif
@@ -696,11 +768,11 @@ database
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for PostgreSQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{version}-%{release}
+Requires:	%{name}-server = %{epoch}:%{version}-%{release}
 #endif
 #ifnarch alpha && %build_system
 %endif
-%if %{build_pgsql}
+%if %build_system && %{build_pgsql}
 Obsoletes:	samba3-passdb-pgsql
 Provides:	samba3-passdb-pgsql
 %endif
@@ -717,7 +789,7 @@ database
 %package vscan-antivir
 Summary: On-access virus scanning for samba using Antivir
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-antivir
 A vfs-module for samba to implement on-access scanning using the
@@ -726,28 +798,22 @@ Antivir antivirus scanner daemon.
 
 
 %if %build_clamav
-%package virusfilter-clamav
+%package vscan-clamav
 Summary: On-access virus scanning for samba using Clam Antivirus
 Group: System/Servers
-URL: https://github.com/fumiyas/samba-virusfilter
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
-Provides: %{name}-virusfilter
 Requires: clamd
-%description virusfilter-clamav
-This is a Samba VFS module to scan and filter virus files on Samba file
-services with an anti-virus scanner.
-
-This package includes the VFS module supporting:
-* ClamAV (clamd daemon) http://www.clamav.net
-
+%description vscan-clamav
+A vfs-module for samba to implement on-access scanning using the
+Clam antivirus scanner daemon.
 %endif
 
 %if %build_fprot
 %package vscan-fprot
 Summary: On-access virus scanning for samba using FPROT
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-fprot
 A vfs-module for samba to implement on-access scanning using the
@@ -755,27 +821,21 @@ FPROT antivirus software (which must be installed to use this).
 %endif
 
 %if %build_fsav
-%package virusfilter-fsecure
+%package vscan-fsecure
 Summary: On-access virus scanning for samba using F-Secure
 Group: System/Servers
-URL: https://github.com/fumiyas/samba-virusfilter
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
-Provides: %{name}-virusfilter
-%description virusfilter-fsecure
-This is a Samba VFS module to scan and filter virus files on Samba file
-services with an anti-virus scanner.
-
-This package provides the VFS module supporting:
-* F-Secure Anti-Virus (fsavd daemon) http://www.f-secure.com
-
+%description vscan-fsecure
+A vfs-module for samba to implement on-access scanning using the
+F-Secure antivirus software (which must be installed to use this).
 %endif
 
 %if %build_icap
 %package vscan-icap
 Summary: On-access virus scanning for samba using ICAP
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-icap
 %description vscan-icap
 A vfs-module for samba to implement on-access scanning using
@@ -786,7 +846,7 @@ ICAP-capable antivirus software.
 %package vscan-kaspersky
 Summary: On-access virus scanning for samba using Kaspersky
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-kaspersky
 A vfs-module for samba to implement on-access scanning using the
@@ -797,7 +857,7 @@ Kaspersky antivirus software (which must be installed to use this).
 %package vscan-mks
 Summary: On-access virus scanning for samba using MKS
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-mks
 A vfs-module for samba to implement on-access scanning using the
@@ -808,7 +868,7 @@ MKS antivirus software (which must be installed to use this).
 %package vscan-nai
 Summary: On-access virus scanning for samba using NAI McAfee
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-nai
 A vfs-module for samba to implement on-access scanning using the
@@ -819,7 +879,7 @@ NAI McAfee antivirus software (which must be installed to use this).
 %package vscan-openav
 Summary: On-access virus scanning for samba using OpenAntivirus
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-openav
 A vfs-module for samba to implement on-access scanning using the
@@ -827,25 +887,21 @@ OpenAntivirus antivirus software (which must be installed to use this).
 %endif
 
 %if %build_sophos
-%package virusfilter-sophos
+%package vscan-sophos
 Summary: On-access virus scanning for samba using Sophos
 Group: System/Servers
-URL: https://github.com/fumiyas/samba-virusfilter
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
-%description virusfilter-sophos
-This is a Samba VFS module to scan and filter virus files on Samba file
-services with an anti-virus scanner.
-
-This package includes the VFS module supporting:
-* Sophos Anti-Virus (savdid daemon) http://www.sophos.com
+%description vscan-sophos
+A vfs-module for samba to implement on-access scanning using the
+Sophos antivirus software (which must be installed to use this).
 %endif
 
 %if %build_symantec
 %package vscan-symantec
 Summary: On-access virus scanning for samba using Symantec
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 Autoreq: 0
 %description vscan-symantec
@@ -858,7 +914,7 @@ Symantec antivirus software (which must be installed to use this).
 %package vscan-trend
 Summary: On-access virus scanning for samba using Trend
 Group: System/Servers
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{epoch}:%{version}
 Provides: %{name}-vscan
 %description vscan-trend
 A vfs-module for samba to implement on-access scanning using the
@@ -867,7 +923,7 @@ Trend antivirus software (which must be installed to use this).
 
 %package domainjoin-gui
 Summary: Domainjoin GUI
-Requires: samba-common = %{version}
+Requires: samba-common = %{epoch}:%{version}
 Group: System/Configuration/Other
 
 %description domainjoin-gui
@@ -959,12 +1015,12 @@ gzip -dc %{SOURCE0} > $VERIFYSOURCE
 # Version specific patches: current version
 %if !%have_pversion
 echo "Applying patches for current version: %{ver}"
-# %patch11 -p1 -b .mga
+%patch11 -p1 -b .mdk
 pushd source3
 popd
-# %patch30 -p1 -b .checkflags
+%patch30 -p1 -b .checkflags
 #patch31 -p1 -b .nss_wins_log
-#%patch33 -p1 -b .netapi_link
+%patch33 -p1 -b .netapi_link
 
 # patches from cvs/samba team
 pushd source3
@@ -985,14 +1041,27 @@ cp %{SOURCE7} .
 cp -a examples examples.bin
 
 %if %build_vscan
-pushd samba-virusfilter-%{vscanver}
-perl -pi -e 's,/var/run/clamav/clamd.ctl,/var/lib/clamav/clamd.socket,g' clamav/svf-clamav.c
-popd
+cp -a %{vscandir} %{vfsdir}
+#fix stupid directory names:
+#mv %{vfsdir}/%{vscandir}/openantivirus %{vfsdir}/%{vscandir}/oav
+# Inline replacement of config dir
+for av in antivir clamav fprotd fsav icap kavp mksd mcdaemon oav sophos symantec trend
+ do
+	[ -e %{vfsdir}/%{vscandir}/*/vscan-$av.h ] && perl -pi -e \
+	's,^#define PARAMCONF "/etc/samba,#define PARAMCONF "/etc/%{name},' \
+	%{vfsdir}/%{vscandir}/*/vscan-$av.h
+done
+#Inline edit vscan header:
+perl -pi -e 's/^# define SAMBA_VERSION_MAJOR 2/# define SAMBA_VERSION_MAJOR 3/g;s/# define SAMBA_VERSION_MINOR 2/# define SAMBA_VERSION_MINOR 0/g' %{vfsdir}/%{vscandir}/include/vscan-global.h
+# dunno why samba-vscan keeps copmatability with ancient versions
+# of samba but breaks  on samba versions with alpha chars in the name ...
+perl -pi -e 's/SAMBA_VERSION_MAJOR==2 && SAMBA_VERSION_RELEASE>=4/SAMBA_VERSION_MAJOR==2/g' %{vfsdir}/%{vscandir}/*/vscan-*.c
 %endif
 
 # Edit some files when not building system samba:
+%if !%build_system
 perl -pi -e 's/%{pkg_name}/%{name}/g' source3/auth/pampass.c
-
+%endif
 
 #remove cvs internal files from docs:
 find docs examples -name '.cvsignore' -exec rm -f {} \;
@@ -1018,7 +1087,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 ./autogen.sh
 # Don't use --with-fhs now, since it overrides libdir, it sets configdir, 
 # lockdir,piddir logfilebase,privatedir and swatdir
-%configure2_5x  --prefix=%{_prefix} \
+%configure      --prefix=%{_prefix} \
                 --sysconfdir=%{_sysconfdir}/%{name} \
                 --localstatedir=/var \
                 --with-modulesdir=%{_libdir}/%{name} \
@@ -1066,7 +1135,8 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #		--with-expsam=%build_expsam \
 #		--with-shared-modules=pdb_ldap,idmap_ldap \
 #		--with-manpages-langs=en,ja,pl	\
-#               --with-smbwrapper \
+#_if !%build_system
+#                --with-smbwrapper \
 #_endif		
 #		--with-nisplussam \
 #                --with-fhs \
@@ -1096,8 +1166,10 @@ make -C lib/netapi/examples
 
 %if %build_vscan
 echo -e "\n\nBuild antivirus VFS modules\n\n"
-pushd %{vscandir}
-%configure --with-samba-source=../
+pushd %{vfsdir}/%{vscandir}
+%configure
+#sed -i -e 's,openantivirus,oav,g' Makefile
+sed -i -e 's,^\(.*clamd socket name.*=\).*,\1 /var/lib/clamav/clamd.socket,g' clamav/vscan-clamav.conf
 make
 popd
 %endif
@@ -1153,17 +1225,10 @@ install -m755 source3/bin/lib*.a %{buildroot}%{_libdir}/
 #install -m 755 source/bin/smbsh %{buildroot}%{_bindir}/
 
 %if %build_vscan
-%makeinstall_std -C %{vscandir}
-install -m 644 %{vscandir}/etc/*.conf.example %{buildroot}/%{_sysconfdir}/%{name}
-for i in %{buildroot}/%{_sysconfdir}/%{name}/*.example
-do mv $i ${i%%.example}
-done
-#mv %{buildroot}/%{_datadir}/%{name}/bin/svf-notify %{buildroot}/%{_datadir}/%{name}/scripts
-# script uses ksh, which we don't have
-rm %{buildroot}/%{_datadir}/%{name}/bin/svf-notify
-perl -pi -e 's,%{_datadir}/%{name}/bin,%{_datadir}/%{name}/scripts,g' %{buildroot}/%{_sysconfdir}/%{name}/smb.svf-*.conf
+%makeinstall_std -C %{vfsdir}/%{vscandir}
+install -m 644 %{vfsdir}/%{vscandir}/*/vscan-*.conf %{buildroot}/%{_sysconfdir}/%{name}
 %endif
-
+	
 #libnss_* still not handled by make:
 # Install the nsswitch library extension file
 for i in wins winbind; do
@@ -1210,8 +1275,8 @@ install -m 0644 examples/pam_winbind/pam_winbind.conf %{buildroot}%{_sysconfdir}
 install -m755 examples/LDAP/convertSambaAccount %{buildroot}/%{_datadir}/%{name}/scripts/
 
 # make a conf file for winbind from the default one:
-	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mageia/smb-winbind.conf
-        install -m644 packaging/Mageia/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
+	cat %{SOURCE30}|sed -e  's/^;  winbind/  winbind/g;s/^;  obey pam/  obey pam/g;s/   printer admin = @adm/#  printer admin = @adm/g; s/^#   printer admin = @"D/   printer admin = @"D/g;s/^;   password server = \*/   password server = \*/g;s/^;  template/  template/g; s/^   security = user/   security = domain/g' > packaging/Mandriva/smb-winbind.conf
+        install -m644 packaging/Mandriva/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
 install -m644 %{SOURCE30} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
@@ -1243,7 +1308,7 @@ perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sy
 # menu support
 
 mkdir -p %{buildroot}/%{_datadir}/applications
-cat > %{buildroot}/%{_datadir}/applications/mageia-%{name}-swat.desktop << EOF
+cat > %{buildroot}/%{_datadir}/applications/mandriva-%{name}-swat.desktop << EOF
 [Desktop Entry]
 Name=Samba Configuration (SWAT)
 Comment=The Swat Samba Administration Tool
@@ -1330,8 +1395,8 @@ rm -f %{buildroot}/%{_mandir}/man1/testprns*
 # smb.conf won't get overwritten
 cp %{buildroot}/%{_sysconfdir}/%{name}/smb.conf %{buildroot}/%{_datadir}/%{name}/smb.conf.clean
 
-# (sb) leave a README.mga.conf to explain what has been done
-cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.mga.conf
+# (sb) leave a README.mdk.conf to explain what has been done
+cat << EOF > %{buildroot}/%{_datadir}/%{name}/README.mdk.conf
 In order to facilitate upgrading an existing samba install, and merging
 previous configuration data with any new syntax used by samba3, a merge
 script has attempted to combine your local configuration data with the
@@ -1413,7 +1478,7 @@ rm -f %{_libdir}/pkgconfig/smbclient.pc
 %endif
 
 %if %build_vscan
-#rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan*.so
+rm -f %{buildroot} %{_libdir}/%{name}/vfs/vscan*.so
 
 %if !%build_antivir
 rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-antivir.so
@@ -1421,8 +1486,8 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-antivir.conf
 %endif
 
 %if !%build_clamav
-rm -f %{buildroot}%{_libdir}/%{name}/vfs/svf-clamav.so
-rm -f %{buildroot}%{_sysconfdir}/%{name}/smb.svf-clamav.conf
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-clamav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-clamav.conf
 %endif
 
 %if !%build_fprot
@@ -1431,8 +1496,8 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fprotd.conf
 %endif
 
 %if !%build_fsav
-rm -f %{buildroot}%{_libdir}/%{name}/vfs/svf-fsav.so
-rm -f %{buildroot}%{_sysconfdir}/%{name}/smb.svf-fsav.conf
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-fsav.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-fsav.conf
 %endif
 
 %if !%build_icap
@@ -1461,8 +1526,8 @@ rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-oav.conf
 %endif
 
 %if !%build_sophos
-rm -f %{buildroot}%{_libdir}/%{name}/vfs/svf-sophos.so
-rm -f %{buildroot}%{_sysconfdir}/%{name}/smb.svf-sophos.conf
+rm -f %{buildroot}%{_libdir}/%{name}/vfs/vscan-sophos.so
+rm -f %{buildroot}%{_sysconfdir}/%{name}/vscan-sophos.conf
 %endif
 
 %if !%build_symantec
@@ -1540,7 +1605,7 @@ fi
 # And not loose our machine account SID
 [ -f %{_sysconfdir}/MACHINE.SID ] && mv -f %{_sysconfdir}/MACHINE.SID %{_sysconfdir}/%{name}/ ||:
 
-# FIXME: Can be removed in mageia ?
+# FIXME: Can be removed in mandriva ?
 %triggerpostun common -- samba-common < 3.0.1-3mdk
 # (sb) merge any existing smb.conf with new syntax file
 if [ $1 = 2 ]; then
@@ -1550,13 +1615,13 @@ if [ $1 = 2 ]; then
 	echo "Upgrade: merging previous smb.conf..."
 	if [ -f %{_datadir}/%{name}/smb.conf.clean ]; then
 		cp %{_datadir}/%{name}/smb.conf.clean %{_sysconfdir}/%{name}/smb.conf
-		cp %{_datadir}/%{name}/README.mga.conf %{_sysconfdir}/%{name}/
+		cp %{_datadir}/%{name}/README.mdk.conf %{_sysconfdir}/%{name}/
 		%{_datadir}/%{name}/scripts/smb-migrate commit
 	fi
 fi
 
 %postun common
-if [ -f %{_sysconfdir}/%{name}/README.mga.conf ];then rm -f %{_sysconfdir}/%{name}/README.mga.conf;fi
+if [ -f %{_sysconfdir}/%{name}/README.mdk.conf ];then rm -f %{_sysconfdir}/%{name}/README.mdk.conf;fi
 
 %if %build_winbind
 %post winbind
@@ -1690,8 +1755,8 @@ update-alternatives --auto smbclient
 %attr(1777,root,root) %dir /var/spool/%{name}
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
-%attr(0755,root,root) %{_datadir}/%{name}/scripts/*
-%exclude %{_datadir}/%{name}/scripts/smb-migrate
+%attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
+%attr(0755,root,root) %{_datadir}/%{name}/scripts/convertSambaAccount
 %{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/vfs_*.8*
 
@@ -1699,7 +1764,7 @@ update-alternatives --auto smbclient
 %defattr(-,root,root)
 %doc README COPYING Manifest Read-Manifest-Now
 %doc WHATSNEW.txt Roadmap
-%doc README.%{name}-mageia-rpm
+%doc README.%{name}-mandriva-rpm
 %doc clean-docs/samba-doc/docs/*
 %doc clean-docs/samba-doc/examples
 #%attr(-,root,root) %{_datadir}/swat%{samba_major}/using_samba/
@@ -1710,7 +1775,7 @@ update-alternatives --auto smbclient
 %config(noreplace) %{_sysconfdir}/xinetd.d/swat%{samba_major}
 #%attr(-,root,root) /sbin/*
 %{_sbindir}/swat%{samba_major}
-%{_datadir}/applications/mageia-%{name}-swat.desktop
+%{_datadir}/applications/mandriva-%{name}-swat.desktop
 %{_miconsdir}/*.png
 %{_liconsdir}/*.png
 %{_iconsdir}/*.png
@@ -1770,7 +1835,7 @@ update-alternatives --auto smbclient
 %dir %{_datadir}/swat%{samba_major}
 %attr(0750,root,adm) %{_datadir}/%{name}/scripts/smb-migrate
 %attr(-,root,root) %{_datadir}/%{name}/smb.conf.clean
-%attr(-,root,root) %{_datadir}/%{name}/README.mga.conf
+%attr(-,root,root) %{_datadir}/%{name}/README.mdk.conf
 
 %if %build_winbind
 %files winbind -f pam_winbind.lang
@@ -1905,13 +1970,15 @@ update-alternatives --auto smbclient
 %defattr(-,root,root)
 %{_libdir}/%{name}/vfs/vscan-antivir.so
 %config(noreplace) %{_sysconfdir}/%{name}/vscan-antivir.conf
+%doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
 
 %if %build_clamav
-%files virusfilter-clamav
+%files vscan-clamav
 %defattr(-,root,root)
-%{_libdir}/%{name}/vfs/svf-clamav.so
-%config(noreplace) %{_sysconfdir}/%{name}/smb.svf-clamav.conf
+%{_libdir}/%{name}/vfs/vscan-clamav.so
+%config(noreplace) %{_sysconfdir}/%{name}/vscan-clamav.conf
+%doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
 
 %if %build_fprot
@@ -1923,10 +1990,11 @@ update-alternatives --auto smbclient
 %endif
 
 %if %build_fsav
-%files virusfilter-fsecure
+%files vscan-fsecure
 %defattr(-,root,root)
-%{_libdir}/%{name}/vfs/svf-fsav.so
-%config(noreplace) %{_sysconfdir}/%{name}/smb.svf-fsav.conf
+%{_libdir}/%{name}/vfs/vscan-fsav.so
+%config(noreplace) %{_sysconfdir}/%{name}/vscan-fsav.conf
+%doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
 
 %if %build_icap
@@ -1970,10 +2038,11 @@ update-alternatives --auto smbclient
 %endif
 
 %if %build_sophos
-%files virusfilter-sophos
+%files vscan-sophos
 %defattr(-,root,root)
-%{_libdir}/%{name}/vfs/svf-sophos.so
-%config(noreplace) %{_sysconfdir}/%{name}/smb.svf-sophos.conf
+%{_libdir}/%{name}/vfs/vscan-sophos.so
+%config(noreplace) %{_sysconfdir}/%{name}/vscan-sophos.conf
+%doc %{vfsdir}/%{vscandir}/INSTALL
 %endif
 
 %if %build_symantec
@@ -2001,100 +2070,421 @@ update-alternatives --auto smbclient
 %{_datadir}/pixmaps/samba/logo-small.png
 
 
-
 %changelog
+* Tue Jun 12 2012 Crispin Boylan <crisb@mandriva.org> 1:3.6.5-4
++ Revision: 805255
+- Fix versioned requires
 
-* Wed Sep 19 2012 fwang <fwang> 3.6.8-1.mga3
-+ Revision: 296015
-- new version 3.6.8
+* Tue Jun 12 2012 Crispin Boylan <crisb@mandriva.org> 1:3.6.5-3
++ Revision: 805250
+- Bump epoch to fix wbclient conflict with samba 4
 
-* Fri Aug 17 2012 buchan <buchan> 3.6.7-1.mga3
-+ Revision: 281805
-- New version 3.6.7
+  + Bernhard Rosenkraenzer <bero@bero.eu>
+    - Rebuild because of libwbclient smb3<->smb4 conflict
 
-* Sat Jun 30 2012 colin <colin> 3.6.6-3.mga3
-+ Revision: 265421
-- Rebuild for new Kerberos
+* Sat May 05 2012 Oden Eriksson <oeriksson@mandriva.com> 3.6.5-2
++ Revision: 796622
+- make the ugly macro work
+- try to bump the release (fugly spec file!)
+- fix deps
 
-* Tue Jun 26 2012 fwang <fwang> 3.6.6-2.mga3
-+ Revision: 263984
-- add conflicts to ease upgrade
-- fix conflicts
-- should use configure2_5x
+* Tue May 01 2012 Oden Eriksson <oeriksson@mandriva.com> 3.6.5-1
++ Revision: 794701
+- 3.6.5
 
-* Tue Jun 26 2012 fwang <fwang> 3.6.6-1.mga3
-+ Revision: 263801
-- new verison 3.6.6
+* Tue May 01 2012 Oden Eriksson <oeriksson@mandriva.com> 3.6.4-1
++ Revision: 794689
+- sync with samba-3.6.4-1.mga2.src.rpm
 
-* Sun May 06 2012 luigiwalser <luigiwalser> 3.6.5-2.mga2
-+ Revision: 234797
-- libwbcilent-devel should require libwbclient
+* Tue May 01 2012 Oden Eriksson <oeriksson@mandriva.com> 3.5.15-1
++ Revision: 794688
+- 3.5.15
 
-* Tue May 01 2012 buchan <buchan> 3.6.5-1.mga2
-+ Revision: 234453
-- Switch from samba-vscan to samba-virusfilter, and enable building it by default
-- New version 3.6.5
+* Wed Apr 11 2012 Oden Eriksson <oeriksson@mandriva.com> 3.5.14-1
++ Revision: 790289
+- fix deps
+- disable rpmlint "wouldn't touch it with a ten foot pole - zz top"
+- 3.5.14
 
-* Tue Apr 10 2012 pterjan <pterjan> 3.6.4-1.mga2
-+ Revision: 230141
-- Update to 3.6.4 (Security release for CVE-2012-1182)
-
-  + buchan <buchan>
-    - New version 3.6.3
-
-* Fri Jan 13 2012 buchan <buchan> 3.6.1-1.mga2
-+ Revision: 195676
-- New version 3.6.1
-- Drop mount-cifs subpackage
-- Force versioned dependency on libwbclient in server
-- BR newer ctdb-devel
-- macro-ise signature checking
-
-* Tue Dec 20 2011 buchan <buchan> 3.5.12-1.mga2
-+ Revision: 184853
+* Thu Dec 15 2011 Oden Eriksson <oeriksson@mandriva.com> 3.5.12-1
++ Revision: 741675
+- fix deps
 - 3.5.12
-- Fix dangling symlinks to tools we no longer ship
 
-  + fwang <fwang>
-    - fix initscript
-    - new version 3.5.11
-    - new version 3.5.10
+* Wed Aug 17 2011 Buchan Milne <bgmilne@mandriva.org> 3.5.11-1
++ Revision: 694853
+- update to new version 3.5.11
 
-* Fri May 13 2011 buchan <buchan> 3.5.8-1.mga1
-+ Revision: 97979
+* Wed Jul 27 2011 Oden Eriksson <oeriksson@mandriva.com> 3.5.10-1
++ Revision: 691879
+- 3.5.10
+
+* Tue Jun 28 2011 Buchan Milne <bgmilne@mandriva.org> 3.5.9-1
++ Revision: 687769
+- update to new version 3.5.9
+
+* Mon May 02 2011 Buchan Milne <bgmilne@mandriva.org> 3.5.8-1
++ Revision: 662322
 - Explicitly request external tdb and talloc
 - Try and fix netapi example linking
 - Enable dns updates
 - Remove some old patches
-- Fix CFLAGS manipulation
+- Revert some pointless (taking into account samba4) non-maintainer changes
+- Fix build with gcc-4.6 optflags
 
-* Thu May 05 2011 saispo <saispo> 3.5.5-3.mga1
-+ Revision: 95047
-- Bump release
-- Fix typo in patch34
-- Fix bug #1152 and CVE-2011-0719
+  + Funda Wang <fwang@mandriva.org>
+    - more file list cleanup
+    - merge various scripts and conf files
+    - about to mergeback
 
-* Mon Apr 18 2011 dams <dams> 3.5.5-2.mga1
-+ Revision: 87809
-- clean smb.conf (from MDVGROUP to MGAGROUP
-- clean smb.conf (from MDVGROUP to MGAGROUP
+  + Per Øyvind Karlsen <peroyvind@mandriva.org>
+    - fix %%exclude abuse
+    - escape wildcards in shell so that they won't get expanded before %%files
 
-  + rtp <rtp>
-    - Add missing library when linking against libnetapi in examples
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - also add the sources...
+    - a futile version bump...
+    - giving up on this because it's too complex to fix and i have no time...
+    - fix file list
+    - 3.5.7
 
-* Thu Jan 13 2011 dmorgan <dmorgan> 3.5.5-1.mga1
-+ Revision: 9014
-- fix file ext
-- Fix rm files
-- More file lisdt fixing
-- Fix file list
-- Fix file list and remove mdk occurencies
-- Disable mgaver, need to be fixed
-- Do not use real_version for now, does not work on the BS
-- Add back missing macro
-- More mandriva/Mandrake clean
-- Remove mandriva macros
+* Wed Sep 15 2010 Buchan Milne <bgmilne@mandriva.org> 3.5.5-1mdv2011.0
++ Revision: 578669
+- update to new version 3.5.5
 
-  + kharec <kharec>
-    - imported package samba
+* Thu Sep 02 2010 Thierry Vignaud <tv@mandriva.org> 3.5.4-2mdv2011.0
++ Revision: 575203
+- let the doc subpackage be noarch
+
+* Sat Jul 31 2010 Funda Wang <fwang@mandriva.org> 3.5.4-1mdv2011.0
++ Revision: 563896
+- new version 3.5.4
+
+* Tue Jun 08 2010 Buchan Milne <bgmilne@mandriva.org> 3.5.3-3mdv2010.1
++ Revision: 547249
+- Add group to domainjoin-gui package
+- Correct license tag
+- Commit missing patch that tries to fix 'not a string literal' in netdomjoin-gui
+- Cleaner fix for NULL pname in setup_logging (mdv#59677) (samba#7499)
+- Enable domain join gui
+- Prevent segfault due to previous patch if setup_logging is called with NULL pname
+
+  + Thomas Backlund <tmb@mandriva.org>
+    - fix typo
+
+  + Luca Berra <bluca@mandriva.org>
+    - fix nss_wins overwriting daemon syslog ident (#59677)
+
+* Thu Jun 03 2010 Frederic Crozat <fcrozat@mandriva.com> 3.5.3-2mdv2010.1
++ Revision: 547046
++ rebuild (emptylog)
+
+* Tue Jun 01 2010 Buchan Milne <bgmilne@mandriva.org> 3.5.3-1mdv2010.1
++ Revision: 546828
+- New release 3.5.3
+- Should fix Mdv bug #58877, Mdv bug #59265 and possibly others related to
+  accessing files via libsmbclient (smb:// in Dolphin, Nautilus etc.)
+
+* Thu Apr 08 2010 Buchan Milne <bgmilne@mandriva.org> 3.5.2-1mdv2010.1
++ Revision: 533210
+- update to new version 3.5.2
+
+* Thu Apr 08 2010 Buchan Milne <bgmilne@mandriva.org> 3.5.1-1mdv2010.1
++ Revision: 533162
+- Try alternate method for removing --no-undefined from plugin flags, and show
+ plugin flags along with other flags
+- Require newer ctdb
+- New version 3.5.1
+- Drop patch 29 (upstreamed), and disable undefined as upstream now sets -z defs
+  by default - not doing this results in undefined symbols in plugins
+- Other minor changes (files,excludes)
+- Notable upstream change: mount.cifs no longer allows undefined non-root mounts
+
+* Tue Mar 09 2010 Buchan Milne <bgmilne@mandriva.org> 3.4.7-1mdv2010.1
++ Revision: 517012
+- update to new version 3.4.7
+- update to new version 3.4.6
+
+* Thu Feb 25 2010 Zombie Ryushu <ryushu@mandriva.org> 3.4.6-1mdv2010.1
++ Revision: 511083
+- First Attempt at Samba 3.4.6
+- First Attempt at Samba 3.4.6
+
+  + Buchan Milne <bgmilne@mandriva.org>
+    - Fix Buildrequires and add explicit options to configure
+
+* Mon Jan 25 2010 Zombie Ryushu <ryushu@mandriva.org> 3.4.5-1mdv2010.1
++ Revision: 496286
+- Attempt to update to 3.4.5 in cooker
+- Attempt to update to 3.4.5 in cooker
+
+* Fri Jan 08 2010 Buchan Milne <bgmilne@mandriva.org> 3.4.4-1mdv2010.1
++ Revision: 487529
+- New version 3.4.4
+- Update some items in the default smb.conf (bug #56894)
+
+* Wed Dec 16 2009 Buchan Milne <bgmilne@mandriva.org> 3.4.3-2mdv2010.1
++ Revision: 479214
+- Fix libsmbclient workgroup browsing (Mdv bug #56063)
+- Fix build on 2009.0 and older (without samba4 providing ldb/tdb/talloc)
+
+* Thu Oct 29 2009 Buchan Milne <bgmilne@mandriva.org> 3.4.3-1mdv2010.1
++ Revision: 460067
+- New version 3.4.3
+- Drop patches 24 and 26, applied upstream with bug 6791
+
+* Thu Oct 01 2009 Oden Eriksson <oeriksson@mandriva.com> 3.4.2-1mdv2010.0
++ Revision: 452236
+- 3.4.2
+
+* Sun Sep 13 2009 Buchan Milne <bgmilne@mandriva.org> 3.4.1-1mdv2010.0
++ Revision: 438980
+- New version 3.4.1
+- Disable patches merged since 3.4.1
+- New version 3.4.0
+- Adjust paths which have changed in source tree since 3.3.x
+- Move some swat translations to swat package (with conflicts)
+- Add suggests on samba-doc to samba-swat
+
+* Fri Aug 14 2009 Thomas Backlund <tmb@mandriva.org> 3.3.7-2mdv2010.0
++ Revision: 416267
+- rebuild due to missing mount-cifs-3.3.7 on x86_64
+
+* Wed Aug 12 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.7-1mdv2010.0
++ Revision: 415582
+- New version 3.3.7
+- Change default server string, as some Windows versions dont like it to change
+- Move smb.conf out of packaging patch so it is under direct version control
+
+* Wed Jun 24 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.6-1mdv2010.0
++ Revision: 388816
+- update to new version 3.3.6
+
+* Wed Jun 17 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.5-1mdv2010.0
++ Revision: 386659
+- New version 3.3.5
+
+* Wed Jun 17 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.4-1mdv2010.0
++ Revision: 386579
+- update to new version 3.3.4
+
+* Wed Jun 17 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.3-1mdv2010.0
++ Revision: 386571
++ rebuild (emptylog)
+
+* Thu Apr 16 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.3-0mdv2009.1
++ Revision: 367753
+- New version 3.3.3
+- Buildrequire avahi-client-devel to enable (new) avahi support
+- Fix winbind password expiry (Samba bug #6253), from Emmanuel Blindauer
+- Enable ctdb support
+
+* Sat Mar 28 2009 Anssi Hannula <anssi@mandriva.org> 3.3.2-3mdv2009.1
++ Revision: 361796
+- fix linking order of rpcclient and libwbclient (fix-linking-order.patch,
+  with the libwbclient case fixing undefined references in libwbclient.so)
+
+* Fri Mar 27 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.2-2mdv2009.1
++ Revision: 361668
+- Build against system (samba4) libtalloc, libtdb, and dont ship talloc, tdb, ldb
+ on 2009.1 or later
+
+* Fri Mar 13 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.2-1mdv2009.1
++ Revision: 354732
+- New version 3.3.2
+- Buildrequire libcap-devel, oplock buffering requires it on 3.2 and later
+
+* Wed Feb 25 2009 Buchan Milne <bgmilne@mandriva.org> 3.3.1-3mdv2009.1
++ Revision: 344895
+- Fix conflict between libsmbclient-devel and other devel packages
+
+* Wed Feb 25 2009 Oden Eriksson <oeriksson@mandriva.com> 3.3.1-2mdv2009.1
++ Revision: 344715
+- rebuilt against new readline
+
+  + Buchan Milne <bgmilne@mandriva.org>
+    - New version 3.3.1
+
+* Thu Feb 19 2009 Oden Eriksson <oeriksson@mandriva.com> 3.2.8-3mdv2009.1
++ Revision: 343000
+- add "BuildConflicts: libcap-devel" to prevent unknown future borkiness and fjukiness...
+
+* Thu Feb 19 2009 Oden Eriksson <oeriksson@mandriva.com> 3.2.8-2mdv2009.1
++ Revision: 342815
+- fix a silly typo
+- fix deps because /usr/include/tdb.h was moved from
+  libsmbclient0-devel to libtdb-devel.
+
+  + Guillaume Rousse <guillomovitch@mandriva.org>
+    - new release
+    - rediff modules separation patch
+
+* Tue Feb 03 2009 Guillaume Rousse <guillomovitch@mandriva.org> 3.2.7-2mdv2009.1
++ Revision: 337185
+- keep bash completion in its own package
+
+* Tue Jan 06 2009 Buchan Milne <bgmilne@mandriva.org> 3.2.7-1mdv2009.1
++ Revision: 325478
+- update to new version 3.2.7
+
+* Mon Jan 05 2009 Oden Eriksson <oeriksson@mandriva.com> 3.2.6-3mdv2009.1
++ Revision: 325110
+- fix deps
+- fix a file conflict
+
+* Sun Jan 04 2009 Oden Eriksson <oeriksson@mandriva.com> 3.2.6-2mdv2009.1
++ Revision: 324355
+- fix php-tdb build (P20 from debian)
+
+* Sat Dec 13 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.6-1mdv2009.1
++ Revision: 313997
+-New version 3.2.6
+
+* Fri Nov 28 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.4-3mdv2009.1
++ Revision: 307414
+- Security fix (CVE-2008-4314)
+- Add patch fixing LDAP password modify exop (samba bug #5886)
+
+* Thu Oct 30 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.4-2mdv2009.1
++ Revision: 298718
+- Drop dangling mount.smb/mount.smbfs symlinks
+- Make mount-cifs require new enough keyutils for krb5 support
+
+* Thu Oct 16 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.4-1mdv2009.1
++ Revision: 294197
+- New version 3.2.4
+
+* Thu Oct 02 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.3-3mdv2009.0
++ Revision: 290748
+- Include the rest of the MODULESDIR-related changes (fixes bug #43924)
+
+* Sat Sep 13 2008 Colin Guthrie <cguthrie@mandriva.org> 3.2.3-2mdv2009.0
++ Revision: 284482
+- Install pkgconfig .pc files for the various libraries
+
+* Tue Sep 02 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.2-1mdv2009.0
++ Revision: 279222
+- New version 3.2.3
+- New version 3.2.2
+- Use patch from git to fix separation of shared libraries and plugins
+- Fix configure options, and avoid overriding variables at install time
+- Ship cifs.upcall, and buildrequire keyutils on distributions with keyutils
+- Fix linking order for cifs.upcall
+
+* Thu Aug 07 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.1-1mdv2009.0
++ Revision: 265872
+- New version 3.2.1
+- Add verification of source signatures
+
+* Mon Jul 28 2008 Buchan Milne <bgmilne@mandriva.org> 3.2.0-1mdv2009.0
++ Revision: 251195
+- New version 3.2.0
+- Drop smbmount et al and related patches
+- Add new library packages
+- Conditionalise postgresql and mysql buildrequires
+- Disable vscan support for now
+
+  + Pixel <pixel@mandriva.com>
+    - rpm filetriggers deprecates update_menus/update_scrollkeeper/update_mime_database/update_icon_cache/update_desktop_database/post_install_gconf_schemas
+    - do not call ldconfig in %%post/%%postun, it is now handled by filetriggers
+
+* Tue Jun 03 2008 Buchan Milne <bgmilne@mandriva.org> 3.0.30-1mdv2009.0
++ Revision: 214823
+- Remove recursive autoconf macros
+  Drop some obsolete patches
+- New version 3.0.30
+  Drop upstreamed patches (CVE-2008-1105)
+  Drop packaging of internal smbldap-tools (dropped upstream)
+
+  + Pixel <pixel@mandriva.com>
+    - adapt to %%_localstatedir now being /var instead of /var/lib (#22312)
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - P22: security fix for CVE-2008-1105
+
+* Sun Mar 23 2008 Emmanuel Andry <eandry@mandriva.org> 3.0.28a-2mdv2008.1
++ Revision: 189635
+- Fix static-devel group
+- protect major
+
+* Tue Mar 11 2008 Buchan Milne <bgmilne@mandriva.org> 3.0.28a-1mdv2008.1
++ Revision: 186720
+- New version 3.0.28a
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - fix summary-not-capitalized
+
+* Sun Jan 13 2008 Funda Wang <fwang@mandriva.org> 3.0.28-4mdv2008.1
++ Revision: 150850
+- rebuild against latest gnutls
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - drop old menu
+
+  + Olivier Blin <blino@mandriva.org>
+    - restore BuildRoot
+
+* Fri Dec 21 2007 Buchan Milne <bgmilne@mandriva.org> 3.0.28-3mdv2008.1
++ Revision: 136361
+- Rebuild for new openldap (2.4) with new soname
+
+* Fri Dec 21 2007 Thierry Vignaud <tv@mandriva.org> 3.0.28-2mdv2008.1
++ Revision: 136255
+- rebuild with latest ldap
+- kill re-definition of %%buildroot on Pixel's request
+
+* Mon Dec 10 2007 Buchan Milne <bgmilne@mandriva.org> 3.0.28-1mdv2008.1
++ Revision: 117061
+- New version 3.0.28
+
+* Wed Nov 21 2007 Buchan Milne <bgmilne@mandriva.org> 3.0.27a-1mdv2008.1
++ Revision: 110969
+- New version 3.0.27a
+
+* Sun Nov 18 2007 Funda Wang <fwang@mandriva.org> 3.0.27-1mdv2008.1
++ Revision: 109971
+- New version 3.0.27
+
+* Wed Oct 10 2007 Buchan Milne <bgmilne@mandriva.org> 3.0.26a-1mdv2008.1
++ Revision: 96878
+- Update to 3.0.26a and samba-vscan 0.3.6c-beta5
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - make mount.cifs umount.cifs build
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - s/Mandrake/Mandriva/
+
+* Wed Sep 12 2007 Buchan Milne <bgmilne@mandriva.org> 3.0.25b-4mdv2008.0
++ Revision: 84705
+- Add patch for CVE-2007-4138
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill desktop-file-validate's error: string list key "Categories" in group "Desktop Entry" does not have a semicolon (";") as trailing character
+
+* Mon Aug 27 2007 Guillaume Rousse <guillomovitch@mandriva.org> 3.0.25b-3mdv2008.0
++ Revision: 71811
+- bash completion
+
+* Thu Aug 23 2007 Thierry Vignaud <tv@mandriva.org> 3.0.25b-2mdv2008.0
++ Revision: 69948
+- fileutils, sh-utils & textutils have been obsoleted by coreutils a long time ago
+- fix man pages extension
+
+* Mon Jul 02 2007 Andreas Hasenack <andreas@mandriva.com> 3.0.25b-1mdv2008.0
++ Revision: 47103
+- updated to version 3.0.25b
+
+* Wed Jun 27 2007 Andreas Hasenack <andreas@mandriva.com> 3.0.25a-2mdv2008.0
++ Revision: 44948
+- re-enable serverbuild, rebuild with new rpm-mandriva-setup (-fstack-protector)
+
+* Thu May 31 2007 Buchan Milne <bgmilne@mandriva.org> 3.0.25a-1mdv2008.0
++ Revision: 33289
+- Update default-quota-ignore-error patch
+
+  + Andreas Hasenack <andreas@mandriva.com>
+    - updated to version 3.0.25a
+    - updated vscan to 0.3.6c-beta4 (this one builds with samba 3.0.25a)
+    - dropped smbw patch, target is not available anymore
 
