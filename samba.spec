@@ -286,7 +286,7 @@ Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 %if %have_pversion && %have_pre
 %endif
 Requires: pam >= 0.64, samba-common = %{epoch}:%{version}
-BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
+BuildRequires: pam-devel readline-devel ncurses-devel popt-devel glibc-devel
 BuildRequires: libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
 # http://lists.samba.org/archive/samba/2009-March/146821.html
