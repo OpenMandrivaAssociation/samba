@@ -324,6 +324,7 @@ BuildRequires: tdb-devel
 %if !%build_talloc
 BuildRequires: talloc-devel
 %endif
+BuildRequires: tirpc-devel
 # for domain-join gui
 BuildRequires: gtk2-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -1138,7 +1139,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #_if !%build_system
 #                --with-smbwrapper \
 #_endif		
-		--without-nis
+#		--without-nis \
 #                --with-fhs \
 
 # Remove -Wl,--no-undefined for plugins:
