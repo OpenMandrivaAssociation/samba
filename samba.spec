@@ -962,7 +962,7 @@ echo "Applying patches for current version: %{ver}"
 # %patch11 -p1 -b .mga
 pushd source3
 popd
-%patch30 -p1 -b .checkflags
+# %patch30 -p1 -b .checkflags
 #patch31 -p1 -b .nss_wins_log
 #%patch33 -p1 -b .netapi_link
 
