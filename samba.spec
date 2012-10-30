@@ -1139,7 +1139,7 @@ CFLAGS=`echo "$CFLAGS"|sed -e 's/-O2/-O/g'`
 #                --with-smbwrapper \
 #_endif		
 		--without-nisplugsam \
-		--without-without-nisplug-home
+		--without-nis
 #                --with-fhs \
 
 # Remove -Wl,--no-undefined for plugins:
