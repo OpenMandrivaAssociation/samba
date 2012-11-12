@@ -1,0 +1,700 @@
+--- samba-3.0.21c/source/po/fr.msg.orig	2005-02-25 18:59:36.000000000 +0100
++++ samba-3.0.21c/source/po/fr.msg	2006-03-02 09:16:39.000000000 +0100
+@@ -1,5 +1,8 @@
++# translation of fr.po to Français
+ # French messages for international release of SWAT.
+ # Copyright (C) 2001 François Le Lay <fanch@tuxfamily.org>
++# Copyright (C) 2006 Nicolas Lecureuil <neoclust@mandriva.org>
++# Copyright (C) 2006 Christophe Berthelé <cpjc@free.fr>
+ #
+ #   This program is free software; you can redistribute it and/or modify
+ #   it under the terms of the GNU General Public License as published by
+@@ -13,41 +16,52 @@
+ #
+ #   You should have received a copy of the GNU General Public License
+ #   along with this program; if not, write to the Free Software
+-#   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ #
++#   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++# Christophe Berthelé <cpjc@free.fr>, 2006.
+ msgid ""
+ msgstr ""
+-"Project-Id-Version: i18n_swat \n"
++"Project-Id-Version: fr\n"
+ "POT-Creation-Date: 2003-10-06 05:30+0900\n"
+-"PO-Revision-Date: 2000-02-08 14:45+0100\n"
+-"Last-Translator: François Le Lay <fanch@tuxfamily.org>\n"
+-"Language-Team: (Samba Team) <samba-technical@samba.org>\n"
++"PO-Revision-Date: 2006-03-01 16:30+0100\n"
++"Last-Translator: Christophe Berthelé <cpjc@free.fr>\n"
++"Language-Team: Français <cooker-i18n@mandrivalinux.org>\n"
+ "MIME-Version: 1.0\n"
+-"Content-Type: text/plain; charset=utf-8\n"
+-"Content-Transfer-Encoding: \n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"X-Generator: KBabel 1.11.1\n"
++"Plural-Forms: nplurals=2;plural=(n>1);\n"
+ 
+ #: ../web/swat.c:117
+ #, c-format
+ msgid "ERROR: Can't open %s"
+-msgstr ""
++msgstr "ERREUR : Ne peut pas ouvrir %s"
+ 
+ #: ../web/swat.c:200
+ msgid "Help"
+ msgstr "Aide"
+ 
+-#: ../web/swat.c:206 ../web/swat.c:220 ../web/swat.c:235 ../web/swat.c:243 ../web/swat.c:252 ../web/swat.c:261 ../web/swat.c:267 ../web/swat.c:273 ../web/swat.c:286
++#: ../web/swat.c:206
++#: ../web/swat.c:220
++#: ../web/swat.c:235
++#: ../web/swat.c:243
++#: ../web/swat.c:252
++#: ../web/swat.c:261
++#: ../web/swat.c:267
++#: ../web/swat.c:273
++#: ../web/swat.c:286
+ msgid "Set Default"
+-msgstr "Définir par défaut"
++msgstr "Rétablir la valeur par défaut"
+ 
+ #: ../web/swat.c:408
+ #, c-format
+ msgid "failed to open %s for writing"
+-msgstr ""
++msgstr "échec lors de l'ouverture de %s en écriture"
+ 
+ #: ../web/swat.c:431
+ #, c-format
+ msgid "Can't reload %s"
+-msgstr ""
++msgstr "Ne peut recharger %s"
+ 
+ #: ../web/swat.c:501
+ #, c-format
+@@ -60,7 +74,7 @@
+ 
+ #: ../web/swat.c:507
+ msgid "Globals"
+-msgstr "Paramètres Généraux"
++msgstr "Paramètres généraux"
+ 
+ #: ../web/swat.c:508
+ msgid "Shares"
+@@ -72,11 +86,11 @@
+ 
+ #: ../web/swat.c:510
+ msgid "Wizard"
+-msgstr ""
++msgstr "Assistant"
+ 
+ #: ../web/swat.c:513
+ msgid "Status"
+-msgstr "Statut"
++msgstr "Etat"
+ 
+ #: ../web/swat.c:514
+ msgid "View Config"
+@@ -88,134 +102,140 @@
+ 
+ #: ../web/swat.c:526
+ msgid "Current View Is"
+-msgstr "Configuration Actuelle"
++msgstr "La vue actuelle est"
+ 
+-#: ../web/swat.c:527 ../web/swat.c:530
++#: ../web/swat.c:527
++#: ../web/swat.c:530
+ msgid "Basic"
+-msgstr "Vue Basique"
++msgstr "Vue simple"
+ 
+-#: ../web/swat.c:528 ../web/swat.c:531
++#: ../web/swat.c:528
++#: ../web/swat.c:531
+ msgid "Advanced"
+-msgstr "Vue Détaillée"
++msgstr "Vue détaillée"
+ 
+ #: ../web/swat.c:529
+ msgid "Change View To"
+-msgstr "Modifier le mot de passe"
++msgstr "Changer la vue en"
+ 
+ #: ../web/swat.c:554
+ msgid "Current Config"
+-msgstr "Configuration Actuelle"
++msgstr "Configuration actuelle"
+ 
+ #: ../web/swat.c:558
+ msgid "Normal View"
+-msgstr "Vue Normale"
++msgstr "Vue normale"
+ 
+ #: ../web/swat.c:560
+ msgid "Full View"
+-msgstr "Vue Complète"
++msgstr "Vue complète"
+ 
+ #. Here we first set and commit all the parameters that were selected
+ #. in the previous screen.
+ #: ../web/swat.c:579
+ msgid "Wizard Parameter Edit Page"
+-msgstr ""
++msgstr "Assistant d'édition des paramètres"
+ 
+ #: ../web/swat.c:608
+ msgid "Note: smb.conf file has been read and rewritten"
+-msgstr ""
++msgstr "Note : le fichier smb.conf a été lu et réécrit"
+ 
+ #. Here we go ...
+ #: ../web/swat.c:716
+ msgid "Samba Configuration Wizard"
+-msgstr ""
++msgstr "Assistant de configuration de Samba"
+ 
+ #: ../web/swat.c:720
+ msgid "The \"Rewrite smb.conf file\" button will clear the smb.conf file of all default values and of comments."
+-msgstr ""
++msgstr "Le bouton \"Réécrire le fichier smb.conf\" va enlever du fichier smb.conf toutes les valeurs par défaut ainsi que les commentaires"
+ 
+ #: ../web/swat.c:721
+ msgid "The same will happen if you press the commit button."
+-msgstr ""
++msgstr "La même chose surviendra si vous appuyez sur le bouton Appliquer"
+ 
+ #: ../web/swat.c:724
+ msgid "Rewrite smb.conf file"
+-msgstr ""
++msgstr "Réécrire le fichier smb.conf"
+ 
+ #: ../web/swat.c:725
+ msgid "Commit"
+-msgstr "commentaire"
++msgstr "Appliquer"
+ 
+ #: ../web/swat.c:726
+ msgid "Edit Parameter Values"
+-msgstr "Paramètres Imprimantes"
++msgstr "Editer les paramètres"
+ 
+ #: ../web/swat.c:732
+ msgid "Server Type"
+-msgstr ""
++msgstr "Type de serveur"
+ 
+ #: ../web/swat.c:733
+ msgid "Stand Alone"
+-msgstr ""
++msgstr "Indépendant"
+ 
+ #: ../web/swat.c:734
+ msgid "Domain Member"
+-msgstr "master de domaine"
++msgstr "Membre du domaine"
+ 
+ #: ../web/swat.c:735
+ msgid "Domain Controller"
+-msgstr "master de domaine"
++msgstr "Contrôleur de domaine"
+ 
+ #: ../web/swat.c:738
+ msgid "Unusual Type in smb.conf - Please Select New Mode"
+-msgstr ""
++msgstr "Type inhabituel dans smb.conf - Veuillez en sélectionner un nouveau"
+ 
+ #: ../web/swat.c:740
+ msgid "Configure WINS As"
+-msgstr ""
++msgstr "Configurer WINS en tant que"
+ 
+ #: ../web/swat.c:741
+ msgid "Not Used"
+-msgstr "ne pas descendre"
++msgstr "Non utilisé"
+ 
+ #: ../web/swat.c:742
+ msgid "Server for client use"
+-msgstr ""
++msgstr "Serveur pour client"
+ 
+ #: ../web/swat.c:743
+ msgid "Client of another WINS server"
+-msgstr ""
++msgstr "Client d'un autre serveur WINS"
+ 
+ #: ../web/swat.c:745
+ msgid "Remote WINS Server"
+-msgstr ""
++msgstr "Serveur WINS distant"
+ 
+ #: ../web/swat.c:756
+ msgid "Error: WINS Server Mode and WINS Support both set in smb.conf"
+-msgstr ""
++msgstr "Erreur : le mode serveur WINS et Support WINS sont tous les deux activés dans smb.conf"
+ 
+ #: ../web/swat.c:757
+ msgid "Please Select desired WINS mode above."
+-msgstr ""
++msgstr "Veuillez choisir ci-dessus le mode WINS désiré."
+ 
+ #: ../web/swat.c:759
+ msgid "Expose Home Directories"
+-msgstr ""
++msgstr "Montrer les répertoires personnels"
+ 
+ #: ../web/swat.c:774
+ msgid "The above configuration options will set multiple parameters and will generally assist with rapid Samba deployment."
+-msgstr ""
++msgstr "Les options de configuration ci-dessus vont initialiser différents paramètres et vont généralement aider pour un déploiement rapide de Samba."
+ 
+ #: ../web/swat.c:787
+ msgid "Global Parameters"
+-msgstr "Variables Globales"
++msgstr "Paramètres généraux"
+ 
+-#: ../web/swat.c:815 ../web/swat.c:916 ../web/swat.c:1265
++#: ../web/swat.c:815
++#: ../web/swat.c:916
++#: ../web/swat.c:1265
+ msgid "Commit Changes"
+ msgstr "Sauver les modifications"
+ 
+-#: ../web/swat.c:819 ../web/swat.c:919 ../web/swat.c:1267
++#: ../web/swat.c:819
++#: ../web/swat.c:919
++#: ../web/swat.c:1267
+ msgid "Reset Values"
+-msgstr "Réinitialiser Valeurs"
++msgstr "Réinitialiser les valeurs"
+ 
+ #: ../web/swat.c:844
+ msgid "Share Parameters"
+@@ -239,7 +259,7 @@
+ 
+ #: ../web/swat.c:957
+ msgid "Can't setup password database vectors."
+-msgstr ""
++msgstr "Impossible d'initialiser la base de mots de passe."
+ 
+ #: ../web/swat.c:983
+ msgid " Must specify \"User Name\" "
+@@ -247,19 +267,19 @@
+ 
+ #: ../web/swat.c:999
+ msgid " Must specify \"Old Password\" "
+-msgstr " Le champ  \"Ancien mot de passe\" doît être spécifié"
++msgstr " Le champ  \"Ancien mot de passe\" doit être spécifié"
+ 
+ #: ../web/swat.c:1005
+ msgid " Must specify \"Remote Machine\" "
+-msgstr "  Le champ \"Machine Distante\" doît être spécifié"
++msgstr " Le champ \"Machine Distante\" doit être spécifié "
+ 
+ #: ../web/swat.c:1012
+ msgid " Must specify \"New, and Re-typed Passwords\" "
+-msgstr "Les champs \"Nouveau mot de passe\" et  \"Confirmation du nouveau mot de passe\" doivent être spécifiés \n"
++msgstr "Les champs \"Nouveau mot de passe\" et \"Confirmation du nouveau mot de passe\" doivent être spécifiés "
+ 
+ #: ../web/swat.c:1018
+ msgid " Re-typed password didn't match new password "
+-msgstr " Echec de la confirmation du nouveau mot de passe"
++msgstr " Echec les mots de passe sont différents"
+ 
+ #: ../web/swat.c:1048
+ #, c-format
+@@ -269,7 +289,7 @@
+ #: ../web/swat.c:1051
+ #, c-format
+ msgid " The passwd for '%s' has NOT been changed."
+-msgstr " Le mot de passe de '%s' n'a PAS été modifié. \n"
++msgstr " Le mot de passe de '%s' n'a PAS été modifié."
+ 
+ #: ../web/swat.c:1076
+ msgid "Server Password Management"
+@@ -278,41 +298,46 @@
+ #.
+ #. * Create all the dialog boxes for data collection
+ #.
+-#: ../web/swat.c:1085 ../web/swat.c:1132
++#: ../web/swat.c:1085
++#: ../web/swat.c:1132
+ msgid "User Name"
+-msgstr " Nom d'utilisateur : "
++msgstr "Nom d'utilisateur"
+ 
+-#: ../web/swat.c:1088 ../web/swat.c:1134
++#: ../web/swat.c:1088
++#: ../web/swat.c:1134
+ msgid "Old Password"
+-msgstr " Ancien mot de passe : "
++msgstr "Ancien mot de passe"
+ 
+-#: ../web/swat.c:1091 ../web/swat.c:1136
++#: ../web/swat.c:1091
++#: ../web/swat.c:1136
+ msgid "New Password"
+-msgstr " Nouveau mot de passe : "
++msgstr "Nouveau mot de passe"
+ 
+-#: ../web/swat.c:1093 ../web/swat.c:1138
++#: ../web/swat.c:1093
++#: ../web/swat.c:1138
+ msgid "Re-type New Password"
+-msgstr " Confirmation du nouveau mot de passe : "
++msgstr " Confirmation du nouveau mot de passe"
+ 
+-#: ../web/swat.c:1101 ../web/swat.c:1149
++#: ../web/swat.c:1101
++#: ../web/swat.c:1149
+ msgid "Change Password"
+ msgstr "Modifier le mot de passe"
+ 
+ #: ../web/swat.c:1104
+ msgid "Add New User"
+-msgstr "Nouvel Utilisateur"
++msgstr "Ajouter l'utilisateur"
+ 
+ #: ../web/swat.c:1106
+ msgid "Delete User"
+-msgstr "Supprimer Utilisateur"
++msgstr "Supprimer l'utilisateur"
+ 
+ #: ../web/swat.c:1108
+ msgid "Disable User"
+-msgstr "Désactiver Utilisateur"
++msgstr "Désactiver l'utilisateur"
+ 
+ #: ../web/swat.c:1110
+ msgid "Enable User"
+-msgstr "Activer Utilisateur"
++msgstr "Activer l'utilisateur"
+ 
+ #: ../web/swat.c:1123
+ msgid "Client/Server Password Management"
+@@ -320,7 +345,7 @@
+ 
+ #: ../web/swat.c:1140
+ msgid "Remote Machine"
+-msgstr " Machine distante : "
++msgstr "Machine distante"
+ 
+ #: ../web/swat.c:1179
+ msgid "Printer Parameters"
+@@ -328,19 +353,20 @@
+ 
+ #: ../web/swat.c:1181
+ msgid "Important Note:"
+-msgstr "Note Importante:"
++msgstr "Note importante :"
+ 
+ #: ../web/swat.c:1182
+ msgid "Printer names marked with [*] in the Choose Printer drop-down box "
+-msgstr "Les Noms d'imprimantes marqués du signe [*] dans le menu déroulant Choisir Imprimante"
++msgstr "Les noms d'imprimantes marqués du signe [*] dans le menu déroulant Choisir Imprimante "
+ 
+ #: ../web/swat.c:1183
+ msgid "are autoloaded printers from "
+-msgstr "désignent des imprimantes automatiquement chargées depuis le "
++msgstr "désignent des imprimantes définies dans "
+ 
++# Traducteurs : Name volontairement non traduit
+ #: ../web/swat.c:1184
+ msgid "Printcap Name"
+-msgstr "Nom Printcap"
++msgstr "Printcap"
+ 
+ #: ../web/swat.c:1185
+ msgid "Attempting to delete these printers from SWAT will have no effect."
+@@ -348,63 +374,68 @@
+ 
+ #: ../web/swat.c:1231
+ msgid "Choose Printer"
+-msgstr "Choisir Imprimante"
++msgstr "Choisir une imprimante"
+ 
+ #: ../web/swat.c:1250
+ msgid "Delete Printer"
+-msgstr "Supprimer Imprimante"
++msgstr "Supprimer une imprimante"
+ 
+ #: ../web/swat.c:1257
+ msgid "Create Printer"
+-msgstr "Créer Imprimante"
++msgstr "Créer une imprimante"
+ 
+ #: ../web/statuspage.c:123
+ msgid "RDONLY     "
+-msgstr ""
++msgstr "RDONLY     "
+ 
+ #: ../web/statuspage.c:124
+ msgid "WRONLY     "
+-msgstr ""
++msgstr "WRONLY     "
+ 
+ #: ../web/statuspage.c:125
+ msgid "RDWR       "
+-msgstr ""
++msgstr "RDWR       "
+ 
+ #: ../web/statuspage.c:309
+ msgid "Server Status"
+-msgstr "Statut du Serveur"
++msgstr "Etat du serveur"
+ 
+ #: ../web/statuspage.c:314
+ msgid "Auto Refresh"
+-msgstr "Rafraîchissement Automatique"
++msgstr "Rafraîchissement automatique"
+ 
+-#: ../web/statuspage.c:315 ../web/statuspage.c:320
++#: ../web/statuspage.c:315
++#: ../web/statuspage.c:320
+ msgid "Refresh Interval: "
+-msgstr "Intervalle de rafraîchissement: "
++msgstr "Intervalle de rafraîchissement : "
+ 
+ #: ../web/statuspage.c:319
+ msgid "Stop Refreshing"
+-msgstr "Stopper Rafraîchissement"
++msgstr "Arrêter le rafraîchissement"
+ 
+ #: ../web/statuspage.c:334
+ msgid "version:"
+-msgstr "version:"
++msgstr "version :"
+ 
+ #: ../web/statuspage.c:337
+ msgid "smbd:"
+-msgstr ""
++msgstr "smbd :"
+ 
+-#: ../web/statuspage.c:337 ../web/statuspage.c:350 ../web/statuspage.c:364
++#: ../web/statuspage.c:337
++#: ../web/statuspage.c:350
++#: ../web/statuspage.c:364
+ msgid "running"
+ msgstr "actif"
+ 
+-#: ../web/statuspage.c:337 ../web/statuspage.c:350 ../web/statuspage.c:364
++#: ../web/statuspage.c:337
++#: ../web/statuspage.c:350
++#: ../web/statuspage.c:364
+ msgid "not running"
+-msgstr "non actif"
++msgstr "inactif"
+ 
+ #: ../web/statuspage.c:341
+ msgid "Stop smbd"
+-msgstr "Stopper smbd"
++msgstr "Arrêter smbd"
+ 
+ #: ../web/statuspage.c:343
+ msgid "Start smbd"
+@@ -416,11 +447,11 @@
+ 
+ #: ../web/statuspage.c:350
+ msgid "nmbd:"
+-msgstr ""
++msgstr "nmbd :"
+ 
+ #: ../web/statuspage.c:354
+ msgid "Stop nmbd"
+-msgstr "Stopper nmbd"
++msgstr "Arrêter nmbd"
+ 
+ #: ../web/statuspage.c:356
+ msgid "Start nmbd"
+@@ -432,51 +463,56 @@
+ 
+ #: ../web/statuspage.c:364
+ msgid "winbindd:"
+-msgstr ""
++msgstr "winbindd :"
+ 
+ #: ../web/statuspage.c:368
+ msgid "Stop winbindd"
+-msgstr "Stopper nmbd"
++msgstr "Arrêter winbindd"
+ 
+ #: ../web/statuspage.c:370
+ msgid "Start winbindd"
+-msgstr "Lancer nmbd"
++msgstr "Lancer winbindd"
+ 
+ #: ../web/statuspage.c:372
+ msgid "Restart winbindd"
+-msgstr "Relancer nmbd"
++msgstr "Relancer winbindd"
+ 
+ #. stop, restart all
+ #: ../web/statuspage.c:381
+ msgid "Stop All"
+-msgstr ""
++msgstr "Arrêter tout"
+ 
+ #: ../web/statuspage.c:382
+ msgid "Restart All"
+-msgstr "Relancer nmbd"
++msgstr "Relancer tout"
+ 
+ #. start all
+ #: ../web/statuspage.c:386
+ msgid "Start All"
+-msgstr "Lancer nmbd"
++msgstr "Lancer tout"
+ 
+ #: ../web/statuspage.c:393
+ msgid "Active Connections"
+-msgstr "Connections Actives"
++msgstr "Connexions actives"
+ 
+-#: ../web/statuspage.c:395 ../web/statuspage.c:408 ../web/statuspage.c:416
++#: ../web/statuspage.c:395
++#: ../web/statuspage.c:408
++#: ../web/statuspage.c:416
+ msgid "PID"
+-msgstr ""
++msgstr "PID"
+ 
+-#: ../web/statuspage.c:395 ../web/statuspage.c:408
++#: ../web/statuspage.c:395
++#: ../web/statuspage.c:408
+ msgid "Client"
+-msgstr ""
++msgstr "Client"
+ 
+ #: ../web/statuspage.c:395
+ msgid "IP address"
+-msgstr "adresse IP"
++msgstr "Adresse IP"
+ 
+-#: ../web/statuspage.c:395 ../web/statuspage.c:408 ../web/statuspage.c:416
++#: ../web/statuspage.c:395
++#: ../web/statuspage.c:408
++#: ../web/statuspage.c:416
+ msgid "Date"
+ msgstr "Date"
+ 
+@@ -486,11 +522,11 @@
+ 
+ #: ../web/statuspage.c:405
+ msgid "Active Shares"
+-msgstr "Partages Actifs"
++msgstr "Partages actifs"
+ 
+ #: ../web/statuspage.c:408
+ msgid "Share"
+-msgstr "Partager"
++msgstr "Partage"
+ 
+ #: ../web/statuspage.c:408
+ msgid "User"
+@@ -502,19 +538,19 @@
+ 
+ #: ../web/statuspage.c:414
+ msgid "Open Files"
+-msgstr "Fichiers Ouverts"
++msgstr "Fichiers ouverts"
+ 
+ #: ../web/statuspage.c:416
+ msgid "Sharing"
+-msgstr ""
++msgstr "Partage"
+ 
+ #: ../web/statuspage.c:416
+ msgid "R/W"
+-msgstr ""
++msgstr "R/W"
+ 
+ #: ../web/statuspage.c:416
+ msgid "Oplock"
+-msgstr ""
++msgstr "Verrouillage"
+ 
+ #: ../web/statuspage.c:416
+ msgid "File"
+@@ -522,11 +558,11 @@
+ 
+ #: ../web/statuspage.c:425
+ msgid "Show Client in col 1"
+-msgstr ""
++msgstr "Montrer le client dans la col 1"
+ 
+ #: ../web/statuspage.c:426
+ msgid "Show PID in col 1"
+-msgstr ""
++msgstr "Montrer le PID dans la col 1"
+ 
+ #: ../param/loadparm.c:755
+ msgid "Base Options"
+@@ -534,19 +570,19 @@
+ 
+ #: ../param/loadparm.c:775
+ msgid "Security Options"
+-msgstr "Options de Sécurité"
++msgstr "Options de sécurité"
+ 
+ #: ../param/loadparm.c:859
+ msgid "Logging Options"
+-msgstr "Options de Logging"
++msgstr "Options de journalisation"
+ 
+ #: ../param/loadparm.c:874
+ msgid "Protocol Options"
+-msgstr "Options de Protocole"
++msgstr "Options de protocole"
+ 
+ #: ../param/loadparm.c:911
+ msgid "Tuning Options"
+-msgstr "Options de réglage"
++msgstr "Options de réglage fin"
+ 
+ #: ../param/loadparm.c:940
+ msgid "Printing Options"
+@@ -558,15 +594,15 @@
+ 
+ #: ../param/loadparm.c:996
+ msgid "Domain Options"
+-msgstr "Options de Domaine"
++msgstr "Options du Domaine"
+ 
+ #: ../param/loadparm.c:1000
+ msgid "Logon Options"
+-msgstr "Options de Logon"
++msgstr "Options de connexion"
+ 
+ #: ../param/loadparm.c:1019
+ msgid "Browse Options"
+-msgstr "Options de Navigation"
++msgstr "Options de navigation"
+ 
+ #: ../param/loadparm.c:1033
+ msgid "WINS Options"
+@@ -574,7 +610,7 @@
+ 
+ #: ../param/loadparm.c:1043
+ msgid "Locking Options"
+-msgstr "Options de Verrouillage"
++msgstr "Options de verrouillage"
+ 
+ #: ../param/loadparm.c:1061
+ msgid "Ldap Options"
+@@ -582,7 +618,7 @@
+ 
+ #: ../param/loadparm.c:1078
+ msgid "Miscellaneous Options"
+-msgstr "Options Diverses"
++msgstr "Options diverses"
+ 
+ #: ../param/loadparm.c:1138
+ msgid "VFS module options"
+@@ -591,3 +627,4 @@
+ #: ../param/loadparm.c:1148
+ msgid "Winbind options"
+ msgstr "Options Winbind"
++
