@@ -1,6 +1,5 @@
-diff -Naur samba-3.6.4/packaging/Mandriva/findsmb samba-3.6.4.oden/packaging/Mandriva/findsmb
---- samba-3.6.4/packaging/Mandriva/findsmb	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/findsmb	2012-05-01 07:56:52.963862033 +0200
+--- samba-3.0.23/packaging/Rosa/findsmb.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/findsmb	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,141 @@
 +#!/usr/bin/perl
 +#
@@ -143,9 +142,8 @@ diff -Naur samba-3.6.4/packaging/Mandriva/findsmb samba-3.6.4.oden/packaging/Man
 +  }
 +} 
 +
-diff -Naur samba-3.6.4/packaging/Mandriva/samba.log samba-3.6.4.oden/packaging/Mandriva/samba.log
---- samba-3.6.4/packaging/Mandriva/samba.log	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/samba.log	2012-05-01 07:56:52.964862039 +0200
+--- samba-3.0.23/packaging/Rosa/samba.log.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/samba.log	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,15 @@
 +/var/log/samba/log.nmb {
 +    notifempty
@@ -162,18 +160,16 @@ diff -Naur samba-3.6.4/packaging/Mandriva/samba.log samba-3.6.4.oden/packaging/M
 +	/usr/bin/killall -HUP smbd
 +    endscript
 +}
-diff -Naur samba-3.6.4/packaging/Mandriva/samba.pamd samba-3.6.4.oden/packaging/Mandriva/samba.pamd
---- samba-3.6.4/packaging/Mandriva/samba.pamd	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/samba.pamd	2012-05-01 07:56:52.964862039 +0200
+--- samba-3.0.23/packaging/Rosa/samba.pamd.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/samba.pamd	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,5 @@
 +#%PAM-1.0
 +auth       required	/lib/security/pam_nologin.so
 +auth       required	/lib/security/pam_stack.so service=system-auth
 +account    required	/lib/security/pam_stack.so service=system-auth
 +session    required	/lib/security/pam_stack.so service=system-auth
-diff -Naur samba-3.6.4/packaging/Mandriva/samba.xinetd samba-3.6.4.oden/packaging/Mandriva/samba.xinetd
---- samba-3.6.4/packaging/Mandriva/samba.xinetd	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/samba.xinetd	2012-05-01 07:56:52.964862039 +0200
+--- samba-3.0.23/packaging/Rosa/samba.xinetd.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/samba.xinetd	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,15 @@
 +# default: on
 +# description: SWAT is the Samba Web Admin Tool. Use swat \
@@ -190,9 +186,8 @@ diff -Naur samba-3.6.4/packaging/Mandriva/samba.xinetd samba-3.6.4.oden/packagin
 +	log_on_failure	+= USERID
 +	disable = no
 +}
-diff -Naur samba-3.6.4/packaging/Mandriva/smb.conf samba-3.6.4.oden/packaging/Mandriva/smb.conf
---- samba-3.6.4/packaging/Mandriva/smb.conf	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/smb.conf	2012-05-01 07:56:52.965862045 +0200
+--- samba-3.0.23/packaging/Rosa/smb.conf.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/smb.conf	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,533 @@
 +
 +# This is the main Samba configuration file. You should read the
@@ -213,7 +208,7 @@ diff -Naur samba-3.6.4/packaging/Mandriva/smb.conf samba-3.6.4.oden/packaging/Ma
 +
 +# 1. Server Naming Options:
 +# workgroup = NT-Domain-Name or Workgroup-Name
-+   workgroup = MDVGROUP
++   workgroup = MGAGROUP
 +
 +# netbios name is the name you will see in "Network Neighbourhood",
 +# but defaults to your hostname
@@ -727,108 +722,8 @@ diff -Naur samba-3.6.4/packaging/Mandriva/smb.conf samba-3.6.4.oden/packaging/Ma
 +;   printable = no
 +;   create mask = 0765
 +
-diff -Naur samba-3.6.4/packaging/Mandriva/smb.init samba-3.6.4.oden/packaging/Mandriva/smb.init
---- samba-3.6.4/packaging/Mandriva/smb.init	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/smb.init	2012-05-01 07:56:52.969862069 +0200
-@@ -0,0 +1,95 @@
-+#!/bin/sh
-+#
-+# chkconfig: 35 91 9
-+# description: Starts and stops the Samba smbd and nmbd daemons \
-+#	       used to provide SMB network services.
-+
-+# Source function library.
-+if [ -f /etc/init.d/functions ] ; then
-+  . /etc/init.d/functions
-+elif [ -f /etc/rc.d/init.d/functions ] ; then
-+  . /etc/rc.d/init.d/functions
-+else
-+  exit 0
-+fi
-+
-+# Source networking configuration.
-+. /etc/sysconfig/network
-+
-+# Check that networking is up.
-+[ ${NETWORKING} = "no" ] && exit 0
-+
-+# Check that smb.conf exists.
-+[ -f /etc/samba/smb.conf ] || exit 0
-+
-+RETVAL=0
-+
-+
-+start() {
-+       export TMPDIR="/var/tmp"
-+	echo -n "Starting SMB services: "
-+	daemon smbd -D 	
-+	RETVAL=$?
-+	echo
-+	echo -n "Starting NMB services: "
-+	daemon nmbd -D 
-+	RETVAL2=$?
-+	echo
-+	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && touch /var/lock/subsys/smb || \
-+	   RETVAL=1
-+	return $RETVAL
-+}	
-+stop() {
-+	echo -n "Shutting down SMB services: "
-+	killproc smbd
-+	RETVAL=$?
-+	echo
-+	echo -n "Shutting down NMB services: "
-+	killproc nmbd
-+	RETVAL2=$?
-+	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && rm -f /var/lock/subsys/smb
-+	echo ""
-+	return $RETVAL
-+}	
-+restart() {
-+	stop
-+	start
-+}	
-+reload() {
-+       export TMPDIR="/var/tmp"
-+        echo -n "Reloading smb.conf file: "
-+	killproc smbd -HUP
-+	RETVAL=$?
-+	echo
-+	return $RETVAL
-+}	
-+mdvstatus() {
-+	status smbd
-+	status nmbd
-+}	
-+
-+case "$1" in
-+  start)
-+  	start
-+	;;
-+  stop)
-+  	stop
-+	;;
-+  restart)
-+  	restart
-+	;;
-+  reload)
-+  	reload
-+	;;
-+  status)
-+  	mdvstatus
-+	;;
-+  condrestart)
-+  	[ -f /var/lock/subsys/smb ] && restart || :
-+	;;
-+  *)
-+	echo "Usage: $0 {start|stop|restart|status|condrestart}"
-+	exit 1
-+esac
-+
-+exit $?
-diff -Naur samba-3.6.4/packaging/Mandriva/smbprint samba-3.6.4.oden/packaging/Mandriva/smbprint
---- samba-3.6.4/packaging/Mandriva/smbprint	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/smbprint	2012-05-01 07:56:52.965862045 +0200
+--- samba-3.0.23/packaging/Rosa/smbprint.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/smbprint	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,77 @@
 +#!/bin/sh
 +
@@ -907,16 +802,14 @@ diff -Naur samba-3.6.4/packaging/Mandriva/smbprint samba-3.6.4.oden/packaging/Ma
 +	echo "print -"
 +	cat
 +) | /usr/bin/smbclient "//$server/$service" $password -U $server -N >> $logfile
-diff -Naur samba-3.6.4/packaging/Mandriva/smbusers samba-3.6.4.oden/packaging/Mandriva/smbusers
---- samba-3.6.4/packaging/Mandriva/smbusers	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/smbusers	2012-05-01 07:56:52.966862051 +0200
+--- samba-3.0.23/packaging/Rosa/smbusers.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/smbusers	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,3 @@
 +# Unix_name = SMB_name1 SMB_name2 ...
 +root = administrator admin
 +nobody = guest pcguest smbguest
-diff -Naur samba-3.6.4/packaging/Mandriva/smb-winbind.conf samba-3.6.4.oden/packaging/Mandriva/smb-winbind.conf
---- samba-3.6.4/packaging/Mandriva/smb-winbind.conf	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/smb-winbind.conf	2012-05-01 07:56:52.967862057 +0200
+--- samba-3.0.23/packaging/Rosa/smb-winbind.conf.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/smb-winbind.conf	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,539 @@
 +
 +# This is the main Samba configuration file. You should read the
@@ -937,7 +830,7 @@ diff -Naur samba-3.6.4/packaging/Mandriva/smb-winbind.conf samba-3.6.4.oden/pack
 +
 +# 1. Server Naming Options:
 +# workgroup = NT-Domain-Name or Workgroup-Name
-+   workgroup = MDVGROUP
++   workgroup = MGAGROUP
 +
 +# netbios name is the name you will see in "Network Neighbourhood",
 +# but defaults to your hostname
@@ -1457,9 +1350,8 @@ diff -Naur samba-3.6.4/packaging/Mandriva/smb-winbind.conf samba-3.6.4.oden/pack
 +;   printable = no
 +;   create mask = 0765
 +
-diff -Naur samba-3.6.4/packaging/Mandriva/system-auth-winbind.pamd samba-3.6.4.oden/packaging/Mandriva/system-auth-winbind.pamd
---- samba-3.6.4/packaging/Mandriva/system-auth-winbind.pamd	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/system-auth-winbind.pamd	2012-05-01 07:56:52.968862063 +0200
+--- samba-3.0.23/packaging/Rosa/system-auth-winbind.pamd.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/system-auth-winbind.pamd	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,17 @@
 +#%PAM-1.0
 +
@@ -1478,9 +1370,8 @@ diff -Naur samba-3.6.4/packaging/Mandriva/system-auth-winbind.pamd samba-3.6.4.o
 +session     required      /lib/security/pam_mkhomedir.so skel=/etc/skel/ umask=0022 
 +session     required      /lib/security/pam_limits.so
 +session     required      /lib/security/pam_unix.so
-diff -Naur samba-3.6.4/packaging/Mandriva/winbind.init samba-3.6.4.oden/packaging/Mandriva/winbind.init
---- samba-3.6.4/packaging/Mandriva/winbind.init	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/winbind.init	2012-05-01 07:56:52.968862063 +0200
+--- samba-3.0.23/packaging/Rosa/winbind.init.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/winbind.init	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,93 @@
 +#!/bin/sh
 +#
@@ -1575,9 +1466,8 @@ diff -Naur samba-3.6.4/packaging/Mandriva/winbind.init samba-3.6.4.oden/packagin
 +esac
 +
 +exit $?
-diff -Naur samba-3.6.4/packaging/Mandriva/wrepld.init samba-3.6.4.oden/packaging/Mandriva/wrepld.init
---- samba-3.6.4/packaging/Mandriva/wrepld.init	1970-01-01 01:00:00.000000000 +0100
-+++ samba-3.6.4.oden/packaging/Mandriva/wrepld.init	2012-05-01 07:56:52.969862069 +0200
+--- samba-3.0.23/packaging/Rosa/wrepld.init.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/wrepld.init	2006-07-11 13:28:27.000000000 +0200
 @@ -0,0 +1,93 @@
 +#!/bin/sh
 +#
@@ -1665,6 +1555,104 @@ diff -Naur samba-3.6.4/packaging/Mandriva/wrepld.init samba-3.6.4.oden/packaging
 +	;;
 +  condrestart)
 +  	[ -f /var/lock/subsys/wrepld ] && restart || :
++	;;
++  *)
++	echo "Usage: $0 {start|stop|restart|status|condrestart}"
++	exit 1
++esac
++
++exit $?
+--- samba-3.0.23/packaging/Rosa/smb.init.mdv	2006-07-11 13:28:27.000000000 +0200
++++ samba-3.0.23/packaging/Rosa/smb.init	2006-07-11 13:31:22.000000000 +0200
+@@ -0,0 +1,95 @@
++#!/bin/sh
++#
++# chkconfig: 35 91 9
++# description: Starts and stops the Samba smbd and nmbd daemons \
++#	       used to provide SMB network services.
++
++# Source function library.
++if [ -f /etc/init.d/functions ] ; then
++  . /etc/init.d/functions
++elif [ -f /etc/rc.d/init.d/functions ] ; then
++  . /etc/rc.d/init.d/functions
++else
++  exit 0
++fi
++
++# Source networking configuration.
++. /etc/sysconfig/network
++
++# Check that networking is up.
++[ ${NETWORKING} = "no" ] && exit 0
++
++# Check that smb.conf exists.
++[ -f /etc/samba/smb.conf ] || exit 0
++
++RETVAL=0
++
++
++start() {
++       export TMPDIR="/var/tmp"
++	echo -n "Starting SMB services: "
++	daemon smbd -D 	
++	RETVAL=$?
++	echo
++	echo -n "Starting NMB services: "
++	daemon nmbd -D 
++	RETVAL2=$?
++	echo
++	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && touch /var/lock/subsys/smb || \
++	   RETVAL=1
++	return $RETVAL
++}	
++stop() {
++	echo -n "Shutting down SMB services: "
++	killproc smbd
++	RETVAL=$?
++	echo
++	echo -n "Shutting down NMB services: "
++	killproc nmbd
++	RETVAL2=$?
++	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && rm -f /var/lock/subsys/smb
++	echo ""
++	return $RETVAL
++}	
++restart() {
++	stop
++	start
++}	
++reload() {
++       export TMPDIR="/var/tmp"
++        echo -n "Reloading smb.conf file: "
++	killproc smbd -HUP
++	RETVAL=$?
++	echo
++	return $RETVAL
++}	
++mdvstatus() {
++	status smbd
++	status nmbd
++}	
++
++case "$1" in
++  start)
++  	start
++	;;
++  stop)
++  	stop
++	;;
++  restart)
++  	restart
++	;;
++  reload)
++  	reload
++	;;
++  status)
++  	mdvstatus
++	;;
++  condrestart)
++  	[ -f /var/lock/subsys/smb ] && restart || :
 +	;;
 +  *)
 +	echo "Usage: $0 {start|stop|restart|status|condrestart}"
