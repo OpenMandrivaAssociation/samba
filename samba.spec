@@ -1,5 +1,5 @@
 %define pkg_name	samba
-%define version		3.6.9
+%define version		3.6.10
 %define rel		2
 #define	subrel		1
 %define vscanver 	0.1.3
@@ -231,7 +231,7 @@ Release: %mkrel %rel
 
 License: GPLv3
 Group: System/Servers
-Source: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.gz
+Source0: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.gz
 Source99: http://ftp.samba.org/pub/samba/stable/samba-%{source_ver}.tar.asc
 Source98: http://ftp.samba.org/pub/samba/samba-pubkey.asc
 URL:	http://www.samba.org

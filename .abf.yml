@@ -1,3 +1,4 @@
 sources:
-  "samba-3.6.9.tar.gz": 004b5eba346f18961cf02a0b3471bba02d36ee7d
   "samba-virusfilter-0.1.3.tar.bz2": 80064106ec56c2ae6f58022823bff9975b69bc5c
+  samba-3.6.10.tar.gz: da22200c30bf156843db121e8ee323fac3fafc10
+  samba-3.6.10.tar.asc: 5f94988f72f6cec547c3e8b0bd115f2a96092878
