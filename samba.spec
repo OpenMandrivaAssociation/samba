@@ -275,6 +275,7 @@ Patch33: samba-3.5.8-fix-netapi-examples-linking.patch
 %else
 # Version specific patches: upcoming version
 %endif
+Patch40: samba-3.6.10-link-tirpc.patch
 # Limbo patches (applied to prereleases, but not preleases, ie destined for
 # samba CVS)
 %if %have_pversion && %have_pre
@@ -290,6 +291,7 @@ BuildRequires: avahi-client-devel
 BuildRequires: libaio-devel
 BuildRequires: pkgconfig(uuid)
 BuildRequires: pkgconfig(gamin)
+BuildRequires: pkgconfig(libtirpc) >= 0.2.2
 %if %build_ctdb
 BuildRequires: pkgconfig(ctdb)
 %endif
@@ -1032,6 +1034,7 @@ popd
 %patch30 -p1 -b .checkflags
 #patch31 -p1 -b .nss_wins_log
 %patch33 -p1 -b .netapi_link
+%patch40 -p1 -b .linkTirpc~
 
 # patches from cvs/samba team
 pushd source3

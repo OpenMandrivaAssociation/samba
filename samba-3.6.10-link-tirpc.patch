@@ -1,0 +1,22 @@
+--- samba-3.6.10/source3/Makefile.in.bero	2012-12-13 00:23:48.331189693 +0100
++++ samba-3.6.10/source3/Makefile.in	2012-12-13 00:24:09.691939607 +0100
+@@ -1782,7 +1782,7 @@ bin/smbd@EXEEXT@: $(BINARY_PREREQS) $(SM
+ 		$(KRB5LIBS) $(DYNEXP) $(PRINT_LIBS) $(AUTH_LIBS) \
+ 		$(ACL_LIBS) $(PASSDB_LIBS) $(LIBS) $(DNSSD_LIBS) $(AVAHI_LIBS) \
+ 		$(POPT_LIBS) @SMBD_LIBS@ $(LIBTALLOC_LIBS) $(LIBTDB_LIBS) \
+-		$(LIBWBCLIENT_LIBS) $(ZLIB_LIBS)
++		$(LIBWBCLIENT_LIBS) $(ZLIB_LIBS) -ltirpc
+ 
+ bin/nmbd@EXEEXT@: $(BINARY_PREREQS) $(NMBD_OBJ) @BUILD_POPT@ $(LIBTALLOC) $(LIBTDB) $(LIBWBCLIENT)
+ 	@echo Linking $@
+--- samba-3.6.10/source3/wscript_build.bero	2012-12-13 00:17:09.656809512 +0100
++++ samba-3.6.10/source3/wscript_build	2012-12-13 00:21:49.475571915 +0100
+@@ -850,7 +850,7 @@ bld.SAMBA3_LIBRARY('smbconf',
+ 
+ bld.SAMBA3_LIBRARY('smbd_base',
+                     source=SMBD_SRC_BASE,
+-                    deps='''tdb tevent dl krb5 ldap gssapi gssapi_krb5
++                    deps='''tirpc tdb tevent dl krb5 ldap gssapi gssapi_krb5
+                     DYNCONFIG wbclient crypt nsl cups cap resolv z passdb
+                     PARAM_WITHOUT_REG samba3core LIBSMB POPT_SAMBA3 KRBCLIENT AVAHI
+                     LIBMSRPC_GEN msrpc3 ads LIBADS_SERVER LIBADS_PRINTER
