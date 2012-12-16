@@ -2,17 +2,16 @@
 #
 # chkconfig: 345 81 45
 # description: Starts and stops the Samba winbind daemon to provide \
-#              user and group information from a domain controller to linux.
+# user and group information from a domain controller to linux.
 #
 ### BEGIN INIT INFO
 # Provides: winbind 
 # Required-Start: $network
 # Required-Stop: $network
 # Default-Start: 3 4 5
-# Default-Stop: 0 1 2 6
 # Short-Description: Winbind naming service (winbindd)
 # Description: Starts and stops the Samba winbind daemon to provide
-#              user and group information from a domain controller to linux.
+# user and group information from a domain controller to linux.
 ### END INIT INFO
 
 # Source function library.

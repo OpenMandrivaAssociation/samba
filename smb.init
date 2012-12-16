@@ -1,18 +1,17 @@
 #!/bin/sh
 #
 # chkconfig: 35 91 9
-# description: Starts and stops the Samba smbd and nmbd daemons \
+# description: Starts and stops the Samba samba daemon \
 #	       used to provide SMB network services.
 #
 ### BEGIN INIT INFO
-# Provides: smb nmb samba
+# Provides: samba
 # Required-Start: $network
 # Required-Stop: $network
 # Default-Start: 3 4 5
-# Default-Stop: 0 1 2 6
-# Short-Description: Samba servers (nmbd and smbd)
-# Description:Starts and stops the Samba smbd and nmbd daemons
-#              used to provide SMB network services.
+# Short-Description: Samba server (samba)
+# Description:Starts and stops the Samba samba daemons used to provide SMB network 
+#             services.
 ### END INIT INFO
 
 # Source function library.
@@ -38,28 +37,19 @@ RETVAL=0
 
 start() {
        export TMPDIR="/var/tmp"
-	echo -n "Starting SMB services: "
-	daemon smbd -D 	
+	gprintf "Starting Samba4: "
+	daemon samba -D 	
 	RETVAL=$?
 	echo
-	echo -n "Starting NMB services: "
-	daemon nmbd -D 
-	RETVAL2=$?
-	echo
-	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && touch /var/lock/subsys/smb || \
-	   RETVAL=1
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/samba
 	return $RETVAL
 }	
 stop() {
-	echo -n "Shutting down SMB services: "
-	killproc smbd
+	gprintf "Shutting down Samba4: "
+	killproc -p /var/run/samba/samba.pid samba
 	RETVAL=$?
 	echo
-	echo -n "Shutting down NMB services: "
-	killproc nmbd
-	RETVAL2=$?
-	[ $RETVAL -eq 0 -a $RETVAL2 -eq 0 ] && rm -f /var/lock/subsys/smb
-	echo ""
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/samba
 	return $RETVAL
 }	
 restart() {
@@ -68,15 +58,14 @@ restart() {
 }	
 reload() {
        export TMPDIR="/var/tmp"
-        echo -n "Reloading smb.conf file: "
-	killproc smbd -HUP
+        gprintf "Reloading smb.conf file: "
+	killproc -p /var/run/samba/samba.pid samba -HUP
 	RETVAL=$?
 	echo
 	return $RETVAL
 }	
 mdkstatus() {
-	status smbd
-	status nmbd
+	status -p /var/run/samba/samba.pid samba
 }	
 
 case "$1" in
@@ -96,10 +85,10 @@ case "$1" in
   	mdkstatus
 	;;
   condrestart)
-  	[ -f /var/lock/subsys/smb ] && restart || :
+  	[ -f /var/lock/subsys/samba ] && restart || :
 	;;
   *)
-	echo "Usage: $0 {start|stop|restart|status|condrestart}"
+	gprintf "Usage: %s {start|stop|restart|status|condrestart}\n" "$0"
 	exit 1
 esac
 

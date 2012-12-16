@@ -1,8 +1,5 @@
 sources:
-  samba-3.6.10.tar.asc: 5f94988f72f6cec547c3e8b0bd115f2a96092878
-  samba-3.6.10.tar.gz: da22200c30bf156843db121e8ee323fac3fafc10
-  samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0
-  samba-virusfilter-0.1.3.tar.bz2: 80064106ec56c2ae6f58022823bff9975b69bc5c
+  samba-4.0.0.tar.gz: c39a99f0f9030d3f154e94a61a99c73a7f48203c
   swat_16.png: 3e2d014fd368ebe99ae7c36ddd17b3fc3de8d32b
   swat_32.png: 32622107f97316b71af56bc71c997903e59b0f4b
   swat_48.png: 1a3ab5ee734f65b59e49372d8c4daf5490f93d3b

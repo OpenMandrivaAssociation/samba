@@ -1,0 +1,10 @@
+--- samba-4.0.0/source3/wscript_build.bero	2012-12-14 16:47:47.124053374 +0100
++++ samba-4.0.0/source3/wscript_build	2012-12-14 16:49:54.517558570 +0100
+@@ -977,6 +977,7 @@ bld.SAMBA3_LIBRARY('smbd_base',
+                     NDR_SMB_ACL
+                     netapi
+                     ''' + bld.env['dmapi_lib'],
++		    ldflags='-ltirpc',
+                     private_library=True,
+                     vars=locals())
+ 

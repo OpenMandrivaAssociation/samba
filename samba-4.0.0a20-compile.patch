@@ -1,0 +1,14 @@
+--- samba-4.0.0alpha20/buildtools/wafsamba/samba_autoconf.py.bero	2012-05-15 16:00:22.127255528 +0200
++++ samba-4.0.0alpha20/buildtools/wafsamba/samba_autoconf.py	2012-05-15 16:01:09.319256578 +0200
+@@ -734,8 +734,9 @@ def SETUP_CONFIGURE_CACHE(conf, enable):
+ def SAMBA_CHECK_UNDEFINED_SYMBOL_FLAGS(conf):
+     # we don't want any libraries or modules to rely on runtime
+     # resolution of symbols
+-    if sys.platform != "openbsd4" and sys.platform != "openbsd5":
+-        conf.env.undefined_ldflags = conf.ADD_LDFLAGS('-Wl,-no-undefined', testflags=True)
++# Unfortunately the Python bindings rely on it anyway
++#    if sys.platform != "openbsd4" and sys.platform != "openbsd5":
++#        conf.env.undefined_ldflags = conf.ADD_LDFLAGS('-Wl,-no-undefined', testflags=True)
+ 
+     if sys.platform != "openbsd4" and sys.platform != "openbsd5" and conf.env.undefined_ignore_ldflags == []:
+         if conf.CHECK_LDFLAGS(['-undefined', 'dynamic_lookup']):
