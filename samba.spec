@@ -136,6 +136,7 @@ Patch0:		samba4-socket-wrapper.patch
 Patch1:		samba-4.0.0a20-compile.patch
 # xdr_* functions have moved from glibc into libtirpc
 Patch2:		samba-4.0.0-tirpc.patch
+BuildRequires:	pkgconfig(libtirpc)
 
 # Limbo patches (applied to prereleases, but not preleases, ie destined for
 # samba CVS)
