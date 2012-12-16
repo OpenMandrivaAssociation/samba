@@ -163,6 +163,7 @@ BuildRequires: libldap-devel krb5-devel
 BuildRequires: keyutils-devel
 BuildRequires: pkgconfig(tdb) >= 1.2.1
 BuildRequires: ldb-devel >= 1:1.1.7-0.beta8.1 pyldb-util-devel >= 1.1.7-0.beta8.1
+BuildRequires: pkgconfig(tevent) python-tevent
 BuildRequires: pkgconfig(talloc) pkgconfig(pytalloc-util)
 BuildRequires: pkgconfig(ctdb) >= 2.0
 
