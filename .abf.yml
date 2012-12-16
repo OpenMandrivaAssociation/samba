@@ -1,5 +1,7 @@
 sources:
+  samba-4.0.0.tar.asc: 97ba68543352e8b92c9f899bf825b7e2a2d0bc43
   samba-4.0.0.tar.gz: c39a99f0f9030d3f154e94a61a99c73a7f48203c
+  samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0
   swat_16.png: 3e2d014fd368ebe99ae7c36ddd17b3fc3de8d32b
   swat_32.png: 32622107f97316b71af56bc71c997903e59b0f4b
   swat_48.png: 1a3ab5ee734f65b59e49372d8c4daf5490f93d3b
