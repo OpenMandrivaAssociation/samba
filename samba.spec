@@ -20,7 +20,7 @@
 %bcond_with doc
 %bcond_without swat
 %bcond_with cifs
-%define build_ads	1
+%bcond_without ads
 %define build_test	1
 # CUPS supports functionality for 'printcap name = cups' (9.0 and later):
 %define build_cupspc	0
@@ -32,14 +32,6 @@
 # To use it, do rpm [-ba|--rebuild] --with 'xxx'
 # Check if the rpm was built with the defaults, otherwise we inform the user
 %define build_non_default 0
-%{?_with_wins: %global build_wins 1}
-%{?_with_wins: %global build_non_default 1}
-%{?_without_wins: %global build_wins 0}
-%{?_without_wins: %global build_non_default 1}
-%{?_with_ads: %global build_ads 1}
-%{?_with_ads: %global build_non_default 1}
-%{?_without_ads: %global build_ads 0}
-%{?_without_ads: %global build_non_default 1}
 %{?_with_test: %global build_test 1}
 %{?_with_test: %global build_non_default 1}
 %{?_without_test: %global build_test 0}
@@ -157,11 +149,11 @@ BuildRequires: mysql-devel
 %endif
 BuildRequires: acl-devel
 BuildRequires: libldap-devel
-%if %build_ads
+%if %{with ads}
 BuildRequires: libldap-devel krb5-devel
 %endif
 BuildRequires: keyutils-devel
-BuildRequires: pkgconfig(tdb) >= 1.2.1
+BuildRequires: pkgconfig(tdb) >= 1.2.1 python-tdb
 BuildRequires: ldb-devel >= 1:1.1.7-0.beta8.1 pyldb-util-devel >= 1.1.7-0.beta8.1
 BuildRequires: pkgconfig(tevent) python-tevent
 BuildRequires: pkgconfig(talloc) pkgconfig(pytalloc-util)
@@ -684,8 +676,7 @@ The samba-domainjoin-gui package includes a domainjoin gtk application.
 %{error:Build options available are:}
 %{error:--with[out] system   Build as the system samba package [or as samba3]}
 %{error:--with[out] winbind  Build with Winbind support                - %opt_status %{with winbind}}
-%{error:--with[out] wins     Build with WINS name resolution support   - %opt_status %build_wins}
-%{error:--with[out] ads      Build with Active Directory support       - %opt_status %build_ads}
+%{error:--with[out] ads      Build with Active Directory support       - %opt_status %{with ads}}
 %{error:--with[out] mysql    Build MySQL passdb backend                - %opt_status %build_mysql}
 %{error:--with[out] pgsql    Build PostgreSQL passdb backend           - %opt_status %build_pgsql}
 %{error:--with[out] test     Enable testing and benchmarking tools     - %opt_status %build_test}
@@ -709,8 +700,6 @@ RPM_EXTRA_OPTIONS="\
 %{?_without_system: --without system}\
 %{?with winbind: --with winbind}\
 %{?without winbind: --without winbind}\
-%{?_with_wins: --with wins}\
-%{?_without_wins: --without wins}\
 %{?_with_ldap: --with ldap}\
 %{?_without_ldap: --without ldap}\
 %{?_with_ads: --with ads}\
@@ -796,7 +785,11 @@ buildtools/bin/waf configure --enable-fhs \
 	--with-winbind \
 %endif
 	--with-swat \
+%if %{with ads}
 	--with-ads \
+%else
+	--without-ads \
+%endif
 	--with-ldap \
 	--disable-rpath \
 	--disable-rpath-install \
@@ -1099,7 +1092,9 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_libdir}/samba/libLIBWBCLIENT_OLD.so
 %{_libdir}/samba/libMESSAGING.so
 %{_libdir}/samba/libaddns.so
+%if %{with ads}
 %{_libdir}/samba/libads.so
+%endif
 %{_libdir}/samba/libasn1-samba4.so.8
 %{_libdir}/samba/libasn1-samba4.so.8.0.0
 %{_libdir}/samba/libasn1util.so
