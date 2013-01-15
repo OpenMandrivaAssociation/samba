@@ -91,7 +91,7 @@
 Summary: Samba SMB server
 Name: samba
 
-Version: 4.0.0
+Version: 4.0.1
 Release: 1
 
 License: GPLv3
