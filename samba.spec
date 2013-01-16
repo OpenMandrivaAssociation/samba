@@ -1578,8 +1578,8 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
 %{perl_vendorlib}/Parse/Yapp/*.pm
-%{_mandir}/man1/pidl.1.*
-%{_mandir}/man3/Parse::Pidl*.3pm.*
+#{_mandir}/man1/pidl.1.*
+#{_mandir}/man3/Parse::Pidl*.3pm.*
 
 %files -n %libnetapi
 %{_libdir}/libnetapi.so.%{netapimajor}*
