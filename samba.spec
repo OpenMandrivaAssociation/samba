@@ -158,6 +158,7 @@ BuildRequires: ldb-devel >= 1:1.1.7-0.beta8.1 pyldb-util-devel >= 1.1.7-0.beta8.
 BuildRequires: pkgconfig(tevent) python-tevent
 BuildRequires: pkgconfig(talloc) pkgconfig(pytalloc-util)
 BuildRequires: pkgconfig(ctdb) >= 2.0
+BuildRequires: pkgconfig(gnutls)
 
 Requires(pre): chkconfig mktemp psmisc
 Requires(pre): coreutils sed grep
@@ -980,6 +981,11 @@ mv %buildroot%_libdir/libnss* %buildroot/%_lib/
 
 rm -f %{buildroot}/%{_mandir}/man1/testprns*
 
+mkdir -p %buildroot%_sysconfdir/ld.so.conf.d
+cat >%buildroot%_sysconfdir/ld.so.conf.d/samba.conf <<EOF
+%_libdir/samba
+EOF
+
 %post server
 
 %_post_service %{name}
@@ -1068,6 +1074,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 #%{_libdir}/%{name}/vfs
 %{_libdir}/%{name}/vfs/*.so
 #dir %{_libdir}/samba/pdb
+%dir %_libdir/samba
 %{_libdir}/samba/ldb
 %{_libdir}/samba/service
 %{_libdir}/samba/process_model
@@ -1226,7 +1233,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 #{_mandir}/man8/vfs_*.8*
 %{_mandir}/man8/samba.8*
 %{_sbindir}/samba_upgradeprovision
-
+%_sysconfdir/ld.so.conf.d
 
 
 
