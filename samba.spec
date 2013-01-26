@@ -235,6 +235,8 @@ Requires: mount-cifs
 Provides:  samba3-client = %version-%release
 Obsoletes: samba3-client < %version-%release
 Obsoletes: smbfs
+# For samba-tool
+Requires: python-talloc python-ldb python-tdb
 %ifarch x86_64
 Conflicts:	cups < 1.2.0-0.5361.0mdk
 %endif
@@ -1585,8 +1587,8 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
 %{perl_vendorlib}/Parse/Yapp/*.pm
-#{_mandir}/man1/pidl.1.*
-#{_mandir}/man3/Parse::Pidl*.3pm.*
+%optional %{_mandir}/man1/pidl.1.*
+%optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
 %files -n %libnetapi
 %{_libdir}/libnetapi.so.%{netapimajor}*
