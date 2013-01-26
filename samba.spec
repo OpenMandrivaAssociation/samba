@@ -237,6 +237,7 @@ Obsoletes: samba3-client < %version-%release
 Obsoletes: smbfs
 # For samba-tool
 Requires: python-talloc python-ldb python-tdb
+Requires: ldb-utils
 %ifarch x86_64
 Conflicts:	cups < 1.2.0-0.5361.0mdk
 %endif
