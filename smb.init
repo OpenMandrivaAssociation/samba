@@ -29,9 +29,6 @@ fi
 # Check that networking is up.
 [ ${NETWORKING} = "no" ] && exit 0
 
-# Check that smb.conf exists.
-[ -f /etc/samba/smb.conf ] || exit 0
-
 RETVAL=0
 
 
