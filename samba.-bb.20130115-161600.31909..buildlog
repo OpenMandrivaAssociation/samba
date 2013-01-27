@@ -1,7 +1,0 @@
-Fetching(Source99): http://ftp.samba.org/pub/samba/stable/samba-4.0.1.tar.asc
-Fetching(Source0): http://ftp.samba.org/pub/samba/stable/samba-4.0.1.tar.gz
-error: Failed build dependencies:
-	python-tdb is needed by samba-4.0.1-1.src
-	pyldb-util-devel >= 1.1.7-0.beta8.1 is needed by samba-4.0.1-1.src
-	python-tevent is needed by samba-4.0.1-1.src
-	pkgconfig(ctdb) >= 2.0 is needed by samba-4.0.1-1.src

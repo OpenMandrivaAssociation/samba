@@ -119,8 +119,6 @@ Source20:	smbusers
 Source21:	smbprint
 #Source22:	smbadduser
 Source23:	findsmb
-Source24:	smb.init
-Source25:	winbind.init
 Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
@@ -916,7 +914,6 @@ done
 
 # Install other stuff
 
-        install -m755 %{SOURCE24} %{buildroot}/%{_initrddir}/%{name}
         install -m644 %{SOURCE28} %{buildroot}/%{_sysconfdir}/pam.d/%{name}
 	install -m644 %{SOURCE29} %{buildroot}/%{_sysconfdir}/pam.d/system-auth-winbind
 #
@@ -988,6 +985,10 @@ mkdir -p %buildroot%_sysconfdir/ld.so.conf.d
 cat >%buildroot%_sysconfdir/ld.so.conf.d/samba.conf <<EOF
 %_libdir/samba
 EOF
+
+mkdir -p %buildroot%_unitdir %buildroot%_sysconfdir/sysconfig
+cp -a packaging/systemd/*.service %buildroot%_unitdir/
+cp -a packaging/systemd/samba.sysconfig %buildroot%_sysconfdir/sysconfig/samba
 
 %post server
 
@@ -1216,7 +1217,6 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %_sbindir/nmbd
 %_sbindir/samba_upgradedns
 #attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smbusers
-%attr(-,root,root) %config(noreplace) %{_initrddir}/%{name}
 #%attr(-,root,root) %config(noreplace) %{_initrddir}/wrepld
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
@@ -1237,10 +1237,10 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_mandir}/man8/samba.8*
 %{_sbindir}/samba_upgradeprovision
 %_sysconfdir/ld.so.conf.d
-
-
-
-
+%_unitdir/samba.service
+%_unitdir/smb.service
+%_unitdir/nmb.service
+%config(noreplace) %_sysconfdir/sysconfig/samba
 
 %if %{with doc}
 %files doc
@@ -1482,12 +1482,12 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %attr(755,root,root) /%{_lib}/libnss_winbind*
 %{_libdir}/%{name}/idmap
 %{_libdir}/winbind_krb5_locator.so
-# %attr(-,root,root) %config(noreplace) %{_initrddir}/winbind
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
 # %{_mandir}/man8/winbindd*.8*
 # %{_mandir}/man7/pam_winbind.7*
 # %{_mandir}/man7/winbind_krb5_locator.7.*
 # %{_mandir}/man1/wbinfo*.1*
+%_unitdir/winbind.service
 
 %files -n nss_wins
 %attr(755,root,root) /%{_lib}/libnss_wins.so*
