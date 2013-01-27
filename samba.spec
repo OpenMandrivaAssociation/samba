@@ -1,3 +1,13 @@
+# Useful commands for testing domain controller/OpenLDAP replacement
+# functionality:
+#
+# Set up initial domain controller:
+# samba-tool domain provision --realm=LINDEV.CH --domain=LINDEV --adminpass='PASSWORD' --server-role='domain controller'
+# Query:
+# ldapsearch -H ldap://127.0.0.1 -x -w 'PASSWORD' -b "DC=lindev,DC=ch" -D "CN=Administrator,CN=Users,DC=lindev,DC=ch"
+# With TLS:
+# ldapsearch -Z -H ldaps://127.0.0.1:636 -x -w 'PASSWORD' -b "DC=lindev,DC=ch" -D "CN=Administrator,CN=Users,DC=lindev,DC=ch"
+
 %define libsmbmajor	0
 %define netapimajor	0
 %define smbsharemodesmajor	0
