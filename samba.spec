@@ -92,7 +92,7 @@ Summary: Samba SMB server
 Name: samba
 
 Version: 4.0.1
-Release: 1
+Release: 2
 
 License: GPLv3
 Group: System/Servers
