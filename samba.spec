@@ -101,8 +101,9 @@
 Summary: Samba SMB server
 Name: samba
 
-Version: 4.0.1
-Release: 2
+Version:	4.0.1
+Release:	3
+Epoch:		1
 
 License: GPLv3
 Group: System/Servers
@@ -140,7 +141,7 @@ BuildRequires:	pkgconfig(libtirpc)
 
 # Limbo patches (applied to prereleases, but not preleases, ie destined for
 # samba CVS)
-Requires: pam >= 0.64, samba-common = %{version}
+Requires: pam >= 0.64, samba-common = %{EVRD}
 BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
 BuildRequires: libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
@@ -156,9 +157,9 @@ BuildRequires: postgresql-devel
 BuildRequires: mysql-devel
 %endif
 BuildRequires: acl-devel
-BuildRequires: libldap-devel
+BuildRequires: openldap-devel
 %if %{with ads}
-BuildRequires: libldap-devel krb5-devel
+BuildRequires: openldap-devel krb5-devel
 %endif
 BuildRequires: keyutils-devel
 BuildRequires: pkgconfig(tdb) >= 1.2.1 python-tdb
@@ -204,9 +205,9 @@ more information.
 %package server
 URL:	http://www.samba.org
 Summary: Samba (SMB) server programs
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{EVRD}
 # provision requires samba4-python
-Requires: %{name}-python = %{version}
+Requires: %{name}-python = %{EVRD}
 Requires(pre):		rpm-helper
 Group: Networking/Other
 Provides: samba = %version-%release
@@ -238,10 +239,9 @@ docs directory for implementation details.
 URL:	http://www.samba.org
 Summary: Samba (SMB) client programs
 Group: Networking/Other
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{EVRD}
 Requires: mount-cifs
-Provides:  samba3-client = %version-%release
-Obsoletes: samba3-client < %version-%release
+%rename		samba3-client
 Obsoletes: smbfs
 # For samba-tool
 Requires: python-talloc python-ldb python-tdb
@@ -255,19 +255,18 @@ Samba-client provides some SMB clients, which complement the built-in
 SMB filesystem in Linux. These allow the accessing of SMB shares, and
 printing to SMB printers.
 
-%package common
-URL:	http://www.samba.org
-Summary: Files used by both Samba servers and clients
-Group: System/Servers
+%package	common
+URL:		http://www.samba.org
+Summary:	Files used by both Samba servers and clients
+Group:		System/Servers
 # rpcclient etc. use samba python modules
-Requires: %{name}-python = %{version}
-Requires: %libpdb = %version-%release
-Requires: %libcredentials = %version-%release
-Requires: %libsmbconf = %version-%release
-Requires: %libsmbldap = %version-%release
-Requires: %libtevent_util = %version-%release
-Provides:  samba-common-ldap = %version-%release
-Obsoletes: samba-common-ldap < %version-%release
+Requires:	%{name}-python = %{EVRD}
+Requires:	%{libpdb} = %{EVRD}
+Requires:	%{libcredentials} = %{EVRD}
+Requires:	%{libsmbconf} = %{EVRD}
+Requires:	%{libsmbldap} = %{EVRD}
+Requires:	%{libtevent_util} = %{EVRD}
+%rename 	samba-common-ldap
 
 %description common
 Samba-common provides files necessary for both the server and client
@@ -278,7 +277,7 @@ packages of Samba.
 URL:	http://www.samba.org
 Summary: Documentation for Samba servers and clients
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{EVRD}
 
 %description doc
 Samba-doc provides documentation files for both the server and client
@@ -289,11 +288,10 @@ packages of Samba.
 %package swat
 URL:	http://www.samba.org
 Summary: The Samba Web Administration Tool
-Requires: %{name}-server = %{version}
+Requires: %{name}-server = %{EVRD}
 Requires: xinetd
 Group: System/Servers
-Provides:  samba-swat-ldap = %version-%release
-Obsoletes: samba-swat-ldap < %version-%release
+%rename 	samba-swat-ldap
 
 %description swat
 SWAT (the Samba Web Administration Tool) allows samba's smb.conf file
@@ -310,7 +308,7 @@ Samba.
 URL:	http://www.samba.org
 Summary: Samba-winbind daemon, utilities and documentation
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires:	%{name}-common = %{EVRD}
 
 %description winbind
 Provides the winbind daemon and testing tools to allow authentication 
@@ -320,7 +318,7 @@ and group/user enumeration from a Windows or Samba domain controller.
 URL:	http://www.samba.org
 Summary: Name Service Switch service for WINS
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires:	%{name}-common = %{EVRD}
 Requires(pre): glibc
 
 %description -n nss_wins
@@ -341,7 +339,7 @@ Samba Python modules
 URL:	http://www.samba.org
 Summary: Debugging and benchmarking tools for samba
 Group: System/Servers
-Requires: %{name}-common = %{version}
+Requires: %{name}-common = %{EVRD}
 
 %description test
 This package provides tools for benchmarking samba, and debugging
@@ -363,8 +361,8 @@ SMB shares.
 URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
 Group:		Development/C
-Provides:	libsmbclient-devel = %{version}-%{release}
-Requires:       %{libname} = %{version}-%{release}
+Provides:	libsmbclient-devel = %{EVRD}
+Requires:       %{libname} = %{EVRD}
 
 %description -n %{libname}-devel
 This package contains the development files for the SMB client
@@ -375,8 +373,8 @@ the development of other software to access SMB shares.
 URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
 Group:          Development/C
-Provides:       libsmbclient-static-devel = %{version}-%{release}
-Requires:       %{libname}-devel = %{version}-%{release}
+Provides:       libsmbclient-static-devel = %{EVRD}
+Requires:       %{libname}-devel = %{EVRD}
 
 %description -n %{libname}-static-devel
 This package contains the static development files for the SMB
@@ -408,8 +406,8 @@ Samba library for accessing functions in 'net' binary
 %package -n %netapidevel
 Group: Development/C
 Summary: Samba library for accessing functions in 'net' binary
-Provides: netapi-devel = %{version}-%{release}
-Requires: %libnetapi = %{version}-%{release}
+Provides: netapi-devel = %{EVRD}
+Requires: %libnetapi = %{EVRD}
 
 %description -n %netapidevel
 Samba library for accessing functions in 'net' binary
@@ -424,8 +422,8 @@ Samba Library for accessing smb share modes (locks etc.)
 %package -n %smbsharemodesdevel
 Group: Development/C
 Summary: Samba Library for accessing smb share modes (locks etc.)
-Provides: smbsharemodes-devel = %{version}-%{release}
-Requires: %libsmbsharemodes = %{version}-%{release}
+Provides: smbsharemodes-devel = %{EVRD}
+Requires: %libsmbsharemodes = %{EVRD}
 
 %description -n %smbsharemodesdevel
 Samba Library for accessing smb share modes (locks etc.)
@@ -440,8 +438,8 @@ Library implementing DCE/RPC for Samba4
 %package -n %dcerpcdevel
 Group: Development/C
 Summary: Library implementing Samba's memory allocator
-Provides: dcerpc-devel = %version-%release
-Requires: %libdcerpc = %version-%release
+Provides: dcerpc-devel = %{EVRD}
+Requires: %libdcerpc = %{EVRD}
 
 %description -n %dcerpcdevel
 Library implementing Samba's memory allocator
@@ -456,8 +454,8 @@ Network Data Representation library from Samba4
 %package -n %ndrdevel
 Group: Development/C
 Summary: Development files for Network Data Representation library from Samba4
-Provides: ndr-devel = %version-%release
-Requires: %libndr = %version-%release
+Provides: ndr-devel = %{EVRD}
+Requires: %libndr = %{EVRD}
 
 %description -n %ndrdevel
 Development files for Network Data Representation library from Samba4
@@ -472,8 +470,8 @@ Samba4's host configuration library
 %package -n %sambahostconfigdevel
 Group: Development/C
 Summary: Samba4's host configuration library
-Provides: samba-hostconfig-devel = %version-%release
-Requires: %libsambahostconfig = %version-%release
+Provides: samba-hostconfig-devel = %{EVRD}
+Requires: %libsambahostconfig = %{EVRD}
 
 %description -n %sambahostconfigdevel
 Samba4's host configuration library
@@ -488,7 +486,7 @@ Library providing access to winbindd
 %package -n %wbclientdevel
 Group: Development/C
 Summary: Library providing access to winbindd
-Provides: wbclient-devel = %{version}-%{release}
+Provides: wbclient-devel = %{EVRD}
 
 %description -n %wbclientdevel
 Library providing access to winbindd
@@ -503,8 +501,8 @@ Samba4 utility library
 %package -n %sambautildevel
 Group: Development/C
 Summary: Development files for Samba4 utility library
-Provides: samba-util-devel = %version-%release
-Requires: %libsambautil = %version-%release
+Provides: samba-util-devel = %{EVRD}
+Requires: %libsambautil = %{EVRD}
 
 %description -n %sambautildevel
 Development files for Samba4 utility library
@@ -519,8 +517,8 @@ Samba4 registry library
 %package -n %registrydevel
 Group: Development/C
 Summary: Development files for Samba4 registry library
-Provides: registry-devel = %version-%release
-Requires: %libregistry = %version-%release
+Provides: registry-devel = %{EVRD}
+Requires: %libregistry = %{EVRD}
 
 %description -n %registrydevel
 Development files for Samba4 registry library
@@ -535,8 +533,8 @@ Samba4 generic security library
 %package -n %gensecdevel
 Group: Development/C
 Summary: Development files for Samba4 generic security library
-Provides: gensecdevel = %version-%release
-Requires: %libgensec = %version-%release
+Provides: gensecdevel = %{EVRD}
+Requires: %libgensec = %{EVRD}
 
 %description -n %gensecdevel
 Development files for Samba4 generic security library
@@ -551,8 +549,8 @@ Samba4 policy library
 %package -n %libpolicydevel
 Group: Development/C
 Summary: Development files for Samba4 policy library
-Provides: policydevel = %version-%release
-Requires: %libpolicy = %version-%release
+Provides: policydevel = %{EVRD}
+Requires: %libpolicy = %{EVRD}
 
 %description -n %libpolicydevel
 Development files for Samba4 policy library
@@ -567,8 +565,8 @@ Samba4 samdb library
 %package -n %libsamdbdevel
 Group: Development/C
 Summary: Development files for Samba4 samdb library
-Provides: samdbdevel = %version-%release
-Requires: %libsamdb = %version-%release
+Provides: samdbdevel = %{EVRD}
+Requires: %libsamdb = %{EVRD}
 
 %description -n %libsamdbdevel
 Development files for Samba4 samdb library
@@ -623,7 +621,7 @@ Utility library for working with the Tevent library
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for MySQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{version}-%{release}
+Requires:	%{name}-server = %{EVRD}
 
 %description passdb-mysql
 The passdb-mysql package for samba provides a password database
@@ -636,7 +634,7 @@ database
 URL:		http://www.samba.org
 Summary:	Samba password database plugin for PostgreSQL
 Group:		System/Libraries
-Requires:	%{name}-server = %{version}-%{release}
+Requires:	%{name}-server = %{EVRD}
 %endif
 %if %{build_pgsql}
 
@@ -669,7 +667,7 @@ Samba testsuite torture library
 %if %{with gtk}
 %package domainjoin-gui
 Summary: Domainjoin GUI
-Requires: samba-common = %{version}
+Requires: samba-common = %{EVRD}
 Group: System/Configuration/Other
 BuildRequires: pkgconfig(gtk+-2.0)
 
