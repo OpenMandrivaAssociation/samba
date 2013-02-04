@@ -102,7 +102,7 @@ Summary: Samba SMB server
 Name: samba
 
 Version:	4.0.1
-Release:	3
+Release:	4
 Epoch:		1
 
 License: GPLv3
@@ -210,10 +210,10 @@ Requires: %{name}-common = %{EVRD}
 Requires: %{name}-python = %{EVRD}
 Requires(pre):		rpm-helper
 Group: Networking/Other
-Provides: samba = %version-%release
-Obsoletes: samba < %version-%release
-Provides:  samba-server-ldap = %version-%release
-Obsoletes: samba-server-ldap < %version-%release
+Provides: samba = %EVRD
+Obsoletes: samba < %EVRD
+Provides:  samba-server-ldap = %EVRD
+Obsoletes: samba-server-ldap < %EVRD
 
 %description server
 Samba-server provides a SMB server which can be used to provide
@@ -384,7 +384,7 @@ allowing the development of other software to access SMB shares.
 %package devel
 Summary: Samba 4 development package
 Group: Development/C
-Requires: %{libname}-devel = %version-%release
+Requires: %{libname}-devel = %EVRD
 
 %description devel
 Samba 4 development libraries
