@@ -1,6 +1,9 @@
+removed_sources:
+  samba-4.0.1.tar.gz: b6f3442acb81214966fbd6398e4fd7786e325b61
 sources:
   samba-4.0.1.tar.asc: 0a868057e3379d58dd11f16e2ec8328c65faf11b
-  samba-4.0.1.tar.gz: b6f3442acb81214966fbd6398e4fd7786e325b61
+  samba-4.0.2.tar.asc: 150cb7162f4b6663af56aeeebadc30963fe5327e
+  samba-4.0.2.tar.gz: cb86f6dcd24920e6240b9402e952c8500fe8d52f
   samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0
   swat_16.png: 3e2d014fd368ebe99ae7c36ddd17b3fc3de8d32b
   swat_32.png: 32622107f97316b71af56bc71c997903e59b0f4b
