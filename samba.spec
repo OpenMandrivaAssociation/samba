@@ -101,7 +101,7 @@
 Summary: Samba SMB server
 Name: samba
 
-Version:	4.0.2
+Version:	4.0.3
 Release:	1
 Epoch:		1
 
@@ -163,7 +163,7 @@ BuildRequires: openldap-devel krb5-devel
 %endif
 BuildRequires: keyutils-devel
 BuildRequires: pkgconfig(tdb) >= 1.2.1 python-tdb
-BuildRequires: ldb-devel >= 1:1.1.7-0.beta8.1 pyldb-util-devel >= 1.1.7-0.beta8.1
+BuildRequires: ldb-devel >= 1:1.1.15 pyldb-util-devel >= 1:1.1.15
 BuildRequires: pkgconfig(tevent) python-tevent
 BuildRequires: pkgconfig(talloc) pkgconfig(pytalloc-util)
 BuildRequires: pkgconfig(ctdb) >= 2.0
@@ -1103,7 +1103,6 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %lang(nl) %_libdir/samba/nl.msg
 %lang(pl) %_libdir/samba/pl.msg
 %lang(ru) %_libdir/samba/ru.msg
-%lang(ru) %_libdir/samba/ru
 %lang(tr) %_libdir/samba/tr.msg
 # %{_libdir}/%{name}/*.so*
 %{_libdir}/samba/libCHARSET3.so
@@ -1218,7 +1217,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_libdir}/samba/libwind-samba4.so.0
 %{_libdir}/samba/libwind-samba4.so.0.0.0
 %{_libdir}/samba/libxattr_tdb.so
-
+%dir %_libdir/samba/vfs
 %{_libdir}/mit_samba.so
 %{_libdir}/%{name}/nss_info
 %_sbindir/smbd
@@ -1274,7 +1273,9 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %attr(-,root,root) %{_datadir}/swat/images/
 %attr(-,root,root) %{_datadir}/swat/include/
 %lang(ja) %{_datadir}/swat/lang/ja
+%lang(ru) %{_datadir}/swat/lang/ru
 %lang(tr) %{_datadir}/swat/lang/tr
+%lang(ru) %{_datadir}/samba/swat/lang/ru
 %{_mandir}/man8/swat*.8*
 
 #%doc swat/README
@@ -1354,6 +1355,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 # %{_mandir}/man1/nmblookup
 # %(for i in %{_mandir}/%{client_man}.[0-9]%{_extension};do echo $i;done)
 
+%_mandir/man1/dbwrap_tool.1*
 %_mandir/man8/samba-tool.8*
 
 #xclude %{_mandir}/man?/smbget*
