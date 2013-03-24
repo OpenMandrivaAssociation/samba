@@ -267,6 +267,7 @@ Requires:	%{libsmbconf} = %{EVRD}
 Requires:	%{libsmbldap} = %{EVRD}
 Requires:	%{libtevent_util} = %{EVRD}
 %rename 	samba-common-ldap
+Conflicts:	samba3-common
 
 %description common
 Samba-common provides files necessary for both the server and client
@@ -820,6 +821,7 @@ buildtools/bin/waf configure --enable-fhs \
 	--enable-uid-wrapper \
 	--prefix=%_prefix \
 	--libdir=%_libdir \
+	--sysconfdir=%_sysconfdir \
 	--datadir=%_datadir \
 	--localstatedir=%_localstatedir \
 	--with-modulesdir=%_libdir/%name \
