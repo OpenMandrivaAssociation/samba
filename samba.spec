@@ -101,7 +101,7 @@
 Summary: Samba SMB server
 Name: samba
 
-Version:	4.0.4
+Version:	4.0.6
 Release:	1
 Epoch:		1
 
@@ -1244,7 +1244,6 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 #{_mandir}/man8/idmap_*.8*
 #{_mandir}/man8/vfs_*.8*
 %{_mandir}/man8/samba.8*
-%{_sbindir}/samba_upgradeprovision
 %_sysconfdir/ld.so.conf.d
 %_unitdir/samba.service
 %_unitdir/smb.service
