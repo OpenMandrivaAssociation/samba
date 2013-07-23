@@ -819,6 +819,7 @@ buildtools/bin/waf configure --enable-fhs \
 	--enable-nss-wrapper \
 	--enable-socket-wrapper \
 	--enable-uid-wrapper \
+    --with-piddir=/run \
 	--prefix=%_prefix \
 	--libdir=%_libdir \
 	--sysconfdir=%_sysconfdir \
@@ -884,6 +885,7 @@ mkdir -p %{buildroot}/var/cache/%{name}
 mkdir -p %{buildroot}/var/log/%{name}
 mkdir -p %{buildroot}/var/run/%{name}
 mkdir -p %{buildroot}/var/spool/%{name}
+mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/private
 mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/{netlogon,profiles,printers}
 mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32ALPHA,W32MIPS,W32PPC}
 mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/codepages/src
@@ -937,13 +939,13 @@ mkdir -p %{buildroot}%{_sysconfdir}/security
 #        install -m644 packaging/Mandrake/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
-#install -m644 packaging/Mandrake/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
-#cat packaging/Mandrake/smb.conf | \
-#touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+install -m644 packaging/LSB/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+cat packaging/LSB/smb.conf | \
+touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >%{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 %if %build_cupspc
-perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
-perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
+#perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+#perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 # Link smbspool to CUPS (does not require installed CUPS)
 
         mkdir -p %{buildroot}/%{_prefix}/lib/cups/backend
@@ -1371,6 +1373,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %dir /var/cache/%{name}
 %dir /var/log/%{name}
 %dir /var/run/%{name}
+%dir /var/lib/%{name}/private
 %(for i in %{_bindir}/{%{commonbin}};do echo $i;done)
 %(for i in %{_mandir}/man?/{%{commonbin}}\.[0-9]*;do echo $i|grep -v testparm;done)
 #%{_libdir}/smbwrapper.so
@@ -1381,7 +1384,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 #%{_libdir}/%{name}/lowcase.dat
 #%{_libdir}/%{name}/valid.dat
 %dir %{_sysconfdir}/%{name}
-#attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb.conf
+%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb.conf
 #attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb-winbind.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/lmhosts
 %dir %{_localstatedir}/lib/%{name}
@@ -1726,6 +1729,10 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 
 
 %changelog
+* Tue Jul 23 2013 Colin Close <itchka@compuserve.com>
+- Added --with-piddir=/run such that systemd can now find the pid file.
+- Added LSB version of smb.conf to installed files to allow the samba daemon to run
+
 * Wed May 16 2012 Zombie Ryushu <ryushu@mandriva.org> 4.0.0-0.7.alpha20
 + Revision: 799156
 - We don't have those swat icons comment them
