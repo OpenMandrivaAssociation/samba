@@ -1,2 +1,4 @@
 # Let's fix this later
 addFilter("binary-or-shlib-defines-rpath")
+# temp for abf issue
+addFilter("tag-not-utf8")
