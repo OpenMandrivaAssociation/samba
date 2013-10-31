@@ -1004,8 +1004,6 @@ cp -a packaging/systemd/samba.sysconfig %buildroot%_sysconfdir/sysconfig/samba
 
 %post server
 
-%_post_service %{name}
-
 # Add a unix group for samba machine accounts
 groupadd -frg 421 machines
 
