@@ -102,7 +102,7 @@ Summary: Samba SMB server
 Name: samba
 
 Version:	4.0.6
-Release:	3
+Release:	4
 Epoch:		1
 
 License: GPLv3
@@ -1063,9 +1063,6 @@ if [ $1 = 0 ]; then
 #else
 #	echo "Leaving %{_sysconfdir}/nsswitch.conf intact"
 fi
-
-%preun server
-%_preun_service %{name}
 
 %post swat
 if [ -f /var/lock/subsys/xinetd ]; then
