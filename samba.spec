@@ -102,7 +102,7 @@ Summary: Samba SMB server
 Name: samba
 
 Version:	4.0.6
-Release:	5
+Release:	6
 Epoch:		1
 
 License: GPLv3
