@@ -28,7 +28,6 @@
 
 # Default options
 %bcond_with doc
-%bcond_without swat
 %bcond_with cifs
 %bcond_without ads
 %define build_test	1
@@ -98,11 +97,13 @@
 
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
 
+%define _serverbuild_flags -fstack-protector-all
+
 Summary: Samba SMB server
 Name: samba
 
-Version:	4.0.6
-Release:	8
+Version:	4.1.4
+Release:	1
 Epoch:		1
 
 License: GPLv3
@@ -113,11 +114,6 @@ Source99: http://ftp.samba.org/pub/samba/stable/samba-%version.tar.asc
 Source98: http://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1: samba.log
 Source3: samba.xinetd
-%if %{with swat}
-Source4: swat_16.png
-Source5: swat_32.png
-Source6: swat_48.png
-%endif
 #Source7: README.%{name}-mandrake-rpm
 BuildRequires: magic-devel
 # For -fuse-ld
@@ -172,6 +168,10 @@ BuildRequires: pkgconfig(gnutls)
 Requires(pre): chkconfig mktemp psmisc
 Requires(pre): coreutils sed grep
 
+# SWAT is no longer included in 4.1.x. For now it has been removed
+# without replacement, maybe it will come back later
+Obsoletes: %{name}-swat < %{EVRD}
+
 %define __noautoreq 'devel.*'
 
 %description
@@ -184,12 +184,7 @@ in Linux. Samba uses NetBIOS over TCP/IP (NetBT) protocols
 and does NOT need NetBEUI (Microsoft Raw NetBIOS frame)
 protocol.
 
-Samba-3.0 features working NT Domain Control capability and
-includes the SWAT (Samba Web Administration Tool) that
-allows samba's smb.conf file to be remotely managed using your
-favourite web browser. For the time being this is being
-enabled on TCP port 901 via xinetd. SWAT is now included in
-it's own subpackage, samba-swat.
+Samba features working NT Domain Control capability.
 
 Please refer to the WHATSNEW.txt document for fixup information.
 This binary release includes encrypted password support.
@@ -222,12 +217,7 @@ clients. Samba uses NetBIOS over TCP/IP (NetBT) protocols
 and does NOT need NetBEUI (Microsoft Raw NetBIOS frame)
 protocol.
 
-Samba features working NT Domain Control capability and
-includes the SWAT (Samba Web Administration Tool) that
-allows samba's smb.conf file to be remotely managed using your
-favourite web browser. For the time being this is being
-enabled on TCP port 901 via xinetd. SWAT is now included in
-it's own subpackage, samba-swat.
+Samba features working NT Domain Control capability.
 
 Please refer to the WHATSNEW.txt document for fixup information.
 This binary release includes encrypted password support.
@@ -283,26 +273,6 @@ Requires: %{name}-common = %{EVRD}
 %description doc
 Samba-doc provides documentation files for both the server and client
 packages of Samba.
-%endif
-
-%if %{with swat}
-%package swat
-URL:	http://www.samba.org
-Summary: The Samba Web Administration Tool
-Requires: %{name}-server = %{EVRD}
-Requires: xinetd
-Group: System/Servers
-%rename 	samba-swat-ldap
-
-%description swat
-SWAT (the Samba Web Administration Tool) allows samba's smb.conf file
-to be remotely managed using your favourite web browser. For the time
-being this is being enabled on TCP port 901 via xinetd. Note that
-SWAT does not use SSL encryption, nor does it preserve comments in
-your smb.conf file. Webmin uses SSL encryption by default, and
-preserves comments in configuration files, even if it does not display
-them, and is therefore the preferred method for remotely managing
-Samba.
 %endif
 
 %package winbind
@@ -759,30 +729,14 @@ fi
 
 
 %setup -q
-# Samba tries to force -fPIE into everything, including libraries.
-# -fPIE overrides -fPIC though, causing anything that tries to link to
-# a -fPIE library to fail on platforms that need -fPIC libraries.
-sed -i -e 's,-fPIC,-fPIC -fno-PIE,g' source3/configure* lib/replace/*.m4 lib/iniparser/Makefile buildtools/wafsamba/wscript buildtools/wafadmin/Tools/gxx.py buildtools/wafadmin/Tools/gcc.py
-
 #patch1 -p1 -b .compile~
 %patch2 -p1 -b .tirpc~
 
 %build
-%serverbuild
 # CFLAGS="`echo "$CFLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
 # CXXFLAGS="`echo "$CXXFLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
 # RPM_OPT_FLAGS="`echo "$RPM_OPT_FLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
 
-%ifarch x86_64
-# Workaround for an apparent compiler bug present in both 4.6 and 4.7:
-# Some files are not recognized as containing PIC code even though they're
-# built with -fPIC
-# So for now, we'll use the only code model that can support linking
-# non-PIC code into a shared library...
-# gold can't deal with that though (http://sourceware.org/bugzilla/show_bug.cgi?id=14324)
-# So we force BFD LD at the same time
-#EXTRAFLAGS="-mcmodel=large -fuse-ld=bfd"
-%endif
 buildtools/bin/waf configure --enable-fhs \
 	--with-perl-archdir=%{perl_vendorlib} \
 	--with-privatelibdir=%{_libdir}/%{name} \
@@ -795,7 +749,6 @@ buildtools/bin/waf configure --enable-fhs \
 %if %{with winbind}
 	--with-winbind \
 %endif
-	--with-swat \
 %if %{with ads}
 	--with-ads \
 %else
@@ -846,18 +799,9 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}
 
 # Put stuff where it should go.
-mkdir -p %buildroot/%{_datadir}/swat/include
-mkdir -p %buildroot/%{_datadir}/swat/images
-mkdir -p %buildroot/%{_datadir}/swat/lang
 mkdir -p %buildroot/%{_libdir}/samba/
 mkdir -p %buildroot/%{_datadir}/man/man8/
 
-
-cp -R swat/include 	       		%buildroot/%{_datadir}/swat/include
-cp -R swat/images              		%buildroot/%{_datadir}/swat/images
-cp -R swat/lang                		%buildroot/%{_datadir}/swat
-cp -R source3/po/*             		%buildroot/%{_libdir}/samba/
-# cp docs-xml/manpages-3/swat.8.xml 	%buildroot/%{_datadir}/man/man8/
 
 # Any entries here mean samba makefile is *really* broken:
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
@@ -870,8 +814,6 @@ if [ -e %buildroot%_libdir/security ]; then
 	mkdir -p %{buildroot}/%_lib
 	mv %buildroot%_libdir/security %buildroot/%_lib
 fi
-# we ship docs in the docs supackage, and lik it into swat, delete the extra copy:
-rm -Rf %{buildroot}/%{_datadir}/swat/using_samba
 
 #Even though we tell waf above where to put perl it gets it wrong
 mkdir -p %{buildroot}/%{perl_vendorlib}
@@ -954,37 +896,6 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
 
-%if %{with swat}
-# xinetd support
-
-        mkdir -p %{buildroot}/%{_sysconfdir}/xinetd.d
-        install -m644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/xinetd.d/swat
-
-# menu support
-
-mkdir -p %{buildroot}/%{_datadir}/applications
-cat > %{buildroot}/%{_datadir}/applications/mandriva-%{name}-swat.desktop << EOF
-[Desktop Entry]
-Name=Samba Configuration (SWAT)
-Comment=The Swat Samba Administration Tool
-Exec=www-browser http://localhost:901/
-Icon=swat
-Terminal=false
-Type=Application
-StartupNotify=true
-Categories=X-MandrivaLinux-System-Configuration-Networking;
-EOF
-
-mkdir -p %{buildroot}%{_liconsdir} %{buildroot}%{_iconsdir} %{buildroot}%{_miconsdir}
-
-# install html man pages for swat
-install -d %{buildroot}/%{_datadir}/swat/help/manpages
-
-cat %{SOURCE4} > %{buildroot}%{_miconsdir}/swat.png
-cat %{SOURCE5} > %{buildroot}%{_iconsdir}/swat.png
-cat %{SOURCE6} > %{buildroot}%{_liconsdir}/swat.png
-%endif
-
 install -c -m 755 %{SOURCE10} %{buildroot}%{_datadir}/%name/scripts/print-pdf
 
 # Move some stuff where it belongs...
@@ -1064,20 +975,6 @@ if [ $1 = 0 ]; then
 #	echo "Leaving %{_sysconfdir}/nsswitch.conf intact"
 fi
 
-%post swat
-if [ -f /var/lock/subsys/xinetd ]; then
-        service xinetd reload >/dev/null 2>&1 || :
-fi
-
-%postun swat
-# Remove swat entry from xinetd
-if [ $1 = 0 -a -f %{_sysconfdir}/xinetd.conf ] ; then
-rm -f %{_sysconfdir}/xinetd.d/swat
-	service xinetd reload &>/dev/null || :
-fi
-
-if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || true ; fi
-
 %files server
 %(for i in %{_sbindir}/{%{serversbin}};do echo $i;done)
 %(for i in %{_bindir}/%{serverbin};do echo $i;done)
@@ -1092,17 +989,6 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_libdir}/samba/gensec
 %{_libdir}/samba/auth
 %{_libdir}/samba/bind9
-%{_libdir}/samba/genmsg
-%lang(de) %_libdir/samba/de.msg
-%lang(en) %_libdir/samba/en.msg
-%lang(fi) %_libdir/samba/fi.msg
-%lang(fr) %_libdir/samba/fr.msg
-%lang(it) %_libdir/samba/it.msg
-%lang(ja) %_libdir/samba/ja.msg
-%lang(nl) %_libdir/samba/nl.msg
-%lang(pl) %_libdir/samba/pl.msg
-%lang(ru) %_libdir/samba/ru.msg
-%lang(tr) %_libdir/samba/tr.msg
 # %{_libdir}/%{name}/*.so*
 %{_libdir}/samba/libCHARSET3.so
 %{_libdir}/samba/libHDB_SAMBA4.so
@@ -1209,6 +1095,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_libdir}/samba/libtrusts_util.so
 %{_libdir}/samba/libuid_wrapper.so
 %{_libdir}/samba/libutil_cmdline.so
+%{_libdir}/samba/libutil_ntdb.so
 %{_libdir}/samba/libutil_reg.so
 %{_libdir}/samba/libutil_setid.so
 %{_libdir}/samba/libutil_tdb.so
@@ -1238,7 +1125,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%name/scripts/print-pdf
 #attr(0755,root,root) %{_datadir}/samba/scripts/convertSambaAccount
-#{_mandir}/man8/idmap_*.8*
+%{_mandir}/man8/idmap_*.8*
 #{_mandir}/man8/vfs_*.8*
 %{_mandir}/man8/samba.8*
 %_sysconfdir/ld.so.conf.d
@@ -1254,53 +1141,6 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %doc README.%{name}-mandrake-rpm
 %doc clean-docs/samba-doc/docs/*
 %doc clean-docs/samba-doc/examples
-#%attr(-,root,root) %{_datadir}/swat/using_samba/
-%attr(-,root,root) %{_datadir}/swat/help/
-%endif
-
-%if %{with swat}
-%files swat
-%config(noreplace) %{_sysconfdir}/xinetd.d/swat
-#%attr(-,root,root) /sbin/*
-%{_sbindir}/swat
-%{_datadir}/applications/mandriva-%{name}-swat.desktop
-%{_miconsdir}/*.png
-%{_liconsdir}/*.png
-%{_iconsdir}/*.png
-#%attr(-,root,root) %{_datadir}/swat/help/
-%attr(-,root,root) %{_datadir}/swat/images/
-%attr(-,root,root) %{_datadir}/swat/include/
-%lang(ja) %{_datadir}/swat/lang/ja
-%lang(ru) %{_datadir}/swat/lang/ru
-%lang(tr) %{_datadir}/swat/lang/tr
-%lang(ru) %{_datadir}/samba/swat/lang/ru
-%{_mandir}/man8/swat*.8*
-
-#%doc swat/README
-%{_datadir}/samba/swat/help/welcome-no-samba-doc.html
-%{_datadir}/samba/swat/help/welcome.html
-%{_datadir}/samba/swat/images/globals.gif
-%{_datadir}/samba/swat/images/home.gif
-%{_datadir}/samba/swat/images/passwd.gif
-%{_datadir}/samba/swat/images/printers.gif
-%{_datadir}/samba/swat/images/samba.gif
-%{_datadir}/samba/swat/images/shares.gif
-%{_datadir}/samba/swat/images/status.gif
-%{_datadir}/samba/swat/images/viewconfig.gif
-%{_datadir}/samba/swat/images/wizard.gif
-%{_datadir}/samba/swat/include/footer.html
-%{_datadir}/samba/swat/include/header.html
-%{_datadir}/samba/swat/lang/ja/help/welcome.html
-%{_datadir}/samba/swat/lang/tr/help/welcome.html
-%{_datadir}/samba/swat/lang/tr/images/globals.gif
-%{_datadir}/samba/swat/lang/tr/images/home.gif
-%{_datadir}/samba/swat/lang/tr/images/passwd.gif
-%{_datadir}/samba/swat/lang/tr/images/printers.gif
-%{_datadir}/samba/swat/lang/tr/images/samba.gif
-%{_datadir}/samba/swat/lang/tr/images/shares.gif
-%{_datadir}/samba/swat/lang/tr/images/status.gif
-%{_datadir}/samba/swat/lang/tr/images/viewconfig.gif
-
 %endif
 
 %files client
@@ -1338,10 +1178,12 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 #{_bindir}/smbtorture3
 %{_bindir}/smbtree
 #{_bindir}/split_tokens
-#{_bindir}/ntdbbackup 
-#{_bindir}/ntdbdump   
-#{_bindir}/ntdbrestore
-#{_bindir}/ntdbtool
+%{_bindir}/ntdbbackup 
+%{_bindir}/ntdbdump   
+%{_bindir}/ntdbrestore
+%{_bindir}/ntdbtool
+%{_bindir}/samba-regedit
+%{_bindir}/smbtar
 #{_bindir}/test_lp_load
 #{_bindir}/timelimit  
 #{_bindir}/versiontest
@@ -1355,6 +1197,14 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 
 %_mandir/man1/dbwrap_tool.1*
 %_mandir/man8/samba-tool.8*
+%_mandir/man8/ntdbbackup.8*
+%_mandir/man8/ntdbdump.8*
+%_mandir/man8/ntdbrestore.8*
+%_mandir/man8/ntdbtool.8*
+%_mandir/man8/samba-regedit.8*
+%_mandir/man8/vfs_btrfs.8*
+%_mandir/man8/vfs_linux_xfs_sgid.8*
+%_mandir/man8/vfs_syncops.8*
 
 #xclude %{_mandir}/man?/smbget*
 #{_mandir}/man5/smbgetrc.5*
@@ -1372,7 +1222,9 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %(for i in %{_bindir}/{%{commonbin}};do echo $i;done)
 %(for i in %{_mandir}/man?/{%{commonbin}}\.[0-9]*;do echo $i|grep -v testparm;done)
 #%{_libdir}/smbwrapper.so
-#dir %{_libdir}/%{name}
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/libnon_posix_acls.so
+%{_libdir}/%{name}/libntdb.so.0*
 %dir %{_datadir}/%{name}
 %{_datadir}/samba/codepages
 #{_libdir}/%{name}/charset
@@ -1410,14 +1262,6 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_mandir}/man7/samba.7*
 %{_mandir}/man7/winbind_krb5_locator.7*
 %{_mandir}/man8/eventlogadm.8*
-%{_mandir}/man8/idmap_ad.8*
-%{_mandir}/man8/idmap_autorid.8*
-%{_mandir}/man8/idmap_hash.8*
-%{_mandir}/man8/idmap_ldap.8*
-%{_mandir}/man8/idmap_nss.8*
-%{_mandir}/man8/idmap_rid.8*
-%{_mandir}/man8/idmap_tdb.8*
-%{_mandir}/man8/idmap_tdb2.8*
 %{_mandir}/man8/net.8*
 %{_mandir}/man8/nmbd.8*
 %{_mandir}/man8/pam_winbind.8*
@@ -1504,6 +1348,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %files python
 %{python_sitearch}/samba
 #exclude %py_platsitedir/subunit
+%{_libdir}/python2.7/site-packages/ntdb.so
 
 %if %{build_test}
 %files test
@@ -1544,6 +1389,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_includedir}/samba-4.0/param.h
 %{_includedir}/samba-4.0/samba/
 %{_includedir}/samba-4.0/share.h
+%{_includedir}/samba-4.0/smb2_lease.h
 %{_includedir}/samba-4.0/tdr.h
 %{_includedir}/samba-4.0/tsocket.h
 %{_includedir}/samba-4.0/tsocket_internal.h
@@ -1592,6 +1438,7 @@ if [ "$1" = "0" -a -x /usr/bin/update-menus ]; then /usr/bin/update-menus || tru
 %{_includedir}/samba-4.0/smbldap.h
 %{_libdir}/pkgconfig/samba-credentials.pc
 %{_libdir}/pkgconfig/smbclient-raw.pc
+%{_mandir}/man3/ntdb.3*
 
 %files pidl
 %{_bindir}/pidl
