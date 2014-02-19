@@ -2,3 +2,8 @@
 addFilter("binary-or-shlib-defines-rpath")
 # temp for abf issue
 addFilter("tag-not-utf8")
+# /lib{,64}/libnss_wins.so and /lib{,64}/libnss_winbind.so
+# Not actually a devel file, but a dlopen-ed bit
+addFilter("devel-file-in-non-devel-package")
+# "invalid" (unversioned) sonames on files that are dlopen-ed
+addFilter("invalid-soname")

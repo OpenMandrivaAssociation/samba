@@ -1496,19 +1496,19 @@ fi
 
 %files -n %libregistry
 %{_libdir}/libregistry.so.*
-%{_libdir}/pkgconfig/registry.pc
 
 %files -n %registrydevel
 %{_includedir}/samba-4.0/registry.h
 %{_libdir}/libregistry.so
+%{_libdir}/pkgconfig/registry.pc
 
 %files -n %libgensec
 %{_libdir}/libgensec.so.*
-%{_libdir}/pkgconfig/gensec.pc
 
 %files -n %gensecdevel
 %{_includedir}/samba-4.0/gensec.h
 %{_libdir}/libgensec.so
+%{_libdir}/pkgconfig/gensec.pc
 
 %files -n %libsambahostconfig
 %{_libdir}/libsamba-hostconfig.so.*
@@ -1526,10 +1526,10 @@ fi
 
 %files -n %libsamdb
 %{_libdir}/libsamdb.so.*
-%{_libdir}/pkgconfig/samdb.pc
 
 %files -n %libsamdbdevel
 %{_libdir}/libsamdb.so
+%{_libdir}/pkgconfig/samdb.pc
 
 %files -n %libwbclient
 %{_libdir}/libwbclient.so.%{wbclientmajor}*
