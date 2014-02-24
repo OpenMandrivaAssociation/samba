@@ -102,7 +102,7 @@
 Summary: Samba SMB server
 Name: samba
 
-Version:	4.1.4
+Version:	4.1.5
 Release:	1
 Epoch:		1
 
