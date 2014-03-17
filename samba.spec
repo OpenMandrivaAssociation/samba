@@ -103,7 +103,7 @@ Summary: Samba SMB server
 Name: samba
 
 Version:	4.1.5
-Release:	1
+Release:	2
 Epoch:		1
 
 License: GPLv3
@@ -918,6 +918,13 @@ cp -a packaging/systemd/samba.sysconfig %buildroot%_sysconfdir/sysconfig/samba
 # Add a unix group for samba machine accounts
 groupadd -frg 421 machines
 
+%systemd_post nmb.service
+%systemd_post smb.service
+
+%postun server
+%systemd_postun nmb.service
+%systemd_postun smb.service
+
 %post common
 # And this too, in case we don't have smbd to create it for us
 [ -f /var/cache/%{name}/unexpected.tdb ] || {
@@ -945,6 +952,8 @@ if [ $1 = 1 ]; then
     if [ -f %{_sysconfdir}/nsswitch.conf.rpmtemp ];then rm -f %{_sysconfdir}/nsswitch.conf.rpmtemp;fi
 fi
 
+%systemd_post winbind.service
+
 %preun winbind
 if [ $1 = 0 ]; then
 	echo "Removing winbind entries from %{_sysconfdir}/nsswitch.conf"
@@ -952,6 +961,8 @@ if [ $1 = 0 ]; then
 
 	/sbin/chkconfig winbind reset
 fi
+
+%systemd_postun winbind.service
 
 %post -n nss_wins
 if [ $1 = 1 ]; then
