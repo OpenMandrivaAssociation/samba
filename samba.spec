@@ -103,7 +103,7 @@ Summary: Samba SMB server
 Name: samba
 
 Version:	4.1.6
-Release:	1
+Release:	2
 Epoch:		1
 
 License: GPLv3
