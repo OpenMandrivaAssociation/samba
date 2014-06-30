@@ -49,7 +49,7 @@
 %{?_with_pgsql: %global build_pgsql 1}
 %global vfsdir examples.bin/VFS
 
-%bcond_without gtk
+%bcond_with gtk
 
 %define libname %mklibname smbclient %libsmbmajor
 %define libnetapi %mklibname netapi %netapimajor
@@ -99,27 +99,25 @@
 
 %define _serverbuild_flags -fstack-protector-all
 
-Summary: Samba SMB server
-Name: samba
-
-Version:	4.1.6
-Release:	2
+Summary:	Samba SMB server
+Name: 		samba
+Version:	4.1.9
+Release:	1
 Epoch:		1
-
-License: GPLv3
-Group: System/Servers
-URL:	http://www.samba.org
-Source0: http://ftp.samba.org/pub/samba/stable/samba-%version.tar.gz
-Source99: http://ftp.samba.org/pub/samba/stable/samba-%version.tar.asc
-Source98: http://ftp.samba.org/pub/samba/samba-pubkey.asc
-Source1: samba.log
-Source3: samba.xinetd
-#Source7: README.%{name}-mandrake-rpm
-BuildRequires: magic-devel
+License:	GPLv3
+Group:		System/Servers
+URL:		http://www.samba.org
+Source0:	http://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
+Source99:	http://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
+Source98:	http://ftp.samba.org/pub/samba/samba-pubkey.asc
+Source1:	samba.log
+Source3:	samba.xinetd
+#Source7:	README.%{name}-mandrake-rpm
+BuildRequires:	magic-devel
 # For -fuse-ld
-BuildRequires: gcc >= 4.6
-Source10: samba-print-pdf.sh
-Source100: %name.rpmlintrc
+BuildRequires:	gcc
+Source10:	samba-print-pdf.sh
+Source100:	%{name}.rpmlintrc
 
 #Sources that used to be in packaging patch:
 Source20:	smbusers
@@ -134,43 +132,44 @@ Patch1:		samba-4.0.0a20-compile.patch
 # xdr_* functions have moved from glibc into libtirpc
 Patch2:		samba-4.0.0-tirpc.patch
 BuildRequires:	pkgconfig(libtirpc)
-
 # Limbo patches (applied to prereleases, but not preleases, ie destined for
 # samba CVS)
-Requires: pam >= 0.64, samba-common = %{EVRD}
-BuildRequires: pam-devel readline-devel ncurses-devel popt-devel
-BuildRequires: libxml2-devel
+Requires:	pam >= 0.64
+Requires:	samba-common = %{EVRD}
+BuildRequires:	pam-devel readline-devel ncurses-devel popt-devel
+BuildRequires:	libxml2-devel
 # Samba 3.2 and later should be built with capabilities support:
 # http://lists.samba.org/archive/samba/2009-March/146821.html
-BuildRequires: libcap-devel
-BuildRequires: gnupg
+BuildRequires:	libcap-devel
+BuildRequires:	gnupg
 # Required for ldb docs
-BuildRequires: xsltproc docbook-style-xsl
+BuildRequires:	xsltproc
+BuildRequires:	docbook-style-xsl
 %if %build_pgsql
-BuildRequires: postgresql-devel
+BuildRequires:	postgresql-devel
 %endif
 %if %build_mysql
-BuildRequires: mysql-devel
+BuildRequires:	mysql-devel
 %endif
-BuildRequires: acl-devel
-BuildRequires: openldap-devel
+BuildRequires:	acl-devel
+BuildRequires:	openldap-devel
 %if %{with ads}
-BuildRequires: openldap-devel krb5-devel
+BuildRequires:	openldap-devel
+BuildRequires:	krb5-devel
 %endif
-BuildRequires: keyutils-devel
-BuildRequires: pkgconfig(tdb) >= 1.2.1 python-tdb
-BuildRequires: ldb-devel >= 1:1.1.15 pyldb-util-devel >= 1:1.1.15
-BuildRequires: pkgconfig(tevent) python-tevent
-BuildRequires: pkgconfig(talloc) pkgconfig(pytalloc-util)
-BuildRequires: pkgconfig(ctdb) >= 2.0
-BuildRequires: pkgconfig(gnutls)
-
-Requires(pre): chkconfig mktemp psmisc
-Requires(pre): coreutils sed grep
-
-# SWAT is no longer included in 4.1.x. For now it has been removed
-# without replacement, maybe it will come back later
-Obsoletes: %{name}-swat < %{EVRD}
+BuildRequires:	keyutils-devel
+BuildRequires:	pkgconfig(tdb) >= 1.2.1
+BuildRequires:	python-tdb
+BuildRequires:	ldb-devel >= 1:1.1.15
+BuildRequires:	pyldb-util-devel >= 1:1.1.15
+BuildRequires:	pkgconfig(tevent)
+BuildRequires:	python-tevent
+BuildRequires:	pkgconfig(talloc)
+BuildRequires:	pkgconfig(pytalloc-util)
+BuildRequires:	pkgconfig(ctdb) >= 2.0
+BuildRequires:	pkgconfig(gnutls)
+Requires(pre):	chkconfig mktemp psmisc
+Requires(pre):	coreutils sed grep
 
 %define __noautoreq 'devel.*'
 
@@ -198,17 +197,21 @@ more information.
 %endif
 
 %package server
-URL:	http://www.samba.org
-Summary: Samba (SMB) server programs
-Requires: %{name}-common = %{EVRD}
+URL:		http://www.samba.org
+Summary:	Samba (SMB) server programs
+Requires:	%{name}-common = %{EVRD}
 # provision requires samba4-python
-Requires: %{name}-python = %{EVRD}
-Requires(pre):		rpm-helper
-Group: Networking/Other
-Provides: samba = %EVRD
-Obsoletes: samba < %EVRD
-Provides:  samba-server-ldap = %EVRD
-Obsoletes: samba-server-ldap < %EVRD
+Requires:	%{name}-python = %{EVRD}
+Requires(pre):	rpm-helper
+Group:		Networking/Other
+%rename	samba
+%rename	samba-server-ldap
+# SWAT is no longer included in 4.1.x. For now it has been removed
+# without replacement, maybe it will come back later
+Obsoletes: %{name}-swat < 4.1.6
+%if %{without gtk}
+Obsoletes: %{name}-domainjoin-gui < %{EVRD}
+%endif
 
 %description server
 Samba-server provides a SMB server which can be used to provide
@@ -226,19 +229,18 @@ Please read the smb.conf file and ENCRYPTION.txt in the
 docs directory for implementation details.
 
 %package client
-URL:	http://www.samba.org
-Summary: Samba (SMB) client programs
-Group: Networking/Other
-Requires: %{name}-common = %{EVRD}
-Requires: mount-cifs
-%rename		samba3-client
-Obsoletes: smbfs
+URL:		http://www.samba.org
+Summary:	Samba (SMB) client programs
+Group:		Networking/Other
+Requires:	%{name}-common = %{EVRD}
+Requires:	mount-cifs
+%rename   	samba3-client
+Obsoletes: 	smbfs
 # For samba-tool
-Requires: python-talloc python-ldb python-tdb
-Requires: ldb-utils
-%ifarch x86_64
-Conflicts:	cups < 1.2.0-0.5361.0mdk
-%endif
+Requires: 	python-talloc
+Requires:	python-ldb
+Requires:	python-tdb
+Requires: 	ldb-utils
 
 %description client
 Samba-client provides some SMB clients, which complement the built-in
@@ -265,10 +267,10 @@ packages of Samba.
 
 %if %{with doc}
 %package doc
-URL:	http://www.samba.org
-Summary: Documentation for Samba servers and clients
-Group: System/Servers
-Requires: %{name}-common = %{EVRD}
+URL:		http://www.samba.org
+Summary: 	Documentation for Samba servers and clients
+Group:		System/Servers
+Requires: 	%{name}-common = %{EVRD}
 
 %description doc
 Samba-doc provides documentation files for both the server and client
@@ -276,9 +278,9 @@ packages of Samba.
 %endif
 
 %package winbind
-URL:	http://www.samba.org
-Summary: Samba-winbind daemon, utilities and documentation
-Group: System/Servers
+URL:		http://www.samba.org
+Summary: 	Samba-winbind daemon, utilities and documentation
+Group:		System/Servers
 Requires:	%{name}-common = %{EVRD}
 
 %description winbind
@@ -286,31 +288,31 @@ Provides the winbind daemon and testing tools to allow authentication
 and group/user enumeration from a Windows or Samba domain controller.
 
 %package -n nss_wins
-URL:	http://www.samba.org
-Summary: Name Service Switch service for WINS
-Group: System/Servers
+URL:		http://www.samba.org
+Summary:	Name Service Switch service for WINS
+Group: 		System/Servers
 Requires:	%{name}-common = %{EVRD}
-Requires(pre): glibc
+Requires(pre):	glibc
 
 %description -n nss_wins
 Provides the libnss_wins shared library which resolves NetBIOS names to 
 IP addresses.
 
 %package python
-URL:	http://www.samba.org
-Group:	Development/Python
+URL:		http://www.samba.org
+Group:		Development/Python
 Summary:	Samba Python modules
-BuildRequires: python-devel
+BuildRequires:	python-devel
 
 %description python
 Samba Python modules
 
 %if %build_test
 %package test
-URL:	http://www.samba.org
-Summary: Debugging and benchmarking tools for samba
-Group: System/Servers
-Requires: %{name}-common = %{EVRD}
+URL:		http://www.samba.org
+Summary:	Debugging and benchmarking tools for samba
+Group:		System/Servers
+Requires:	%{name}-common = %{EVRD}
 
 %description test
 This package provides tools for benchmarking samba, and debugging
@@ -353,32 +355,32 @@ client library, part of the samba suite of networking software,
 allowing the development of other software to access SMB shares.
 
 %package devel
-Summary: Samba 4 development package
-Group: Development/C
-Requires: %{libname}-devel = %EVRD
+Summary:	Samba 4 development package
+Group:		Development/C
+Requires:	%{libname}-devel = %{EVRD}
 
 %description devel
 Samba 4 development libraries
 
 %package pidl
-Summary: Perl IDL compiler for Samba4
-Group: Development/Perl
+Summary:	Perl IDL compiler for Samba4
+Group:		Development/Perl
 
 %description pidl
 Perl Interface Description Language compiler for Samba4
 
 %package -n %libnetapi
-Summary: Samba library for accessing functions in 'net' binary
-Group: System/Libraries
+Summary:	Samba library for accessing functions in 'net' binary
+Group:		System/Libraries
 
 %description -n %libnetapi
 Samba library for accessing functions in 'net' binary
 
 %package -n %netapidevel
-Group: Development/C
-Summary: Samba library for accessing functions in 'net' binary
-Provides: netapi-devel = %{EVRD}
-Requires: %libnetapi = %{EVRD}
+Group:		Development/C
+Summary:	Samba library for accessing functions in 'net' binary
+Provides:	netapi-devel = %{EVRD}
+Requires:	%{libnetapi} = %{EVRD}
 
 %description -n %netapidevel
 Samba library for accessing functions in 'net' binary
@@ -391,188 +393,188 @@ Summary: Samba Library for accessing smb share modes (locks etc.)
 Samba Library for accessing smb share modes (locks etc.)
 
 %package -n %smbsharemodesdevel
-Group: Development/C
-Summary: Samba Library for accessing smb share modes (locks etc.)
-Provides: smbsharemodes-devel = %{EVRD}
-Requires: %libsmbsharemodes = %{EVRD}
+Group:		Development/C
+Summary:	Samba Library for accessing smb share modes (locks etc.)
+Provides:	smbsharemodes-devel = %{EVRD}
+Requires:	%{libsmbsharemodes} = %{EVRD}
 
 %description -n %smbsharemodesdevel
 Samba Library for accessing smb share modes (locks etc.)
 
 %package -n %libdcerpc
-Group: System/Libraries
-Summary: Library implementing DCE/RPC for Samba4
+Group:		System/Libraries
+Summary:	Library implementing DCE/RPC for Samba4
 
 %description -n %libdcerpc
 Library implementing DCE/RPC for Samba4
 
 %package -n %dcerpcdevel
-Group: Development/C
-Summary: Library implementing Samba's memory allocator
-Provides: dcerpc-devel = %{EVRD}
-Requires: %libdcerpc = %{EVRD}
+Group:		Development/C
+Summary:	Library implementing Samba's memory allocator
+Provides:	dcerpc-devel = %{EVRD}
+Requires:	%{libdcerpc} = %{EVRD}
 
 %description -n %dcerpcdevel
 Library implementing Samba's memory allocator
 
 %package -n %libndr
-Group: System/Libraries
-Summary: Network Data Representation library from Samba4
+Group:		System/Libraries
+Summary:	Network Data Representation library from Samba4
 
 %description -n %libndr
 Network Data Representation library from Samba4
 
 %package -n %ndrdevel
-Group: Development/C
-Summary: Development files for Network Data Representation library from Samba4
-Provides: ndr-devel = %{EVRD}
-Requires: %libndr = %{EVRD}
+Group:		Development/C
+Summary:	Development files for Network Data Representation library from Samba4
+Provides:	ndr-devel = %{EVRD}
+Requires:	%{libndr} = %{EVRD}
 
 %description -n %ndrdevel
 Development files for Network Data Representation library from Samba4
 
 %package -n %libsambahostconfig
-Group: System/Libraries
-Summary: Samba4's host configuration library
+Group:		System/Libraries
+Summary:	Samba4's host configuration library
 
 %description -n %libsambahostconfig
 Samba4's host configuration library
 
 %package -n %sambahostconfigdevel
-Group: Development/C
-Summary: Samba4's host configuration library
-Provides: samba-hostconfig-devel = %{EVRD}
-Requires: %libsambahostconfig = %{EVRD}
+Group:		Development/C
+Summary:	Samba4's host configuration library
+Provides:	samba-hostconfig-devel = %{EVRD}
+Requires:	%{libsambahostconfig} = %{EVRD}
 
 %description -n %sambahostconfigdevel
 Samba4's host configuration library
 
 %package -n %libwbclient
-Group: System/Libraries
-Summary: Library providing access to winbindd
+Group:		System/Libraries
+Summary:	Library providing access to winbindd
 
 %description -n %libwbclient
 Library providing access to winbindd
 
 %package -n %wbclientdevel
-Group: Development/C
-Summary: Library providing access to winbindd
-Provides: wbclient-devel = %{EVRD}
+Group:		Development/C
+Summary:	Library providing access to winbindd
+Provides:	wbclient-devel = %{EVRD}
 
 %description -n %wbclientdevel
 Library providing access to winbindd
 
 %package -n %libsambautil
-Group: System/Libraries
-Summary: Samba4 utility library
+Group:		System/Libraries
+Summary:	Samba4 utility library
 
 %description -n %libsambautil
 Samba4 utility library
 
 %package -n %sambautildevel
-Group: Development/C
-Summary: Development files for Samba4 utility library
-Provides: samba-util-devel = %{EVRD}
-Requires: %libsambautil = %{EVRD}
+Group:		Development/C
+Summary:	Development files for Samba4 utility library
+Provides:	samba-util-devel = %{EVRD}
+Requires:	%{libsambautil} = %{EVRD}
 
 %description -n %sambautildevel
 Development files for Samba4 utility library
 
 %package -n %libregistry
-Group: System/Libraries
-Summary: Samba4 registry library
+Group:		System/Libraries
+Summary:	Samba4 registry library
 
 %description -n %libregistry
 Samba4 registry library
 
 %package -n %registrydevel
-Group: Development/C
-Summary: Development files for Samba4 registry library
-Provides: registry-devel = %{EVRD}
-Requires: %libregistry = %{EVRD}
+Group:		Development/C
+Summary:	Development files for Samba4 registry library
+Provides:	registry-devel = %{EVRD}
+Requires:	%{libregistry} = %{EVRD}
 
 %description -n %registrydevel
 Development files for Samba4 registry library
 
 %package -n %libgensec
-Group: System/Libraries
-Summary: Samba4 generic security library
+Group:		System/Libraries
+Summary:	Samba4 generic security library
 
 %description -n %libgensec
 Samba4 generic security library
 
 %package -n %gensecdevel
-Group: Development/C
-Summary: Development files for Samba4 generic security library
-Provides: gensecdevel = %{EVRD}
-Requires: %libgensec = %{EVRD}
+Group:		Development/C
+Summary:	Development files for Samba4 generic security library
+Provides:	gensecdevel = %{EVRD}
+Requires:	%{libgensec} = %{EVRD}
 
 %description -n %gensecdevel
 Development files for Samba4 generic security library
 
 %package -n %libpolicy
-Group: System/Libraries
-Summary: Samba4 policy library
+Group:		System/Libraries
+Summary:	Samba4 policy library
 
 %description -n %libpolicy
 Samba4 policy library
 
 %package -n %libpolicydevel
-Group: Development/C
-Summary: Development files for Samba4 policy library
-Provides: policydevel = %{EVRD}
-Requires: %libpolicy = %{EVRD}
+Group:		Development/C
+Summary:	Development files for Samba4 policy library
+Provides:	policydevel = %{EVRD}
+Requires:	%{libpolicy} = %{EVRD}
 
 %description -n %libpolicydevel
 Development files for Samba4 policy library
 
 %package -n %libsamdb
-Group: System/Libraries
-Summary: Samba4 samdb library
+Group:		System/Libraries
+Summary:	Samba4 samdb library
 
 %description -n %libsamdb
 Samba4 samdb library
 
 %package -n %libsamdbdevel
-Group: Development/C
-Summary: Development files for Samba4 samdb library
-Provides: samdbdevel = %{EVRD}
-Requires: %libsamdb = %{EVRD}
+Group:		Development/C
+Summary:	Development files for Samba4 samdb library
+Provides:	samdbdevel = %{EVRD}
+Requires:	%{libsamdb} = %{EVRD}
 
 %description -n %libsamdbdevel
 Development files for Samba4 samdb library
 
 %package -n %libpdb
-Summary: Library for working with the Samba user database
-Group: System/Libraries
+Summary:	Library for working with the Samba user database
+Group:		System/Libraries
 
 %description -n %libpdb
 Library for working with the Samba user database
 
 %package -n %libcredentials
-Summary: Library for working with Samba credentials
-Group: System/Libraries
+Summary:	Library for working with Samba credentials
+Group:		System/Libraries
 
 %description -n %libcredentials
 Library for working with Samba credentials
 
 %package -n %libsmbconf
-Summary: Library for working with Samba config files
-Group: System/Libraries
+Summary:	Library for working with Samba config files
+Group:		System/Libraries
 
 %description -n %libsmbconf
 Library for working with Samba config files
 
 %package -n %libsmbldap
-Summary: Samba LDAP library
-Group: System/Libraries
+Summary:	Samba LDAP library
+Group:		System/Libraries
 
 %description -n %libsmbldap
 Samba LDAP library
 
 %package -n %libtevent_util
-Summary: Utility library for working with the Tevent library
-Group: System/Libraries
+Summary:	Utility library for working with the Tevent library
+Group:		System/Libraries
 
 %description -n %libtevent_util
 Utility library for working with the Tevent library
@@ -617,9 +619,9 @@ database
 
 %if %{with cifs}
 %package -n mount-cifs
-URL:	http://www.samba.org
-Summary: CIFS filesystem mount helper
-Group: Networking/Other
+URL:		http://www.samba.org
+Summary:	CIFS filesystem mount helper
+Group:		Networking/Other
 Conflicts:	%{name}-client <= 3.0.11-1mdk
 Requires:	keyutils > 1.2-%{mkrel 4}
 
@@ -629,18 +631,18 @@ using the cifs filesystem driver
 %endif
 
 %package -n %libtorture
-Summary: Samba testsuite torture library
-Group: Networking/Other
+Summary:	Samba testsuite torture library
+Group:		Networking/Other
 
 %description -n %libtorture
 Samba testsuite torture library
 
 %if %{with gtk}
 %package domainjoin-gui
-Summary: Domainjoin GUI
-Requires: samba-common = %{EVRD}
-Group: System/Configuration/Other
-BuildRequires: pkgconfig(gtk+-2.0)
+Summary:	Domainjoin GUI
+Requires:	samba-common = %{EVRD}
+Group:		System/Configuration/Other
+BuildRequires:	pkgconfig(gtk+-2.0)
 
 %description domainjoin-gui
 The samba-domainjoin-gui package includes a domainjoin gtk application.
@@ -738,7 +740,6 @@ fi
 # RPM_OPT_FLAGS="`echo "$RPM_OPT_FLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
 
 buildtools/bin/waf configure --enable-fhs \
-	--with-perl-archdir=%{perl_vendorlib} \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
 	--enable-gnutls \
@@ -773,12 +774,12 @@ buildtools/bin/waf configure --enable-fhs \
 	--enable-socket-wrapper \
 	--enable-uid-wrapper \
     --with-piddir=/run \
-	--prefix=%_prefix \
-	--libdir=%_libdir \
-	--sysconfdir=%_sysconfdir \
-	--datadir=%_datadir \
-	--localstatedir=%_localstatedir \
-	--with-modulesdir=%_libdir/%name \
+	--prefix=%{_prefix} \
+	--libdir=%{_libdir} \
+	--sysconfdir=%{_sysconfdir} \
+	--datadir=%{_datadir} \
+	--localstatedir=%{_localstatedir} \
+	--with-modulesdir=%{_libdir}/%{name} \
 	-v -v -p \
 	%?_smp_mflags
 
@@ -791,16 +792,15 @@ buildtools/bin/waf build -v -v %?_smp_mflags
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
-%__cc %optflags `pkg-config --cflags gtk+-2.0` -I../../../../../bin/default/include/public -o netdomjoin-gui netdomjoin-gui.c -L../../../../../bin/default/source3/ -lnetapi `pkg-config --libs gtk+-2.0`
+%__cc %{optflags} `pkg-config --cflags gtk+-2.0` -I../../../../../bin/default/include/public -o netdomjoin-gui netdomjoin-gui.c -L../../../../../bin/default/source3/ -lnetapi `pkg-config --libs gtk+-2.0`
 %endif
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}
 
 # Put stuff where it should go.
-mkdir -p %buildroot/%{_libdir}/samba/
-mkdir -p %buildroot/%{_datadir}/man/man8/
+mkdir -p %{buildroot}/%{_libdir}/samba/
+mkdir -p %{buildroot}/%{_datadir}/man/man8/
 
 
 # Any entries here mean samba makefile is *really* broken:
@@ -810,14 +810,14 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 
 %makeinstall_std
 # PAM modules don't go to /usr...
-if [ -e %buildroot%_libdir/security ]; then
+if [ -e %{buildroot}%{_libdir}/security ]; then
 	mkdir -p %{buildroot}/%_lib
-	mv %buildroot%_libdir/security %buildroot/%_lib
+	mv %{buildroot}%{_libdir}/security %{buildroot}/%_lib
 fi
 
 #Even though we tell waf above where to put perl it gets it wrong
-mkdir -p %{buildroot}/%{perl_vendorlib}
-mv %{buildroot}%_datadir/perl5/* %{buildroot}/%{perl_vendorlib}
+#mkdir -p %{buildroot}/%{perl_vendorlib}
+#mv %{buildroot}%_datadir/perl5/* %{buildroot}/%{perl_vendorlib}
 
 #need to stay
 mkdir -p %{buildroot}/{sbin,bin}
@@ -839,7 +839,7 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
 
 # Fix some paths so provision works:
-perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{python_sitearch}/samba/__init__.py
+perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py_platsitedir}/samba/__init__.py
 #perl -pi -e 's,share/samba/setup,share/%{name}/setup,g' %{buildroot}/%{python_sitearch}/samba/provision.py
 
 %if %{with gtk}
@@ -896,22 +896,22 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
 
-install -c -m 755 %{SOURCE10} %{buildroot}%{_datadir}/%name/scripts/print-pdf
+install -c -m 755 %{SOURCE10} %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
 
 # Move some stuff where it belongs...
-mkdir -p %buildroot%_lib
-mv %buildroot%_libdir/libnss* %buildroot/%_lib/
+mkdir -p %{buildroot}%_lib
+mv %{buildroot}%{_libdir}/libnss* %{buildroot}/%_lib/
 
 rm -f %{buildroot}/%{_mandir}/man1/testprns*
 
-mkdir -p %buildroot%_sysconfdir/ld.so.conf.d
-cat >%buildroot%_sysconfdir/ld.so.conf.d/samba.conf <<EOF
-%_libdir/samba
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
+cat >%{buildroot}%{_sysconfdir}/ld.so.conf.d/samba.conf <<EOF
+%{_libdir}/samba
 EOF
 
-mkdir -p %buildroot%_unitdir %buildroot%_sysconfdir/sysconfig
-cp -a packaging/systemd/*.service %buildroot%_unitdir/
-cp -a packaging/systemd/samba.sysconfig %buildroot%_sysconfdir/sysconfig/samba
+mkdir -p %{buildroot}%{_unitdir} %{buildroot}%{_sysconfdir}/sysconfig
+cp -a packaging/systemd/*.service %{buildroot}%{_unitdir}/
+cp -a packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
 
 %post server
 
@@ -993,7 +993,7 @@ fi
 #%{_libdir}/%{name}/vfs
 %{_libdir}/%{name}/vfs/*.so
 #dir %{_libdir}/samba/pdb
-%dir %_libdir/samba
+%dir %{_libdir}/samba
 %{_libdir}/samba/ldb
 %{_libdir}/samba/service
 %{_libdir}/samba/process_model
@@ -1114,12 +1114,12 @@ fi
 %{_libdir}/samba/libwind-samba4.so.0
 %{_libdir}/samba/libwind-samba4.so.0.0.0
 %{_libdir}/samba/libxattr_tdb.so
-%dir %_libdir/samba/vfs
+%dir %{_libdir}/samba/vfs
 %{_libdir}/mit_samba.so
 %{_libdir}/%{name}/nss_info
-%_sbindir/smbd
-%_sbindir/nmbd
-%_sbindir/samba_upgradedns
+%{_sbindir}/smbd
+%{_sbindir}/nmbd
+%{_sbindir}/samba_upgradedns
 #attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smbusers
 #%attr(-,root,root) %config(noreplace) %{_initrddir}/wrepld
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
@@ -1134,16 +1134,16 @@ fi
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
 %{_datadir}/samba/setup
-%attr(0755,root,root) %{_datadir}/%name/scripts/print-pdf
+%attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 #attr(0755,root,root) %{_datadir}/samba/scripts/convertSambaAccount
 %{_mandir}/man8/idmap_*.8*
 #{_mandir}/man8/vfs_*.8*
 %{_mandir}/man8/samba.8*
-%_sysconfdir/ld.so.conf.d
-%_unitdir/samba.service
-%_unitdir/smb.service
-%_unitdir/nmb.service
-%config(noreplace) %_sysconfdir/sysconfig/samba
+%{_sysconfdir}/ld.so.conf.d
+%{_unitdir}/samba.service
+%{_unitdir}/smb.service
+%{_unitdir}/nmb.service
+%config(noreplace) %{_sysconfdir}/sysconfig/samba
 
 %if %{with doc}
 %files doc
@@ -1165,7 +1165,7 @@ fi
 #{_bindir}/masktest3
 #{_bindir}/msgtest
 %{_bindir}/net
-%_bindir/nmblookup4
+%{_bindir}/nmblookup4
 %{_bindir}/pdbedit
 #{_bindir}/pdbtest 
 %{_bindir}/profiles
@@ -1176,7 +1176,7 @@ fi
 %{_sbindir}/samba_kcc  
 %{_bindir}/sharesec
 %{_bindir}/smbcacls
-%_bindir/smbclient4
+%{_bindir}/smbclient4
 #{_bindir}/smbconftort
 %{_bindir}/smbcontrol
 %{_bindir}/smbcquotas
@@ -1206,16 +1206,16 @@ fi
 # %{_mandir}/man1/nmblookup
 # %(for i in %{_mandir}/%{client_man}.[0-9]%{_extension};do echo $i;done)
 
-%_mandir/man1/dbwrap_tool.1*
-%_mandir/man8/samba-tool.8*
-%_mandir/man8/ntdbbackup.8*
-%_mandir/man8/ntdbdump.8*
-%_mandir/man8/ntdbrestore.8*
-%_mandir/man8/ntdbtool.8*
-%_mandir/man8/samba-regedit.8*
-%_mandir/man8/vfs_btrfs.8*
-%_mandir/man8/vfs_linux_xfs_sgid.8*
-%_mandir/man8/vfs_syncops.8*
+%{_mandir}/man1/dbwrap_tool.1*
+%{_mandir}/man8/samba-tool.8*
+%{_mandir}/man8/ntdbbackup.8*
+%{_mandir}/man8/ntdbdump.8*
+%{_mandir}/man8/ntdbrestore.8*
+%{_mandir}/man8/ntdbtool.8*
+%{_mandir}/man8/samba-regedit.8*
+%{_mandir}/man8/vfs_btrfs.8*
+%{_mandir}/man8/vfs_linux_xfs_sgid.8*
+%{_mandir}/man8/vfs_syncops.8*
 
 #xclude %{_mandir}/man?/smbget*
 #{_mandir}/man5/smbgetrc.5*
@@ -1323,19 +1323,19 @@ fi
 %{_mandir}/man8/winbindd.8*
 
 %files -n %libpdb
-%_libdir/libpdb.so.*
+%{_libdir}/libpdb.so.*
 
 %files -n %libcredentials
-%_libdir/libsamba-credentials.so.*
+%{_libdir}/libsamba-credentials.so.*
 
 %files -n %libsmbconf
-%_libdir/libsmbconf.so.*
+%{_libdir}/libsmbconf.so.*
 
 %files -n %libsmbldap
-%_libdir/libsmbldap.so.*
+%{_libdir}/libsmbldap.so.*
 
 %files -n %libtevent_util
-%_libdir/libtevent-util.so.*
+%{_libdir}/libtevent-util.so.*
 
 %files winbind 
 # %config(noreplace) %{_sysconfdir}/security/pam_winbind.conf
@@ -1351,13 +1351,13 @@ fi
 # %{_mandir}/man7/pam_winbind.7*
 # %{_mandir}/man7/winbind_krb5_locator.7.*
 # %{_mandir}/man1/wbinfo*.1*
-%_unitdir/winbind.service
+%{_unitdir}/winbind.service
 
 %files -n nss_wins
 %attr(755,root,root) /%{_lib}/libnss_wins.so*
 
 %files python
-%{python_sitearch}/samba
+%{py_platsitedir}/samba
 #exclude %py_platsitedir/subunit
 %{_libdir}/python2.7/site-packages/ntdb.so
 
@@ -1374,7 +1374,7 @@ fi
 
 %files -n %{libname}
 %{_libdir}/libsmbclient.so.%{libsmbmajor}*
-%_libdir/libsmbclient-raw.so.*
+%{_libdir}/libsmbclient-raw.so.*
 
 %files -n %{libname}-devel
 %{_includedir}/samba-4.0/libsmbclient.h
@@ -1412,13 +1412,13 @@ fi
 %{_includedir}/samba-4.0/ldb_wrap.h
 %{_libdir}/pkgconfig/torture.pc
 %{_libdir}/pkgconfig/samba-util.pc
-%_libdir/libtorture.so
-%_libdir/libpdb.so
-%_libdir/libsamba-credentials.so
-%_libdir/libsmbclient-raw.so
-%_libdir/libsmbconf.so
-%_libdir/libsmbldap.so
-%_libdir/libtevent-util.so
+%{_libdir}/libtorture.so
+%{_libdir}/libpdb.so
+%{_libdir}/libsamba-credentials.so
+%{_libdir}/libsmbclient-raw.so
+%{_libdir}/libsmbconf.so
+%{_libdir}/libsmbldap.so
+%{_libdir}/libtevent-util.so
 %{_includedir}/samba-4.0/lookup_sid.h
 %{_includedir}/samba-4.0/machine_sid.h
 %{_includedir}/samba-4.0/passdb.h
@@ -1464,7 +1464,7 @@ fi
 %files -n %netapidevel
 %{_libdir}/libnetapi*.so
 %{_includedir}/samba-4.0/netapi.h
-%_libdir/pkgconfig/netapi.pc
+%{_libdir}/pkgconfig/netapi.pc
 
 %files -n %libsmbsharemodes
 %{_libdir}/libsmbsharemodes.so.%{smbsharemodesmajor}*
@@ -1478,7 +1478,7 @@ fi
 %{_libdir}/libdcerpc.so.*
 %{_libdir}/libdcerpc-samr.so.*
 %{_libdir}/libdcerpc-atsvc.so.*
-%_libdir/libdcerpc-binding.so.*
+%{_libdir}/libdcerpc-binding.so.*
 %{_libdir}/libdcerpc-server.so.*
 
 %files -n %dcerpcdevel
@@ -1489,7 +1489,7 @@ fi
 %{_libdir}/libdcerpc.so
 %{_libdir}/libdcerpc-samr.so
 %{_libdir}/libdcerpc-atsvc.so
-%_libdir/libdcerpc-binding.so
+%{_libdir}/libdcerpc-binding.so
 %{_libdir}/libdcerpc-server.so
 
 %files -n %libndr
@@ -1570,13 +1570,13 @@ fi
 #%exclude %{_mandir}/man1/editreg*
 
 %files -n %libtorture
-%_libdir/libtorture.so.0*
+%{_libdir}/libtorture.so.0*
 
+%if %{with gtk}
 %files domainjoin-gui
-%defattr(-,root,root)
 %{_sbindir}/netdomjoin-gui
 %dir %{_datadir}/pixmaps/samba
 %{_datadir}/pixmaps/samba/samba.ico
 %{_datadir}/pixmaps/samba/logo.png
 %{_datadir}/pixmaps/samba/logo-small.png
-
+%endif
