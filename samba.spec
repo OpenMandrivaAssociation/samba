@@ -101,8 +101,8 @@
 
 Summary:	Samba SMB server
 Name: 		samba
-Version:	4.1.9
-Release:	2
+Version:	4.1.12
+Release:	1
 Epoch:		1
 License:	GPLv3
 Group:		System/Servers
@@ -739,7 +739,10 @@ fi
 # CXXFLAGS="`echo "$CXXFLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
 # RPM_OPT_FLAGS="`echo "$RPM_OPT_FLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
 
-buildtools/bin/waf configure --enable-fhs \
+# samba doesnt support python3 yet
+export PYTHON=%{__python2}
+
+%{__python2} buildtools/bin/waf configure --enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
 	--enable-gnutls \
@@ -788,7 +791,7 @@ buildtools/bin/waf configure --enable-fhs \
 
 #sed -i -e "s|, '-Wl,--no-undefined'||g" bin/c4che/default.cache.py
 
-buildtools/bin/waf build -v -v %?_smp_mflags
+%{__python2} buildtools/bin/waf build -v -v %?_smp_mflags
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
@@ -808,7 +811,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}/%{_datadir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 
-%makeinstall_std
+PYTHON=%{__python2} %makeinstall_std
 # PAM modules don't go to /usr...
 if [ -e %{buildroot}%{_libdir}/security ]; then
 	mkdir -p %{buildroot}/%_lib
@@ -839,7 +842,7 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
 
 # Fix some paths so provision works:
-perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py_platsitedir}/samba/__init__.py
+perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py2_platsitedir}/samba/__init__.py
 #perl -pi -e 's,share/samba/setup,share/%{name}/setup,g' %{buildroot}/%{python_sitearch}/samba/provision.py
 
 %if %{with gtk}
@@ -1033,6 +1036,7 @@ fi
 %{_libdir}/samba/libdcerpc-samba4.so
 %{_libdir}/samba/libdfs_server_ad.so
 %{_libdir}/samba/libdlz_bind9_for_torture.so
+%{_libdir}/samba/libdnsserver_common.so
 %{_libdir}/samba/libdsdb-module.so
 %{_libdir}/samba/liberrors.so
 %{_libdir}/samba/libevents.so
@@ -1059,7 +1063,6 @@ fi
 %{_libdir}/samba/libkrb5-samba4.so.26
 %{_libdir}/samba/libkrb5-samba4.so.26.0.0
 %{_libdir}/samba/libkrb5samba.so
-%{_libdir}/samba/libldb-cmdline.so
 %{_libdir}/samba/libldbsamba.so
 %{_libdir}/samba/liblibcli_lsa3.so
 %{_libdir}/samba/liblibcli_netlogon3.so
@@ -1357,7 +1360,7 @@ fi
 %attr(755,root,root) /%{_lib}/libnss_wins.so*
 
 %files python
-%{py_platsitedir}/samba
+%{py2_platsitedir}/samba
 #exclude %py_platsitedir/subunit
 %{_libdir}/python2.7/site-packages/ntdb.so
 
