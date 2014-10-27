@@ -102,9 +102,9 @@
 
 Summary:	Samba SMB server
 Name: 		samba
-Version:	4.1.12
-Release:	1
 Epoch:		1
+Version:	4.1.12
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 URL:		http://www.samba.org
@@ -198,7 +198,6 @@ more information.
 %endif
 
 %package server
-URL:		http://www.samba.org
 Summary:	Samba (SMB) server programs
 Requires:	%{name}-common = %{EVRD}
 # provision requires samba4-python
@@ -230,7 +229,6 @@ Please read the smb.conf file and ENCRYPTION.txt in the
 docs directory for implementation details.
 
 %package client
-URL:		http://www.samba.org
 Summary:	Samba (SMB) client programs
 Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
@@ -249,7 +247,6 @@ SMB filesystem in Linux. These allow the accessing of SMB shares, and
 printing to SMB printers.
 
 %package	common
-URL:		http://www.samba.org
 Summary:	Files used by both Samba servers and clients
 Group:		System/Servers
 # rpcclient etc. use samba python modules
@@ -266,9 +263,17 @@ Conflicts:	samba3-common
 Samba-common provides files necessary for both the server and client
 packages of Samba.
 
+%package	libs
+Summary:	Common libraries used by both Samba servers and clients
+Group:		System/Libraries
+Conflicts:	%{name}-server < 1:4.1.12-2
+
+%description libs
+Samba-libs provides common libraries necessary for both the server and client
+packages of Samba.
+
 %if %{with doc}
 %package doc
-URL:		http://www.samba.org
 Summary: 	Documentation for Samba servers and clients
 Group:		System/Servers
 Requires: 	%{name}-common = %{EVRD}
@@ -279,7 +284,6 @@ packages of Samba.
 %endif
 
 %package winbind
-URL:		http://www.samba.org
 Summary: 	Samba-winbind daemon, utilities and documentation
 Group:		System/Servers
 Requires:	%{name}-common = %{EVRD}
@@ -289,7 +293,6 @@ Provides the winbind daemon and testing tools to allow authentication
 and group/user enumeration from a Windows or Samba domain controller.
 
 %package -n nss_wins
-URL:		http://www.samba.org
 Summary:	Name Service Switch service for WINS
 Group: 		System/Servers
 Requires:	%{name}-common = %{EVRD}
@@ -300,7 +303,6 @@ Provides the libnss_wins shared library which resolves NetBIOS names to
 IP addresses.
 
 %package python
-URL:		http://www.samba.org
 Group:		Development/Python
 Summary:	Samba Python modules
 BuildRequires:	python-devel
@@ -310,7 +312,6 @@ Samba Python modules
 
 %if %build_test
 %package test
-URL:		http://www.samba.org
 Summary:	Debugging and benchmarking tools for samba
 Group:		System/Servers
 Requires:	%{name}-common = %{EVRD}
@@ -321,7 +322,6 @@ the correct operation of tools against smb servers.
 %endif
 
 %package -n %{libname}
-URL:		http://www.samba.org
 Summary: 	SMB Client Library
 Group:		System/Libraries
 Provides:	libsmbclient
@@ -332,7 +332,6 @@ suite of networking software, allowing other software to access
 SMB shares.
 
 %package -n %{libname}-devel
-URL:		http://www.samba.org
 Summary: 	SMB Client Library Development files
 Group:		Development/C
 Provides:	libsmbclient-devel = %{EVRD}
@@ -344,7 +343,6 @@ library, part of the samba suite of networking software, allowing
 the development of other software to access SMB shares.
 
 %package -n %{libname}-static-devel
-URL:            http://www.samba.org
 Summary:        SMB Client Static Library Development files
 Group:          Development/C
 Provides:       libsmbclient-static-devel = %{EVRD}
@@ -581,7 +579,6 @@ Group:		System/Libraries
 Utility library for working with the Tevent library
 
 #%package passdb-ldap
-#URL:		http://www.samba.org
 #Summary:	Samba password database plugin for LDAP
 #Group:		System/Libraries
 #
@@ -592,7 +589,6 @@ Utility library for working with the Tevent library
 
 %if %{build_mysql}
 %package passdb-mysql
-URL:		http://www.samba.org
 Summary:	Samba password database plugin for MySQL
 Group:		System/Libraries
 Requires:	%{name}-server = %{EVRD}
@@ -605,7 +601,6 @@ database
 
 %if %{build_pgsql}
 %package passdb-pgsql
-URL:		http://www.samba.org
 Summary:	Samba password database plugin for PostgreSQL
 Group:		System/Libraries
 Requires:	%{name}-server = %{EVRD}
@@ -620,7 +615,6 @@ database
 
 %if %{with cifs}
 %package -n mount-cifs
-URL:		http://www.samba.org
 Summary:	CIFS filesystem mount helper
 Group:		Networking/Other
 Conflicts:	%{name}-client <= 3.0.11-1mdk
@@ -1004,7 +998,38 @@ fi
 %{_libdir}/samba/gensec
 %{_libdir}/samba/auth
 %{_libdir}/samba/bind9
-# %{_libdir}/%{name}/*.so*
+%dir %{_libdir}/samba/vfs
+%{_libdir}/%{name}/nss_info
+%{_libdir}/mit_samba.so
+%{_sbindir}/smbd
+%{_sbindir}/nmbd
+%{_sbindir}/samba_upgradedns
+#attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smbusers
+#%attr(-,root,root) %config(noreplace) %{_initrddir}/wrepld
+%attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+%attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
+#%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/samba-slapd.include
+%(for i in %{_mandir}/man?/%{serverbin}\.[0-9]*;do echo $i;done)
+%attr(775,root,adm) %dir %{_localstatedir}/lib/%{name}/netlogon
+%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/profiles
+%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/printers
+%attr(2775,root,adm) %dir %{_localstatedir}/lib/%{name}/printers/*
+%attr(1777,root,root) %dir /var/spool/%{name}
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/scripts
+%{_datadir}/samba/setup
+%attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
+#attr(0755,root,root) %{_datadir}/samba/scripts/convertSambaAccount
+%{_mandir}/man8/idmap_*.8*
+#{_mandir}/man8/vfs_*.8*
+%{_mandir}/man8/samba.8*
+%{_sysconfdir}/ld.so.conf.d
+%{_unitdir}/samba.service
+%{_unitdir}/smb.service
+%{_unitdir}/nmb.service
+%config(noreplace) %{_sysconfdir}/sysconfig/samba
+
+%files libs
 %{_libdir}/samba/libCHARSET3.so
 %{_libdir}/samba/libHDB_SAMBA4.so
 %{_libdir}/samba/libLIBWBCLIENT_OLD.so
@@ -1118,36 +1143,6 @@ fi
 %{_libdir}/samba/libwind-samba4.so.0
 %{_libdir}/samba/libwind-samba4.so.0.0.0
 %{_libdir}/samba/libxattr_tdb.so
-%dir %{_libdir}/samba/vfs
-%{_libdir}/mit_samba.so
-%{_libdir}/%{name}/nss_info
-%{_sbindir}/smbd
-%{_sbindir}/nmbd
-%{_sbindir}/samba_upgradedns
-#attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smbusers
-#%attr(-,root,root) %config(noreplace) %{_initrddir}/wrepld
-%attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
-#%attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/samba-slapd.include
-%(for i in %{_mandir}/man?/%{serverbin}\.[0-9]*;do echo $i;done)
-%attr(775,root,adm) %dir %{_localstatedir}/lib/%{name}/netlogon
-%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/profiles
-%attr(755,root,root) %dir %{_localstatedir}/lib/%{name}/printers
-%attr(2775,root,adm) %dir %{_localstatedir}/lib/%{name}/printers/*
-%attr(1777,root,root) %dir /var/spool/%{name}
-%dir %{_datadir}/%{name}
-%dir %{_datadir}/%{name}/scripts
-%{_datadir}/samba/setup
-%attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
-#attr(0755,root,root) %{_datadir}/samba/scripts/convertSambaAccount
-%{_mandir}/man8/idmap_*.8*
-#{_mandir}/man8/vfs_*.8*
-%{_mandir}/man8/samba.8*
-%{_sysconfdir}/ld.so.conf.d
-%{_unitdir}/samba.service
-%{_unitdir}/smb.service
-%{_unitdir}/nmb.service
-%config(noreplace) %{_sysconfdir}/sysconfig/samba
 
 %if %{with doc}
 %files doc
