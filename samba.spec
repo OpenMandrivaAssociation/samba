@@ -74,16 +74,8 @@
 
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin testparm,regdiff,regpatch,regshell,regtree
-
 %global serverbin 	oLschema2ldif
 %global serversbin samba,samba_dnsupdate,samba_spnupdate
-
-%global clientbin 	samba-tool,nmblookup,smbclient,cifsdd
-%global client_sbin 	mount.smb,mount.smbfs
-%global clientbin_renameonly net,rpcclient,smbcacls,smbcquotas,smbpasswd,smbtree,profiles,pdbedit,sharesec,smbcontrol,smbstatus,smbta-util
-%global cifs_bin	mount.cifs,umount.cifs
-%global client_man	man1/nmblookup	
-
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
 
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
@@ -754,7 +746,7 @@ fi
 export PYTHON=%{__python2}
 
 %{__python2} buildtools/bin/waf configure --enable-fhs \
-	--with-privatelibdir=%{_libdir}/%{name} \
+	--with-privatelibdir=%{_libdir} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
 	--enable-gnutls \
 	--enable-cups \
@@ -1164,71 +1156,66 @@ fi
 %endif
 
 %files client
+%{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool   
-#{_bindir}/dbwrap_torture
-#{_bindir}/debug2html  
 %{_bindir}/eventlogadm
-#{_bindir}/locktest2   
-#{_bindir}/locktest3
 #{_bindir}/log2pcap 
-#{_bindir}/masktest3
-#{_bindir}/msgtest
 %{_bindir}/net
+%{_bindir}/nmblookup
 %{_bindir}/nmblookup4
+%{_bindir}/ntdbbackup 
+%{_bindir}/ntdbdump   
+%{_bindir}/ntdbrestore
+%{_bindir}/ntdbtool
 %{_bindir}/pdbedit
-#{_bindir}/pdbtest 
 %{_bindir}/profiles
-#{_bindir}/pthreadpooltest
-#{_bindir}/rpc_open_tcp
 %{_bindir}/rpcclient
-#{_bindir}/samba-dig  
-%{_sbindir}/samba_kcc  
 %{_bindir}/sharesec
+%{_bindir}/samba-regedit
+%{_bindir}/samba-tool
 %{_bindir}/smbcacls
+%{_bindir}/smbclient
 %{_bindir}/smbclient4
-#{_bindir}/smbconftort
 %{_bindir}/smbcontrol
 %{_bindir}/smbcquotas
-#{_bindir}/smbfilter  
 %{_bindir}/smbget     
 %{_bindir}/smbpasswd
 %{_bindir}/smbspool   
 %{_bindir}/smbstatus
 %{_bindir}/smbta-util
-#{_bindir}/smbtorture3
 %{_bindir}/smbtree
-#{_bindir}/split_tokens
-%{_bindir}/ntdbbackup 
-%{_bindir}/ntdbdump   
-%{_bindir}/ntdbrestore
-%{_bindir}/ntdbtool
-%{_bindir}/samba-regedit
 %{_bindir}/smbtar
-#{_bindir}/test_lp_load
-#{_bindir}/timelimit  
-#{_bindir}/versiontest
 #{_bindir}/vfstest
-#{_bindir}/vlp
-
-
-%(for i in %{_bindir}/{%{clientbin}};do echo $i;done)
-# %{_mandir}/man1/nmblookup
-# %(for i in %{_mandir}/%{client_man}.[0-9]%{_extension};do echo $i;done)
-
+%{_sbindir}/samba_kcc  
 %{_mandir}/man1/dbwrap_tool.1*
-%{_mandir}/man8/samba-tool.8*
+%{_mandir}/man1/nmblookup.1*
+%{_mandir}/man1/nmblookup4.1*
+%{_mandir}/man1/profiles.1*
+%{_mandir}/man1/rpcclient.1*
+%{_mandir}/man1/sharesec.1*
+%{_mandir}/man1/smbcacls.1*
+%{_mandir}/man1/smbclient.1*
+%{_mandir}/man1/smbcontrol.1*
+%{_mandir}/man1/smbcquotas.1*
+%{_mandir}/man1/smbget.1*
+%{_mandir}/man1/smbstatus.1*
+%{_mandir}/man5/smbpasswd.5*
+%{_mandir}/man8/eventlogadm.8*
+%{_mandir}/man8/net.8*
 %{_mandir}/man8/ntdbbackup.8*
 %{_mandir}/man8/ntdbdump.8*
 %{_mandir}/man8/ntdbrestore.8*
 %{_mandir}/man8/ntdbtool.8*
+%{_mandir}/man8/pdbedit.8*
 %{_mandir}/man8/samba-regedit.8*
+%{_mandir}/man8/samba-tool.8*
+%{_mandir}/man8/smbpasswd.8*
+%{_mandir}/man8/smbspool.8*
+%{_mandir}/man8/smbta-util.8*
 %{_mandir}/man8/vfs_btrfs.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
 
-#xclude %{_mandir}/man?/smbget*
-#{_mandir}/man5/smbgetrc.5*
-#{_mandir}/man8/eventlogadm3.8*
 # Link of smbspool to CUPS
 %if %build_cupspc
 %{_prefix}/lib*/cups/backend/smb
@@ -1249,39 +1236,17 @@ fi
 %dir %{_localstatedir}/lib/%{name}
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_mandir}/man1/findsmb.1*
-%{_mandir}/man1/log2pcap.1*
-%{_mandir}/man1/nmblookup.1*
-%{_mandir}/man1/nmblookup4.1*
-%{_mandir}/man1/profiles.1*
-%{_mandir}/man1/rpcclient.1*
-%{_mandir}/man1/sharesec.1*
-%{_mandir}/man1/smbcacls.1*
-%{_mandir}/man1/smbclient.1*
-%{_mandir}/man1/smbcontrol.1*
-%{_mandir}/man1/smbcquotas.1*
-%{_mandir}/man1/smbget.1*
-%{_mandir}/man1/smbstatus.1*
+%{_mandir}/man1/log2pcap.1* #orphanmanpage
 %{_mandir}/man1/smbtar.1*
 %{_mandir}/man1/smbtree.1*
 %{_mandir}/man1/testparm.1*
-%{_mandir}/man1/vfstest.1*
+%{_mandir}/man1/vfstest.1* #orphanmanpage
 %{_mandir}/man5/lmhosts.5*
 %{_mandir}/man5/smb.conf.5*
 %{_mandir}/man5/smbgetrc.5*
-%{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man7/samba.7*
-%{_mandir}/man8/eventlogadm.8*
-%{_mandir}/man8/net.8*
 %{_mandir}/man8/nmbd.8*
-%{_mandir}/man8/pdbedit.8*
 %{_mandir}/man8/smbd.8*
-%{_mandir}/man8/smbpasswd.8*
-%{_mandir}/man8/smbspool.8*
-%{_mandir}/man8/smbta-util.8*
-#{_mandir}/man8/tdbbackup.8*
-#{_mandir}/man8/tdbdump.8*
-#{_mandir}/man8/tdbrestore.8*
-#{_mandir}/man8/tdbtool.8*
 %{_mandir}/man8/vfs_acl_tdb.8*
 %{_mandir}/man8/vfs_acl_xattr.8*
 %{_mandir}/man8/vfs_aio_fork.8*
