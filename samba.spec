@@ -10,9 +10,10 @@
 %define debug_package %{nil}
 
 # Default options
-%bcond_with doc
-%bcond_with cifs
 %bcond_without ads
+%bcond_with cifs
+%bcond_with doc
+%bcond_with gtk
 %define build_test	1
 # CUPS supports functionality for 'printcap name = cups' (9.0 and later):
 %define build_cupspc	0
@@ -31,8 +32,6 @@
 %{?_with_mysql: %global build_mysql 1}
 %{?_with_pgsql: %global build_pgsql 1}
 %global vfsdir examples.bin/VFS
-
-%bcond_with gtk
 
 %define	major	0
 %define libdcerpc %mklibname dcerpc %{major}
@@ -73,9 +72,9 @@
 %define devwbclient %mklibname -d wbclient
 
 #Define sets of binaries that we can use in globs and loops:
-%global commonbin testparm,regdiff,regpatch,regshell,regtree
+%global commonbin	testparm,regdiff,regpatch,regshell,regtree
 %global serverbin 	oLschema2ldif
-%global serversbin samba,samba_dnsupdate,samba_spnupdate
+%global serversbin	samba,samba_dnsupdate,samba_spnupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
 
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
@@ -96,12 +95,8 @@ Source98:	http://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1:	samba.log
 Source3:	samba.xinetd
 #Source7:	README.%{name}-mandrake-rpm
-BuildRequires:	magic-devel
-# For -fuse-ld
-BuildRequires:	gcc
 Source10:	samba-print-pdf.sh
 Source100:	%{name}.rpmlintrc
-
 #Sources that used to be in packaging patch:
 Source20:	smbusers
 Source21:	smbprint
@@ -120,6 +115,7 @@ BuildRequires:	python-tevent
 BuildRequires:	xsltproc
 BuildRequires:	acl-devel
 BuildRequires:	keyutils-devel
+BuildRequires:	magic-devel
 BuildRequires:	openldap-devel
 BuildRequires:	pam-devel
 BuildRequires:	readline-devel
@@ -145,6 +141,8 @@ BuildRequires:	mysql-devel
 %if %{build_pgsql}
 BuildRequires:	postgresql-devel
 %endif
+
+#### there is no straight samba rpm...
 Requires(pre):	chkconfig mktemp psmisc
 Requires(pre):	coreutils sed grep
 Requires:	pam >= 0.64
@@ -177,11 +175,11 @@ more information.
 
 %package server
 Summary:	Samba (SMB) server programs
+Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
 # provision requires samba-python
 Requires:	%{name}-python = %{EVRD}
 Requires(pre):	rpm-helper
-Group:		Networking/Other
 %rename	samba
 %rename	samba-server-ldap
 # SWAT is no longer included in 4.1.x. For now it has been removed
@@ -211,13 +209,13 @@ Summary:	Samba (SMB) client programs
 Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
 Requires:	mount-cifs
-%rename   	samba3-client
-Obsoletes:	smbfs
 # For samba-tool
 Requires:	python-talloc
 Requires:	python-ldb
 Requires:	python-tdb
 Requires:	ldb-utils
+%rename   	samba3-client
+Obsoletes:	smbfs
 
 %description client
 Samba-client provides some SMB clients, which complement the built-in
@@ -229,11 +227,6 @@ Summary:	Files used by both Samba servers and clients
 Group:		System/Servers
 # rpcclient etc. use samba python modules
 Requires:	%{name}-python = %{EVRD}
-#Requires:	%{libpdb} = %{EVRD}
-#Requires:	%{libsambacredentials} = %{EVRD}
-#Requires:	%{libsmbconf} = %{EVRD}
-#Requires:	%{libsmbldap} = %{EVRD}
-#Requires:	%{libtevent_util} = %{EVRD}
 %rename 	samba-common-ldap
 Conflicts:	samba3-common
 
@@ -281,9 +274,9 @@ Provides the libnss_wins shared library which resolves NetBIOS names to
 IP addresses.
 
 %package python
-Group:		Development/Python
 Summary:	Samba Python modules
-BuildRequires:	python-devel
+Group:		Development/Python
+BuildRequires:	pkgconfig(python2)
 
 %description python
 Samba Python modules
@@ -300,12 +293,12 @@ the correct operation of tools against smb servers.
 %endif
 
 %package devel
-Summary:	Samba 4 development package
+Summary:	Samba development package
 Group:		Development/C
 Requires:	%{devsmbclient} = %{EVRD}
 
 %description devel
-Samba 4 development libraries.
+Samba development libraries.
 
 %package pidl
 Summary:	Perl IDL compiler for Samba
@@ -483,7 +476,7 @@ Development files for Samba samdb library.
 %package -n %{libsmbclient}
 Summary:	SMB Client Library
 Group:		System/Libraries
-Provides:	libsmbclient
+Provides:	libsmbclient = %{EVRD}
 
 %description -n %{libsmbclient}
 This package contains the SMB client library, part of the samba
@@ -620,8 +613,7 @@ database
 %package -n mount-cifs
 Summary:	CIFS filesystem mount helper
 Group:		Networking/Other
-Conflicts:	%{name}-client <= 3.0.11-1mdk
-Requires:	keyutils > 1.2-%{mkrel 4}
+Requires:	keyutils > 1.2
 
 %description -n mount-cifs
 This package provides the mount.cifs helper to mount cifs filesystems
@@ -655,9 +647,6 @@ The samba-domainjoin-gui package includes a domainjoin gtk application.
 %{error:--with[out] test     Enable testing and benchmarking tools     - %opt_status %build_test}
 %{error: }
 %else
-#{error: }
-#{error: This rpm has build options available, use --with options to see them}
-#{error: }
 echo -e "\n This rpm has build options available, use --with options to see them\n" >&2
 sleep 1
 %endif
@@ -678,17 +667,7 @@ RPM_EXTRA_OPTIONS="\
 %{?_with_ads: --with ads}\
 %{?_without_ads: --without ads}\
 "
-# echo "Building a non-default rpm with the following command-line arguments:"
-# echo "$RPM_EXTRA_OPTIONS"
-# echo "This rpm was built with non-default options, thus, to build ">%{SOURCE7}
-# echo "an identical rpm, you need to supply the following options">>%{SOURCE7}
-# echo "at build time: $RPM_EXTRA_OPTIONS">>%{SOURCE7}
-# echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
-%else
-# echo "This rpm was built with default options">%{SOURCE7}
-# echo -e "\n%{name}-%{version}-%{release}\n">>%{SOURCE7}
 %endif
-
 
 #Try and validate signatures on source:
 # FIXME: find public key used to sign samba releases
@@ -726,7 +705,8 @@ fi
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
 
-%{__python2} buildtools/bin/waf configure --enable-fhs \
+%{__python2} buildtools/bin/waf configure \
+	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
 	--enable-gnutls \
@@ -800,10 +780,6 @@ if [ -e %{buildroot}%{_libdir}/security ]; then
 	mv %{buildroot}%{_libdir}/security %{buildroot}/%{_lib}
 fi
 
-#Even though we tell waf above where to put perl it gets it wrong
-#mkdir -p %{buildroot}/%{perl_vendorlib}
-#mv %{buildroot}%_datadir/perl5/* %{buildroot}/%{perl_vendorlib}
-
 #need to stay
 mkdir -p %{buildroot}/{sbin,bin}
 mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d,xinetd.d}
@@ -825,7 +801,6 @@ mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
 
 # Fix some paths so provision works:
 perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py2_platsitedir}/samba/__init__.py
-#perl -pi -e 's,share/samba/setup,share/%{name}/setup,g' %{buildroot}/%{python_sitearch}/samba/provision.py
 
 %if %{with gtk}
 install -m 755 source3/lib/netapi/examples/netdomjoin-gui/netdomjoin-gui %{buildroot}/%{_sbindir}/netdomjoin-gui
