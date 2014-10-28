@@ -1218,7 +1218,6 @@ fi
 %{_unitdir}/winbind.service
 %{_bindir}/ntlm_auth
 %{_bindir}/wbinfo
-%{_sbindir}/rcwinbind
 %{_sbindir}/winbindd
 %attr(755,root,root) /%{_lib}/security/pam_winbind.so
 %attr(755,root,root) /%{_lib}/libnss_winbind.so.*
