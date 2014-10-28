@@ -125,13 +125,13 @@ BuildRequires:	pam-devel
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 1:1.1.15
+BuildRequires:	pkgconfig(ldb)
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
-BuildRequires:	pkgconfig(pyldb-util) >= 1:1.1.15
+BuildRequires:	pkgconfig(pyldb-util)
 BuildRequires:	pkgconfig(pytalloc-util)
 BuildRequires:	pkgconfig(talloc)
 BuildRequires:	pkgconfig(tdb) >= 1.2.1
