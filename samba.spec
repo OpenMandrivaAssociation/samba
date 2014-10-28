@@ -1413,8 +1413,6 @@ fi
 %files -n %{devdcerpc}
 %{_libdir}/pkgconfig/dcerpc*.pc
 %{_includedir}/samba-4.0/dcerpc*.h
-#dir %{_includedir}/samba-4.0/dcerpc-server
-#{_includedir}/samba-4.0/dcerpc-server/*.h
 %{_libdir}/libdcerpc.so
 %{_libdir}/libdcerpc-atsvc.so
 %{_libdir}/libdcerpc-binding.so
@@ -1431,15 +1429,24 @@ fi
 
 %files -n %{libndr}
 %{_libdir}/libndr.so.%{major}*
+%{_libdir}/libndr-krb5pac.so.%{major}*
+%{_libdir}/libndr-nbt.so.%{major}*
+%{_libdir}/libndr-standard.so.%{major}*
 
 %files -n %{devndr}
 %{_includedir}/samba-4.0/ndr.h
 %{_includedir}/samba-4.0/ndr
 %{_libdir}/pkgconfig/ndr.pc
+%{_libdir}/pkgconfig/ndr_krb5pac.pc
+%{_libdir}/pkgconfig/ndr_nbt.pc
+%{_libdir}/pkgconfig/ndr_standard.pc
 %{_libdir}/libndr.so
+%{_libdir}/libndr-krb5pac.so
+%{_libdir}/libndr-nbt.so
+%{_libdir}/libndr-standard.so
 
 %files -n %{libnetapi}
-%{_libdir}/libnetapi.so.%{netapimajor}*
+%{_libdir}/libnetapi.so.%{major}*
 
 %files -n %{devnetapi}
 %{_libdir}/libnetapi*.so
