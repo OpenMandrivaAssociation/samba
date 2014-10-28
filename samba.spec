@@ -746,7 +746,7 @@ fi
 export PYTHON=%{__python2}
 
 %{__python2} buildtools/bin/waf configure --enable-fhs \
-	--with-privatelibdir=%{_libdir} \
+	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
 	--enable-gnutls \
 	--enable-cups \
@@ -779,7 +779,7 @@ export PYTHON=%{__python2}
 	--enable-nss-wrapper \
 	--enable-socket-wrapper \
 	--enable-uid-wrapper \
-    --with-piddir=/run \
+	--with-piddir=/run \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--sysconfdir=%{_sysconfdir} \
@@ -787,7 +787,7 @@ export PYTHON=%{__python2}
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
 	-v -v -p \
-	%?_smp_mflags
+	%{?_smp_mflags}
 
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
@@ -817,8 +817,8 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 PYTHON=%{__python2} %makeinstall_std
 # PAM modules don't go to /usr...
 if [ -e %{buildroot}%{_libdir}/security ]; then
-	mkdir -p %{buildroot}/%_lib
-	mv %{buildroot}%{_libdir}/security %{buildroot}/%_lib
+	mkdir -p %{buildroot}/%{_lib}
+	mv %{buildroot}%{_libdir}/security %{buildroot}/%{_lib}
 fi
 
 #Even though we tell waf above where to put perl it gets it wrong
@@ -905,8 +905,8 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 install -c -m 755 %{SOURCE10} %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
 
 # Move some stuff where it belongs...
-mkdir -p %{buildroot}%_lib
-mv %{buildroot}%{_libdir}/libnss* %{buildroot}/%_lib/
+mkdir -p %{buildroot}%{_lib}
+mv %{buildroot}%{_libdir}/libnss* %{buildroot}/%{_lib}/
 
 rm -f %{buildroot}/%{_mandir}/man1/testprns*
 
@@ -918,6 +918,10 @@ EOF
 mkdir -p %{buildroot}%{_unitdir} %{buildroot}%{_sysconfdir}/sysconfig
 cp -a packaging/systemd/*.service %{buildroot}%{_unitdir}/
 cp -a packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
+
+# MD removal of orphan manpages 
+rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
+rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 
 %post server
 
@@ -1236,11 +1240,9 @@ fi
 %dir %{_localstatedir}/lib/%{name}
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_mandir}/man1/findsmb.1*
-%{_mandir}/man1/log2pcap.1* #orphanmanpage
 %{_mandir}/man1/smbtar.1*
 %{_mandir}/man1/smbtree.1*
 %{_mandir}/man1/testparm.1*
-%{_mandir}/man1/vfstest.1* #orphanmanpage
 %{_mandir}/man5/lmhosts.5*
 %{_mandir}/man5/smb.conf.5*
 %{_mandir}/man5/smbgetrc.5*
@@ -1305,7 +1307,7 @@ fi
 %{_mandir}/man8/winbindd.8*
 
 %files -n nss_wins
-%attr(755,root,root) /%{_lib}/libnss_wins.so*
+%attr(755,root,root) /%{_lib}/libnss_wins.so.*
 
 %files python
 %{py2_platsitedir}/samba
@@ -1362,6 +1364,8 @@ fi
 %{_includedir}/samba-4.0/smb_signing.h
 %{_includedir}/samba-4.0/smb_unix_ext.h
 %{_includedir}/samba-4.0/smb_util.h
+/%{_lib}/libnss_winbind.so
+/%{_lib}/libnss_wins.so
 %{_mandir}/man3/ntdb.3*
 
 %files pidl
