@@ -110,49 +110,45 @@ Source23:	findsmb
 Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
-Patch0:		samba4-socket-wrapper.patch
-Patch1:		samba-4.0.0a20-compile.patch
 # xdr_* functions have moved from glibc into libtirpc
 Patch2:		samba-4.0.0-tirpc.patch
-BuildRequires:	pkgconfig(libtirpc)
-# Limbo patches (applied to prereleases, but not preleases, ie destined for
-# samba CVS)
-Requires:	pam >= 0.64
-Requires:	samba-common = %{EVRD}
-BuildRequires:	pam-devel readline-devel ncurses-devel popt-devel
-BuildRequires:	libxml2-devel
-# Samba 3.2 and later should be built with capabilities support:
-# http://lists.samba.org/archive/samba/2009-March/146821.html
-BuildRequires:	libcap-devel
-BuildRequires:	gnupg
-# Required for ldb docs
-BuildRequires:	xsltproc
+
 BuildRequires:	docbook-style-xsl
-%if %build_pgsql
-BuildRequires:	postgresql-devel
-%endif
-%if %build_mysql
-BuildRequires:	mysql-devel
-%endif
-BuildRequires:	acl-devel
-BuildRequires:	openldap-devel
-%if %{with ads}
-BuildRequires:	openldap-devel
-BuildRequires:	krb5-devel
-%endif
-BuildRequires:	keyutils-devel
-BuildRequires:	pkgconfig(tdb) >= 1.2.1
+BuildRequires:	gnupg
 BuildRequires:	python-tdb
-BuildRequires:	ldb-devel >= 1:1.1.15
-BuildRequires:	pyldb-util-devel >= 1:1.1.15
-BuildRequires:	pkgconfig(tevent)
 BuildRequires:	python-tevent
-BuildRequires:	pkgconfig(talloc)
-BuildRequires:	pkgconfig(pytalloc-util)
+BuildRequires:	xsltproc
+BuildRequires:	acl-devel
+BuildRequires:	keyutils-devel
+BuildRequires:	openldap-devel
+BuildRequires:	pam-devel
+BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
+BuildRequires:	pkgconfig(ldb) >= 1:1.1.15
+BuildRequires:	pkgconfig(libcap)
+BuildRequires:	pkgconfig(libtirpc)
+BuildRequires:	pkgconfig(libxml-2.0)
+BuildRequires:	pkgconfig(ncurses)
+BuildRequires:	pkgconfig(popt)
+BuildRequires:	pkgconfig(pyldb-util) >= 1:1.1.15
+BuildRequires:	pkgconfig(pytalloc-util)
+BuildRequires:	pkgconfig(talloc)
+BuildRequires:	pkgconfig(tdb) >= 1.2.1
+BuildRequires:	pkgconfig(tevent)
+%if %{with ads}
+BuildRequires:	krb5-devel
+%endif
+%if %{build_mysql}
+BuildRequires:	mysql-devel
+%endif
+%if %{build_pgsql}
+BuildRequires:	postgresql-devel
+%endif
 Requires(pre):	chkconfig mktemp psmisc
 Requires(pre):	coreutils sed grep
+Requires:	pam >= 0.64
+Requires:	samba-common = %{EVRD}
 
 %define __noautoreq 'devel.*'
 
@@ -173,7 +169,7 @@ This binary release includes encrypted password support.
 
 Please read the smb.conf file and ENCRYPTION.txt in the
 docs directory for implementation details.
-%if %build_non_default
+%if %{build_non_default}
 WARNING: This RPM was built with command-line options. Please
 see README.%{name}-mandrake-rpm in the documentation for
 more information.
@@ -292,7 +288,7 @@ BuildRequires:	python-devel
 %description python
 Samba Python modules
 
-%if %build_test
+%if %{build_test}
 %package test
 Summary:	Debugging and benchmarking tools for samba
 Group:		System/Servers
@@ -594,15 +590,6 @@ Requires:	%{libwbclient} = %{EVRD}
 %description -n %{devwbclient}
 Library providing access to winbindd.
 
-#%package passdb-ldap
-#Summary:	Samba password database plugin for LDAP
-#Group:		System/Libraries
-#
-#%description passdb-ldap
-#The passdb-ldap package for samba provides a password database
-#backend allowing samba to store account details in an LDAP
-#database
-
 %if %{build_mysql}
 %package passdb-mysql
 Summary:	Samba password database plugin for MySQL
@@ -680,7 +667,7 @@ clear
 exit 1
 %endif
 
-%if %build_non_default
+%if %{build_non_default}
 RPM_EXTRA_OPTIONS="\
 %{?_with_system: --with system}\
 %{?_without_system: --without system}\
@@ -732,16 +719,10 @@ else
 	#exit 1
 fi
 
-
 %setup -q
-#patch1 -p1 -b .compile~
 %patch2 -p1 -b .tirpc~
 
 %build
-# CFLAGS="`echo "$CFLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
-# CXXFLAGS="`echo "$CXXFLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
-# RPM_OPT_FLAGS="`echo "$RPM_OPT_FLAGS"|sed -e 's/ -g / /g;s/ -Wl,--no-undefined//g'` -DLDAP_DEPRECATED"
-
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
 
@@ -791,8 +772,6 @@ export PYTHON=%{__python2}
 
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
-
-#sed -i -e "s|, '-Wl,--no-undefined'||g" bin/c4che/default.cache.py
 
 %{__python2} buildtools/bin/waf build -v -v %?_smp_mflags
 
@@ -856,16 +835,6 @@ install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo.png %{buildroot}/
 install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo-small.png %{buildroot}/%{_datadir}/pixmaps/%{name}/logo-small.png
 %endif
 
-#libnss_* still not handled by make:
-# Install the nsswitch library extension file
-#for i in wins winbind; do
-#  install -m755 source4/nsswitch/libnss_${i}.so %{buildroot}/%{_lib}/libnss_${i}.so
-#done
-# Make link for wins and winbind resolvers
-#( cd %{buildroot}/%{_lib}; ln -s libnss_wins.so libnss_wins.so.2; ln -s libnss_winbind.so libnss_winbind.so.2)
-#install -d %{buildroot}/%{_libdir}/krb5/plugins
-#install -m755 source4/bin/winbind_krb5_locator.so %{buildroot}/%{_libdir}/krb5/plugins
-
 %if %{build_test}
 for i in {%{testbin}};do
   mv %{buildroot}/%{_bindir}/$i %{buildroot}/%{_bindir}/${i} || :
@@ -891,7 +860,7 @@ install -m644 packaging/LSB/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.con
 cat packaging/LSB/smb.conf | \
 touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >%{buildroot}/%{_sysconfdir}/%{name}/smb.conf
-%if %build_cupspc
+%if %{build_cupspc}
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 # Link smbspool to CUPS (does not require installed CUPS)
@@ -984,16 +953,12 @@ if [ $1 = 1 ]; then
     else
         echo "wins entry found in %{_sysconfdir}/nsswitch.conf"
     fi
-#    else
-#        echo "Upgrade, leaving nsswitch.conf intact"
 fi
 
 %preun -n nss_wins
 if [ $1 = 0 ]; then
 	echo "Removing wins entry from %{_sysconfdir}/nsswitch.conf"
 	perl -pi -e 's/ wins//' %{_sysconfdir}/nsswitch.conf
-#else
-#	echo "Leaving %{_sysconfdir}/nsswitch.conf intact"
 fi
 
 %files server
@@ -1163,7 +1128,6 @@ fi
 %{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool   
 %{_bindir}/eventlogadm
-#{_bindir}/log2pcap 
 %{_bindir}/net
 %{_bindir}/nmblookup
 %{_bindir}/nmblookup4
@@ -1189,7 +1153,6 @@ fi
 %{_bindir}/smbta-util
 %{_bindir}/smbtree
 %{_bindir}/smbtar
-#{_bindir}/vfstest
 %{_sbindir}/samba_kcc  
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
@@ -1221,7 +1184,7 @@ fi
 %{_mandir}/man8/vfs_syncops.8*
 
 # Link of smbspool to CUPS
-%if %build_cupspc
+%if %{build_cupspc}
 %{_prefix}/lib*/cups/backend/smb
 %endif
 
@@ -1533,9 +1496,6 @@ fi
 %{_includedir}/samba-4.0/wbclient.h
 %{_libdir}/pkgconfig/wbclient.pc
 
-#%files passdb-ldap
-#%{_libdir}/%{name}/*/*ldap.so
-
 %if %{build_pgsql}
 %files passdb-pgsql
 %{_libdir}/%{name}/pdb/*pgsql.so
@@ -1544,9 +1504,6 @@ fi
 %if %{with cifs}
 %files -n mount-cifs
 %attr(4755,root,root) /*bin/*mount.cifs
-#/*bin/cifs.upcall
-#{_mandir}/man8/*mount.cifs*.8*
-#{_mandir}/man8/cifs.upcall*.8*
 %endif
 
 %if %{with gtk}
@@ -1557,3 +1514,4 @@ fi
 %{_datadir}/pixmaps/samba/logo.png
 %{_datadir}/pixmaps/samba/logo-small.png
 %endif
+
