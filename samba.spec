@@ -73,7 +73,7 @@
 %define devwbclient %mklibname -d wbclient
 
 #Define sets of binaries that we can use in globs and loops:
-%global commonbin ntlm_auth,testparm,regdiff,regpatch,regshell,regtree
+%global commonbin testparm,regdiff,regpatch,regshell,regtree
 
 %global serverbin 	oLschema2ldif
 %global serversbin samba,samba_dnsupdate,samba_spnupdate
@@ -1013,7 +1013,6 @@ fi
 %{_libdir}/samba/auth
 %{_libdir}/samba/bind9
 %dir %{_libdir}/samba/vfs
-%{_libdir}/%{name}/nss_info
 %{_libdir}/mit_samba.so
 %{_sbindir}/smbd
 %{_sbindir}/nmbd
@@ -1030,7 +1029,6 @@ fi
 %dir %{_datadir}/%{name}/scripts
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
-%{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/samba.8*
 %{_sysconfdir}/ld.so.conf.d
 %{_unitdir}/samba.service
@@ -1267,18 +1265,14 @@ fi
 %{_mandir}/man1/smbtree.1*
 %{_mandir}/man1/testparm.1*
 %{_mandir}/man1/vfstest.1*
-%{_mandir}/man1/wbinfo.1*
 %{_mandir}/man5/lmhosts.5*
-%{_mandir}/man5/pam_winbind.conf.5*
 %{_mandir}/man5/smb.conf.5*
 %{_mandir}/man5/smbgetrc.5*
 %{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man7/samba.7*
-%{_mandir}/man7/winbind_krb5_locator.7*
 %{_mandir}/man8/eventlogadm.8*
 %{_mandir}/man8/net.8*
 %{_mandir}/man8/nmbd.8*
-%{_mandir}/man8/pam_winbind.8*
 %{_mandir}/man8/pdbedit.8*
 %{_mandir}/man8/smbd.8*
 %{_mandir}/man8/smbpasswd.8*
@@ -1323,18 +1317,27 @@ fi
 %{_mandir}/man8/vfs_time_audit.8*
 %{_mandir}/man8/vfs_tsmsm.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
-%{_mandir}/man8/winbindd.8*
 
 %files winbind 
-# %config(noreplace) %{_sysconfdir}/security/pam_winbind.conf
-%{_sbindir}/winbindd
-%{_bindir}/wbinfo
-%attr(755,root,root) /%{_lib}/security/pam_winbind*
-%attr(755,root,root) /%{_lib}/libnss_winbind*
-%{_libdir}/%{name}/idmap
-%{_libdir}/winbind_krb5_locator.so
+#config(noreplace) %{_sysconfdir}/security/pam_winbind.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
 %{_unitdir}/winbind.service
+%{_bindir}/ntlm_auth
+%{_bindir}/wbinfo
+%{_sbindir}/rcwinbind
+%{_sbindir}/winbindd
+%attr(755,root,root) /%{_lib}/security/pam_winbind.so
+%attr(755,root,root) /%{_lib}/libnss_winbind.so.*
+%{_libdir}/%{name}/idmap
+%{_libdir}/%{name}/nss_info
+%{_libdir}/winbind_krb5_locator.so
+%{_mandir}/man1/ntlm_auth.1*
+%{_mandir}/man1/wbinfo.1*
+%{_mandir}/man5/pam_winbind.conf.5*
+%{_mandir}/man7/winbind_krb5_locator.7*
+%{_mandir}/man8/idmap_*.8*
+%{_mandir}/man8/pam_winbind.8*
+%{_mandir}/man8/winbindd.8*
 
 %files -n nss_wins
 %attr(755,root,root) /%{_lib}/libnss_wins.so*
