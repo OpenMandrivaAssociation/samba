@@ -178,7 +178,7 @@ more information.
 %package server
 Summary:	Samba (SMB) server programs
 Requires:	%{name}-common = %{EVRD}
-# provision requires samba4-python
+# provision requires samba-python
 Requires:	%{name}-python = %{EVRD}
 Requires(pre):	rpm-helper
 Group:		Networking/Other
@@ -308,18 +308,18 @@ Requires:	%{devsmbclient} = %{EVRD}
 Samba 4 development libraries.
 
 %package pidl
-Summary:	Perl IDL compiler for Samba4
+Summary:	Perl IDL compiler for Samba
 Group:		Development/Perl
 
 %description pidl
-Perl Interface Description Language compiler for Samba4.
+Perl Interface Description Language compiler for Samba.
 
 %package -n %{libdcerpc}
-Summary:	Library implementing DCE/RPC for Samba4
+Summary:	Library implementing DCE/RPC for Samba
 Group:		System/Libraries
 
 %description -n %{libdcerpc}
-Library implementing DCE/RPC for Samba4.
+Library implementing DCE/RPC for Samba.
 
 %package -n %{devdcerpc}
 Summary:	Library implementing Samba's memory allocator
@@ -330,34 +330,34 @@ Requires:	%{libdcerpc} = %{EVRD}
 Library implementing Samba's memory allocator.
 
 %package -n %{libgensec}
-Summary:	Samba4 generic security library
+Summary:	Samba generic security library
 Group:		System/Libraries
 
 %description -n %{libgensec}
-Samba4 generic security library.
+Samba generic security library.
 
 %package -n %{devgensec}
-Summary:	Development files for Samba4 generic security library
+Summary:	Development files for Samba generic security library
 Group:		Development/C
 Requires:	%{libgensec} = %{EVRD}
 
 %description -n %{devgensec}
-Development files for Samba4 generic security library.
+Development files for Samba generic security library.
 
 %package -n %{libndr}
-Summary:	Network Data Representation library from Samba4
+Summary:	Network Data Representation library from Samba
 Group:		System/Libraries
 
 %description -n %{libndr}
-Network Data Representation library from Samba4.
+Network Data Representation library from Samba.
 
 %package -n %{devndr}
-Summary:	Development files for Network Data Representation library from Samba4
+Summary:	Development files for Network Data Representation library from Samba
 Group:		Development/C
 Requires:	%{libndr} = %{EVRD}
 
 %description -n %{devndr}
-Development files for Network Data Representation library from Samba4.
+Development files for Network Data Representation library from Samba.
 
 %package -n %{libnetapi}
 Summary:	Samba library for accessing functions in 'net' binary
@@ -391,19 +391,19 @@ Provides:	pdb-devel = %{EVRD}
 Development files for Samba user database library.
 
 %package -n %{libregistry}
-Summary:	Samba4 registry library
+Summary:	Samba registry library
 Group:		System/Libraries
 
 %description -n %{libregistry}
-Samba4 registry library.
+Samba registry library.
 
 %package -n %{devregistry}
-Summary:	Development files for Samba4 registry library
+Summary:	Development files for Samba registry library
 Group:		Development/C
 Requires:	%{libregistry} = %{EVRD}
 
 %description -n %{devregistry}
-Development files for Samba4 registry library.
+Development files for Samba registry library.
 
 %package -n %{libsambacredentials}
 Summary:	Library for working with Samba credentials
@@ -418,67 +418,67 @@ Group:		Development/C
 Requires:	%{libsambacredentials} = %{EVRD}
 
 %description -n %{devsambacredentials}
-Development files for Samba4 credentials library.
+Development files for Samba credentials library.
 
 %package -n %{libsambahostconfig}
-Summary:	Samba4's host configuration library
+Summary:	Samba's host configuration library
 Group:		System/Libraries
 
 %description -n %{libsambahostconfig}
-Samba4's host configuration library.
+Samba's host configuration library.
 
 %package -n %{devsambahostconfig}
-Summary:	Samba4's host configuration library
+Summary:	Samba's host configuration library
 Group:		Development/C
 Requires:	%{libsambahostconfig} = %{EVRD}
 
 %description -n %{devsambahostconfig}
-Samba4's host configuration library.
+Samba's host configuration library.
 
 %package -n %{libsambapolicy}
-Summary:	Samba4 policy library
+Summary:	Samba policy library
 Group:		System/Libraries
 
 %description -n %{libsambapolicy}
-Samba4 policy library.
+Samba policy library.
 
 %package -n %{devsambapolicy}
-Summary:	Development files for Samba4 policy library
+Summary:	Development files for Samba policy library
 Group:		Development/C
 Requires:	%{libsambapolicy} = %{EVRD}
 
 %description -n %{devsambapolicy}
-Development files for Samba4 policy library.
+Development files for Samba policy library.
 
 %package -n %{libsambautil}
 Group:		System/Libraries
-Summary:	Samba4 utility library
+Summary:	Samba utility library
 
 %description -n %{libsambautil}
-Samba4 utility library.
+Samba utility library.
 
 %package -n %{devsambautil}
-Summary:	Development files for Samba4 utility library
+Summary:	Development files for Samba utility library
 Group:		Development/C
 Requires:	%{libsambautil} = %{EVRD}
 
 %description -n %{devsambautil}
-Development files for Samba4 utility library.
+Development files for Samba utility library.
 
 %package -n %{libsamdb}
-Summary:	Samba4 samdb library
+Summary:	Samba samdb library
 Group:		System/Libraries
 
 %description -n %{libsamdb}
-Samba4 samdb library
+Samba samdb library
 
 %package -n %{devsamdb}
-Summary:	Development files for Samba4 samdb library
+Summary:	Development files for Samba samdb library
 Group:		Development/C
 Requires:	%{libsamdb} = %{EVRD}
 
 %description -n %{devsamdb}
-Development files for Samba4 samdb library.
+Development files for Samba samdb library.
 
 %package -n %{libsmbclient}
 Summary:	SMB Client Library
@@ -508,12 +508,12 @@ Group:		System/Libraries
 Library for working with Samba config files.
 
 %package -n %{devsmbconf}
-Summary:	Development files for Samba4 smbconf library
+Summary:	Development files for Samba smbconf library
 Group:		Development/C
 Requires:	%{libsmbconf} = %{EVRD}
 
 %description -n %{devsmbconf}
-Development files for Samba4 smbconf library.
+Development files for Samba smbconf library.
 
 %package -n %{libsmbldap}
 Summary:	Samba LDAP library
@@ -523,12 +523,12 @@ Group:		System/Libraries
 Samba LDAP library
 
 %package -n %{devsmbldap}
-Summary:	Development files for Samba4 smbldap library
+Summary:	Development files for Samba smbldap library
 Group:		Development/C
 Requires:	%{libsmbldap} = %{EVRD}
 
 %description -n %{devsmbldap}
-Development files for Samba4 smbldap library.
+Development files for Samba smbldap library.
 
 %package -n %{libsmbsharemodes}
 Summary:	Samba Library for accessing smb share modes (locks etc.)
@@ -568,12 +568,12 @@ Group:		Networking/Other
 Samba testsuite torture library.
 
 %package -n %{devtorture}
-Summary:	Development files for Samba4 torture library
+Summary:	Development files for Samba torture library
 Group:		Development/C
 Requires:	%{libtorture} = %{EVRD}
 
 %description -n %{devtorture}
-Development files for Samba4 torture library.
+Development files for Samba torture library.
 
 %package -n %{libwbclient}
 Summary:	Library providing access to winbindd
@@ -691,7 +691,7 @@ RPM_EXTRA_OPTIONS="\
 
 
 #Try and validate signatures on source:
-# FIXME: find public key used to sign samba4 releases
+# FIXME: find public key used to sign samba releases
 export GNUPGHOME=%{_tmppath}/samba-gpghome
 if [ -d "$GNUPGHOME" ]
 then echo "Error, GNUPGHOME $GNUPGHOME exists, remove it and try again"; exit 1
@@ -1007,8 +1007,7 @@ fi
 %if %{with ads}
 %{_libdir}/samba/libads.so
 %endif
-%{_libdir}/samba/libasn1-samba4.so.8
-%{_libdir}/samba/libasn1-samba4.so.8.0.0
+%{_libdir}/samba/libasn1-samba4.so.8*
 %{_libdir}/samba/libasn1util.so
 %{_libdir}/samba/libauth.so
 %{_libdir}/samba/libauth4.so
@@ -1038,25 +1037,17 @@ fi
 %{_libdir}/samba/libflag_mapping.so
 %{_libdir}/samba/libgpo.so
 %{_libdir}/samba/libgse.so
-%{_libdir}/samba/libgssapi-samba4.so.2
-%{_libdir}/samba/libgssapi-samba4.so.2.0.0
-%{_libdir}/samba/libhcrypto-samba4.so.5
-%{_libdir}/samba/libhcrypto-samba4.so.5.0.1
-%{_libdir}/samba/libhdb-samba4.so.11
-%{_libdir}/samba/libhdb-samba4.so.11.0.2
-%{_libdir}/samba/libheimbase-samba4.so.1
-%{_libdir}/samba/libheimbase-samba4.so.1.0.0
-%{_libdir}/samba/libheimntlm-samba4.so.1
-%{_libdir}/samba/libheimntlm-samba4.so.1.0.1
-%{_libdir}/samba/libhx509-samba4.so.5
-%{_libdir}/samba/libhx509-samba4.so.5.0.0
+%{_libdir}/samba/libgssapi-samba4.so.2*
+%{_libdir}/samba/libhcrypto-samba4.so.5*
+%{_libdir}/samba/libhdb-samba4.so.11*
+%{_libdir}/samba/libheimbase-samba4.so.1*
+%{_libdir}/samba/libheimntlm-samba4.so.1*
+%{_libdir}/samba/libhx509-samba4.so.5*
 %{_libdir}/samba/libidmap.so
 %{_libdir}/samba/libiniparser.so
 %{_libdir}/samba/libinterfaces.so
-%{_libdir}/samba/libkdc-samba4.so.2
-%{_libdir}/samba/libkdc-samba4.so.2.0.0
-%{_libdir}/samba/libkrb5-samba4.so.26
-%{_libdir}/samba/libkrb5-samba4.so.26.0.0
+%{_libdir}/samba/libkdc-samba4.so.2*
+%{_libdir}/samba/libkrb5-samba4.so.26*
 %{_libdir}/samba/libkrb5samba.so
 %{_libdir}/samba/libldbsamba.so
 %{_libdir}/samba/liblibcli_lsa3.so
@@ -1079,8 +1070,7 @@ fi
 %{_libdir}/samba/libprinting_migrate.so
 %{_libdir}/samba/libprocess_model.so
 %{_libdir}/samba/libreplace.so
-%{_libdir}/samba/libroken-samba4.so.19
-%{_libdir}/samba/libroken-samba4.so.19.0.1
+%{_libdir}/samba/libroken-samba4.so.19*
 %{_libdir}/samba/libsamba-modules.so
 %{_libdir}/samba/libsamba-net.so
 %{_libdir}/samba/libsamba-security.so
@@ -1111,8 +1101,7 @@ fi
 %{_libdir}/samba/libutil_setid.so
 %{_libdir}/samba/libutil_tdb.so
 %{_libdir}/samba/libwinbind-client.so
-%{_libdir}/samba/libwind-samba4.so.0
-%{_libdir}/samba/libwind-samba4.so.0.0.0
+%{_libdir}/samba/libwind-samba4.so.0*
 %{_libdir}/samba/libxattr_tdb.so
 
 %if %{with doc}
