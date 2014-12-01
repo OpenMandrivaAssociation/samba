@@ -891,7 +891,7 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 # Link smbspool to CUPS (does not require installed CUPS)
 
         mkdir -p %{buildroot}/%{_libdir}/cups/backend
-        ln -s %{_bindir}/smbspool %{buildroot}/%{_libdir}/cups/backend/sm
+        ln -s %{_bindir}/smbspool %{buildroot}/%{_libdir}/cups/backend/smb
 %endif
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
