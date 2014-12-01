@@ -16,7 +16,7 @@
 %bcond_with gtk
 %define build_test	1
 # CUPS supports functionality for 'printcap name = cups' (9.0 and later):
-%define build_cupspc	0
+%define build_cupspc	1
 # %_{pre,postun}_service are provided by rpm-helper in 9.0 and later
 %define build_mysql	0
 %define build_pgsql 	0
@@ -840,8 +840,8 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 # Link smbspool to CUPS (does not require installed CUPS)
 
-        mkdir -p %{buildroot}/%{_prefix}/lib/cups/backend
-        ln -s %{_bindir}/smbspool %{buildroot}/%{_prefix}/lib/cups/backend/smb
+        mkdir -p %{buildroot}/%{_libdir}/cups/backend
+        ln -s %{_bindir}/smbspool %{buildroot}/%{_libdir}/cups/backend/smb
 %endif
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
@@ -1149,7 +1149,7 @@ fi
 
 # Link of smbspool to CUPS
 %if %{build_cupspc}
-%{_prefix}/lib*/cups/backend/smb
+%{_libdir}/cups/backend/smb
 %endif
 
 %files common
