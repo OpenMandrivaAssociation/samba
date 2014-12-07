@@ -3,3 +3,4 @@ removed_sources:
 sources:
   samba-4.1.12.tar.gz: e4ee05e4f90dd064693a8ac0b517947fa55e8932
   samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0
+  samba-4.1.14.tar.gz: db536187b4450adc610678fc8423cb1bfdc57836
