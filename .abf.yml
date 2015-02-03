@@ -1,7 +1,4 @@
-removed_sources:
-  samba-4.1.6.tar.gz: e265ac592d3a3bf98899f3963d74ccd607106de3
 sources:
-  samba-4.1.12.tar.gz: e4ee05e4f90dd064693a8ac0b517947fa55e8932
-  samba-4.1.14.tar.asc: 18f1c2a56f58604f6847a40d66d0d49bf2d2d2ce
-  samba-4.1.14.tar.gz: db536187b4450adc610678fc8423cb1bfdc57836
+  samba-4.1.16.tar.gz: 6fe5cbbec3ebf29a22af35229c17f699b6559c6d
+  samba-4.1.16.tar.asc: 244daf949b2520b76580d76ec3479c89b828cd47
   samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0

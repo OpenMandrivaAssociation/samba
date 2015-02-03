@@ -84,8 +84,8 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.1.14
-Release:	2
+Version:	4.1.16
+Release:	1
 License:	GPLv3
 Group:		System/Servers
 Url:		http://www.samba.org
@@ -738,6 +738,7 @@ export PYTHON=%{__python2}
 	--with-cluster-support \
 	--with-sendfile-support \
 	--with-dnsupdate \
+	--with-systemd \
 	--enable-nss-wrapper \
 	--enable-socket-wrapper \
 	--enable-uid-wrapper \
@@ -871,17 +872,14 @@ rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 # tmpfiles for runtime dir creation
 install -D -p -m 0644 %{SOURCE30} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
+# install NM dispatcher file
+install -d -m 0755 %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d/
+install -m 0755 packaging/NetworkManager/30-winbind-systemd %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d/30-winbind
+
 %post server
 
 # Add a unix group for samba machine accounts
 groupadd -frg 421 machines
-
-%systemd_post nmb.service
-%systemd_post smb.service
-
-%postun server
-%systemd_postun nmb.service
-%systemd_postun smb.service
 
 %post common
 # And this too, in case we don't have smbd to create it for us
@@ -894,7 +892,6 @@ if [ -f %{_sysconfdir}/%{name}/README.mdk.conf ];then rm -f %{_sysconfdir}/%{nam
 
 %post winbind
 if [ $1 = 1 ]; then
-    /sbin/chkconfig winbind on
     cp -af %{_sysconfdir}/nsswitch.conf %{_sysconfdir}/nsswitch.conf.rpmsave
     cp -af %{_sysconfdir}/nsswitch.conf %{_sysconfdir}/nsswitch.conf.rpmtemp
     for i in passwd group;do
@@ -910,17 +907,12 @@ if [ $1 = 1 ]; then
     if [ -f %{_sysconfdir}/nsswitch.conf.rpmtemp ];then rm -f %{_sysconfdir}/nsswitch.conf.rpmtemp;fi
 fi
 
-%systemd_post winbind.service
-
 %preun winbind
 if [ $1 = 0 ]; then
 	echo "Removing winbind entries from %{_sysconfdir}/nsswitch.conf"
 	perl -pi -e 's/ winbind//' %{_sysconfdir}/nsswitch.conf
 
-	/sbin/chkconfig winbind reset
 fi
-
-%systemd_postun winbind.service
 
 %post -n nss_wins
 if [ $1 = 1 ]; then
@@ -1099,8 +1091,8 @@ fi
 %{_bindir}/net
 %{_bindir}/nmblookup
 %{_bindir}/nmblookup4
-%{_bindir}/ntdbbackup 
-%{_bindir}/ntdbdump   
+%{_bindir}/ntdbbackup
+%{_bindir}/ntdbdump
 %{_bindir}/ntdbrestore
 %{_bindir}/ntdbtool
 %{_bindir}/pdbedit
@@ -1114,14 +1106,14 @@ fi
 %{_bindir}/smbclient4
 %{_bindir}/smbcontrol
 %{_bindir}/smbcquotas
-%{_bindir}/smbget     
+%{_bindir}/smbget
 %{_bindir}/smbpasswd
-%{_bindir}/smbspool   
+%{_bindir}/smbspool
 %{_bindir}/smbstatus
 %{_bindir}/smbta-util
 %{_bindir}/smbtree
 %{_bindir}/smbtar
-%{_sbindir}/samba_kcc  
+%{_sbindir}/samba_kcc
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
 %{_mandir}/man1/nmblookup4.1*
@@ -1220,6 +1212,7 @@ fi
 %files winbind
 #config(noreplace) %{_sysconfdir}/security/pam_winbind.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
+%{_sysconfdir}/NetworkManager/dispatcher.d/30-winbind
 %{_unitdir}/winbind.service
 %{_bindir}/ntlm_auth
 %{_bindir}/wbinfo
