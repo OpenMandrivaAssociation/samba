@@ -105,6 +105,7 @@ Source23:	findsmb
 Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
+Source30:	%{name}-tmpfiles.conf
 # xdr_* functions have moved from glibc into libtirpc
 Patch2:		samba-4.0.0-tirpc.patch
 
@@ -867,6 +868,9 @@ cp -a packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/sam
 rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
 rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 
+# tmpfiles for runtime dir creation
+install -D -p -m 0644 %{SOURCE30} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+
 %post server
 
 # Add a unix group for samba machine accounts
@@ -1090,7 +1094,7 @@ fi
 
 %files client
 %{_bindir}/cifsdd
-%{_bindir}/dbwrap_tool   
+%{_bindir}/dbwrap_tool
 %{_bindir}/eventlogadm
 %{_bindir}/net
 %{_bindir}/nmblookup
@@ -1166,6 +1170,7 @@ fi
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/lmhosts
 %dir %{_localstatedir}/lib/%{name}
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
+%{_tmpfilesdir}/%{name}.conf
 %{_mandir}/man1/findsmb.1*
 %{_mandir}/man1/smbtar.1*
 %{_mandir}/man1/smbtree.1*
@@ -1212,7 +1217,7 @@ fi
 %{_mandir}/man8/vfs_tsmsm.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
 
-%files winbind 
+%files winbind
 #config(noreplace) %{_sysconfdir}/security/pam_winbind.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/system-auth-winbind*
 %{_unitdir}/winbind.service
