@@ -84,7 +84,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.1.16
+Version:	4.1.17
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -297,6 +297,11 @@ the correct operation of tools against smb servers.
 Summary:	Samba development package
 Group:		Development/C
 Requires:	%{devsmbclient} = %{EVRD}
+%if "%_lib" == "lib64"
+Provides:	devel(libdcerpc-samba(64bit))
+%else
+Provides:	devel(libdcerpc-samba)
+%endif
 
 %description devel
 Samba development libraries.
@@ -1295,7 +1300,6 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
-%{perl_vendorlib}/Parse/Yapp/*.pm
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
