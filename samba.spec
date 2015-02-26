@@ -85,7 +85,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.1.16
-Release:	1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		http://www.samba.org
@@ -94,6 +94,7 @@ Source99:	http://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 Source98:	http://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1:	samba.log
 Source3:	samba.xinetd
+Source4:	samba.sysconfig
 #Source7:	README.%{name}-mandrake-rpm
 Source10:	samba-print-pdf.sh
 Source100:	%{name}.rpmlintrc
@@ -863,7 +864,7 @@ EOF
 
 mkdir -p %{buildroot}%{_unitdir} %{buildroot}%{_sysconfdir}/sysconfig
 cp -a packaging/systemd/*.service %{buildroot}%{_unitdir}/
-cp -a packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
+install -m644 %{SOURCE4} %{buildroot}%{_sysconfdir}/sysconfig/samba
 
 # MD removal of orphan manpages 
 rm -f %{buildroot}%{_mandir}/man1/log2pcap.1*
