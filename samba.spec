@@ -1300,6 +1300,7 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
+%{perl_vendorlib}/Parse/Yapp*
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
