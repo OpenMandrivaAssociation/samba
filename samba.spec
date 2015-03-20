@@ -88,10 +88,10 @@ Version:	4.1.17
 Release:	2
 License:	GPLv3
 Group:		System/Servers
-Url:		http://www.samba.org
-Source0:	http://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
-Source99:	http://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
-Source98:	http://ftp.samba.org/pub/samba/samba-pubkey.asc
+Url:		https://www.samba.org
+Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
+Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
+Source98:	https://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1:	samba.log
 Source3:	samba.xinetd
 Source4:	samba.sysconfig
