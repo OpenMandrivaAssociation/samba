@@ -705,9 +705,9 @@ fi
 
 %build
 # samba doesnt support python3 yet
-export PYTHON=%{__python2}
+#export PYTHON=%{__python2}
 
-%{__python2} buildtools/bin/waf configure \
+%{__python} buildtools/bin/waf configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
@@ -756,7 +756,7 @@ export PYTHON=%{__python2}
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
 
-%{__python2} buildtools/bin/waf build -v -v %?_smp_mflags
+%{__python} buildtools/bin/waf build -v -v %?_smp_mflags
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
@@ -776,7 +776,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}/%{_datadir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 
-PYTHON=%{__python2} %makeinstall_std
+PYTHON=%{__python} %makeinstall_std
 # PAM modules don't go to /usr...
 if [ -e %{buildroot}%{_libdir}/security ]; then
 	mkdir -p %{buildroot}/%{_lib}
@@ -803,7 +803,7 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
 
 # Fix some paths so provision works:
-perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py2_platsitedir}/samba/__init__.py
+perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py_platsitedir}/samba/__init__.py
 
 %if %{with gtk}
 install -m 755 source3/lib/netapi/examples/netdomjoin-gui/netdomjoin-gui %{buildroot}/%{_sbindir}/netdomjoin-gui
@@ -1235,7 +1235,7 @@ fi
 %attr(755,root,root) /%{_lib}/libnss_wins.so.*
 
 %files python
-%{py2_platsitedir}/samba
+%{py_platsitedir}/samba
 %{_libdir}/python2.7/site-packages/ntdb.so
 
 %if %{build_test}
@@ -1296,7 +1296,8 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
-%{perl_vendorlib}/Parse/Yapp/*.pm
+#Below not required itchka@compuserve.com 
+#%{perl_vendorlib}/Parse/Yapp/*.pm
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
