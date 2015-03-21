@@ -1,3 +1,5 @@
-sources:
-  samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0
+removed_sources:
   samba-4.1.17.tar.gz: 00c5a3007ca73bb8a497fa9942887520a6e58d65
+sources:
+  samba-4.2.0.tar.gz: 1a480bdc6ca07725ddad00c8a6c45909f4912e81
+  samba-pubkey.asc: ee2a7feb0178f49c8bc2520a1efeb2140b845fd0
