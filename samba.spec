@@ -1296,8 +1296,9 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
-#Below not required itchka@compuserve.com 
-#%{perl_vendorlib}/Parse/Yapp/*.pm
+#FIX ME!
+#Something odd here line below only seems to work on ABF NOT locally  itchka@compuserve.com 
+%{perl_vendorlib}/Parse/Yapp/*.pm
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
