@@ -93,7 +93,6 @@ Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 Source98:	https://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1:	samba.log
-Source3:	samba.xinetd
 #Source7:	README.%{name}-mandrake-rpm
 Source10:	samba-print-pdf.sh
 Source100:	%{name}.rpmlintrc
@@ -789,7 +788,7 @@ fi
 
 #need to stay
 mkdir -p %{buildroot}/{sbin,bin}
-mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d,xinetd.d}
+mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d}
 mkdir -p %{buildroot}/%{_initrddir}
 mkdir -p %{buildroot}/var/cache/%{name}
 mkdir -p %{buildroot}/var/log/%{name}
