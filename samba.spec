@@ -106,7 +106,7 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 # xdr_* functions have moved from glibc into libtirpc
-Patch2:		samba-4.0.0-tirpc.patch
+#Patch2:		samba-4.0.0-tirpc.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -143,8 +143,11 @@ BuildRequires:	postgresql-devel
 %endif
 
 #### there is no straight samba rpm...
-Requires(pre):	chkconfig mktemp psmisc
-Requires(pre):	coreutils sed grep
+Requires(pre):	mktemp
+Requires(pre):	psmisc
+Requires(pre):	coreutils
+Requires(pre):	sed
+Requires(pre):	grep
 Requires:	pam >= 0.64
 Requires:	samba-common = %{EVRD}
 
@@ -704,7 +707,7 @@ else
 fi
 
 %setup -q
-%patch2 -p1 -b .tirpc~
+#patch2 -p1 -b .tirpc~
 
 %build
 # samba doesnt support python3 yet
