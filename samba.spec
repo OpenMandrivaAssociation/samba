@@ -973,7 +973,6 @@ fi
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
-%{_sysconfdir}/ld.so.conf.d
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
@@ -986,6 +985,7 @@ fi
 %{_libdir}/samba/libLIBWBCLIENT_OLD.so
 %{_libdir}/samba/libMESSAGING.so
 %{_libdir}/samba/libaddns.so
+%{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads.so
 %endif
