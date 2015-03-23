@@ -713,7 +713,7 @@ fi
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
 
-%{__python2} buildtools/bin/waf configure \
+%configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
@@ -736,6 +736,9 @@ export PYTHON=%{__python2}
 	--disable-rpath-private-install \
 	--enable-pthreadpool \
 	--enable-avahi \
+    --with-pie \
+    --with-relro \
+    --without-fam \
 	--with-iconv \
 	--with-acl-support \
 	--with-dnsupdate \
@@ -756,13 +759,14 @@ export PYTHON=%{__python2}
 	--datadir=%{_datadir} \
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
-	-v -v -p \
-	%{?_smp_mflags}
+    --with-sockets-dir=/run/samba \
+    --with-lockdir=/var/lib/samba \
+    --with-cachedir=/var/lib/samba
 
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
 
-%{__python2} buildtools/bin/waf build -v -v %?_smp_mflags
+%make
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
