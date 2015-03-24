@@ -750,6 +750,9 @@ fi
 	--datadir=%{_datadir} \
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
+    --with-sockets-dir=/run/samba \
+    --with-lockdir=/var/lib/samba \
+    --with-cachedir=/var/lib/samba \
 	-v -v -p \
 	%{?_smp_mflags}
 
