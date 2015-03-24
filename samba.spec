@@ -749,7 +749,6 @@ export PYTHON=%{__python2}
 	--with-sendfile-support \
 	--with-dnsupdate \
 	--with-systemd \
-	--enable-nss-wrapper \
 	--enable-socket-wrapper \
 	--enable-uid-wrapper \
 	--with-piddir=/run \
