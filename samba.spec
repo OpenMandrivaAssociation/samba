@@ -713,7 +713,7 @@ fi
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
 
-%configure \
+%{__python2} buildtools/bin/waf configure \ \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
