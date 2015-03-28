@@ -134,7 +134,7 @@ BuildRequires:	pkgconfig(pytalloc-util)
 BuildRequires:	pkgconfig(talloc)
 BuildRequires:	pkgconfig(tdb) >= 1.2.1
 BuildRequires:	pkgconfig(tevent)
-BuildRequires:	%{_lib}systemd-daemon)
+BuildRequires:	%{_lib}systemd-daemon-devel
 %if %{with ads}
 BuildRequires:	krb5-devel
 %endif
