@@ -92,7 +92,6 @@ Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 Source98:	https://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1:	samba.log
-Source3:	samba.xinetd
 #Source7:	README.%{name}-mandrake-rpm
 Source10:	samba-print-pdf.sh
 Source100:	%{name}.rpmlintrc
@@ -106,7 +105,7 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 # xdr_* functions have moved from glibc into libtirpc
-# Patch2:		samba-4.0.0-tirpc.patch
+#Patch2:		samba-4.0.0-tirpc.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -143,7 +142,7 @@ BuildRequires:	postgresql-devel
 %endif
 
 #### there is no straight samba rpm...
-Requires(pre):	mktemp 
+Requires(pre):	mktemp
 Requires(pre):	psmisc
 Requires(pre):	coreutils
 Requires(pre):	sed
@@ -702,7 +701,7 @@ else
 fi
 
 %setup -q
-# %patch2 -p1 -b .tirpc~
+#patch2 -p1 -b .tirpc~
 
 %build
 # samba doesnt support python3 yet
@@ -732,6 +731,9 @@ LDFLAGS=-ltirpc  %configure \
 	--disable-rpath-private-install \
 	--enable-pthreadpool \
 	--enable-avahi \
+    --with-pie \
+    --with-relro \
+    --without-fam \
 	--with-iconv \
 	--with-acl-support \
 	--with-dnsupdate \
@@ -750,13 +752,14 @@ LDFLAGS=-ltirpc  %configure \
 	--datadir=%{_datadir} \
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
-	-v -v -p \
-	%{?_smp_mflags}
+    --with-sockets-dir=/run/samba \
+    --with-lockdir=/var/lib/samba \
+    --with-cachedir=/var/lib/samba
 
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
 
-%{__python2} buildtools/bin/waf build -j10 -v -v %?_smp_mflags
+%make
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
@@ -785,7 +788,7 @@ fi
 
 #need to stay
 mkdir -p %{buildroot}/{sbin,bin}
-mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d,xinetd.d}
+mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d}
 mkdir -p %{buildroot}/%{_initrddir}
 mkdir -p %{buildroot}/var/cache/%{name}
 mkdir -p %{buildroot}/var/log/%{name}
