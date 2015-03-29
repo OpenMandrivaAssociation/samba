@@ -705,7 +705,7 @@ fi
 export PYTHON=%{__python2}
 
 # xdr_* functions have moved from glibc into libtirpc
-LDFLAGS=-ltirpc  %configure \
+LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
