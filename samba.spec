@@ -7,6 +7,7 @@
 # ldapsearch -H ldap://127.0.0.1 -x -w 'PASSWORD' -b "DC=lindev,DC=ch" -D "CN=Administrator,CN=Users,DC=lindev,DC=ch"
 # With TLS:
 # ldapsearch -Z -H ldaps://127.0.0.1:636 -x -w 'PASSWORD' -b "DC=lindev,DC=ch" -D "CN=Administrator,CN=Users,DC=lindev,DC=ch"
+%undefine _unpackaged_subdirs_terminate_build
 %define debug_package %{nil}
 
 # Default options
@@ -42,8 +43,8 @@
 %define devndr %mklibname -d ndr
 %define libnetapi %mklibname netapi %{major}
 %define devnetapi %mklibname -d netapi
-%define libpdb %mklibname pdb %{major}
-%define devpdb %mklibname -d pdb
+%define libsambapassdb %mklibname sambapassdb %{major}
+%define devsambapassdb %mklibname -d sambapassdb
 %define libregistry %mklibname registry %{major}
 %define devregistry %mklibname -d registry
 %define libsambacredentials %mklibname samba-credentials %{major}
@@ -62,8 +63,6 @@
 %define devsmbconf %mklibname -d smbconf
 %define libsmbldap %mklibname smbldap %{major}
 %define devsmbldap %mklibname -d smbldap
-%define libsmbsharemodes %mklibname smbsharemodes %{major}
-%define devsmbsharemodes %mklibname -d smbsharemodes
 %define libtevent_util %mklibname tevent-util %{major}
 %define devtevent_util %mklibname -d tevent-util
 %define libtorture %mklibname torture %{major}
@@ -107,7 +106,7 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 # xdr_* functions have moved from glibc into libtirpc
-Patch2:		samba-4.0.0-tirpc.patch
+# Patch2:		samba-4.0.0-tirpc.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -144,8 +143,11 @@ BuildRequires:	postgresql-devel
 %endif
 
 #### there is no straight samba rpm...
-Requires(pre):	chkconfig mktemp psmisc
-Requires(pre):	coreutils sed grep
+Requires(pre):	mktemp 
+Requires(pre):	psmisc
+Requires(pre):	coreutils
+Requires(pre):	sed
+Requires(pre):	grep
 Requires:	pam >= 0.64
 Requires:	samba-common = %{EVRD}
 
@@ -373,20 +375,20 @@ Requires:	%{libnetapi} = %{EVRD}
 %description -n %{devnetapi}
 Samba library for accessing functions in 'net' binary.
 
-%package -n %{libpdb}
+%package -n %{libsambapassdb}
 Summary:	Library for working with the Samba user database
 Group:		System/Libraries
 
-%description -n %{libpdb}
+%description -n %{libsambapassdb}
 Library for working with the Samba user database.
 
-%package -n %{devpdb}
+%package -n %{devsambapassdb}
 Summary:	Development files for Samba user database library
 Group:		Development/C
-Requires:	%{libpdb} = %{EVRD}
-Provides:	pdb-devel = %{EVRD}
+Requires:	%{libsambapassdb} = %{EVRD}
+Provides:	samba-passdb-devel = %{EVRD}
 
-%description -n %{devpdb}
+%description -n %{devsambapassdb}
 Development files for Samba user database library.
 
 %package -n %{libregistry}
@@ -529,21 +531,6 @@ Requires:	%{libsmbldap} = %{EVRD}
 %description -n %{devsmbldap}
 Development files for Samba smbldap library.
 
-%package -n %{libsmbsharemodes}
-Summary:	Samba Library for accessing smb share modes (locks etc.)
-Group:		System/Libraries
-
-%description -n %{libsmbsharemodes}
-Samba Library for accessing smb share modes (locks etc.)
-
-%package -n %{devsmbsharemodes}
-Summary:	Samba Library for accessing smb share modes (locks etc.)
-Group:		Development/C
-Requires:	%{libsmbsharemodes} = %{EVRD}
-
-%description -n %{devsmbsharemodes}
-Samba Library for accessing smb share modes (locks etc.)
-
 %package -n %{libtevent_util}
 Summary:	Utility library for working with the Tevent library
 Group:		System/Libraries
@@ -634,8 +621,19 @@ Group:		System/Configuration/Other
 BuildRequires:	pkgconfig(gtk+-2.0)
 
 %description domainjoin-gui
-The samba-domainjoin-gui package includes a domainjoin gtk application.
+The samba-domainjoin-gui package includes a domainjoin gtk application
 %endif
+
+#%package ctdb
+#Summary:	A clustered implementation of TDB
+#Requires:
+#Group:
+#BuildRequires:
+#%description ctdb
+#CTDB is a cluster implementation of the TDB database used by 
+#Samba and other projects to store temporary data
+
+
 
 %prep
 # Allow users to query build options with --with options:
@@ -701,17 +699,17 @@ then
 	echo "Verification of %{SOURCE0} against %{SOURCE99} with key %{SOURCE98} succeeded"
 else
 	echo "Source verification failed!" >&2
-	#exit 1
 fi
 
 %setup -q
-%patch2 -p1 -b .tirpc~
+# %patch2 -p1 -b .tirpc~
 
 %build
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
 
-%{__python2} buildtools/bin/waf configure \
+#LDFLAGS=-ltirpc %{__python} buildtools/bin/waf configure \
+LDFLAGS=-ltirpc  %configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
@@ -744,10 +742,8 @@ export PYTHON=%{__python2}
 	--with-sendfile-support \
 	--with-dnsupdate \
 	--with-systemd \
-	--enable-nss-wrapper \
-	--enable-socket-wrapper \
-	--enable-uid-wrapper \
 	--with-piddir=/run \
+	--without-cluster \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--sysconfdir=%{_sysconfdir} \
@@ -760,7 +756,7 @@ export PYTHON=%{__python2}
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
 
-%{__python2} buildtools/bin/waf build -v -v %?_smp_mflags
+%{__python2} buildtools/bin/waf build -j10 -v -v %?_smp_mflags
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
@@ -807,7 +803,7 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
 
 # Fix some paths so provision works:
-perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py2_platsitedir}/samba/__init__.py
+perl -pi -e 's,default_ldb_modules_dir = None,default_ldb_modules_dir = \"%{_libdir}/%{name}/ldb\",g' %{buildroot}/%{py_platsitedir}/samba/__init__.py
 
 %if %{with gtk}
 install -m 755 source3/lib/netapi/examples/netdomjoin-gui/netdomjoin-gui %{buildroot}/%{_sbindir}/netdomjoin-gui
@@ -942,7 +938,6 @@ fi
 %(for i in %{_bindir}/%{serverbin};do echo $i;done)
 %attr(755,root,root) /%{_lib}/security/pam_smbpass*
 %{_libdir}/%{name}/vfs/*.so
-%dir %{_libdir}/samba
 %{_libdir}/samba/ldb
 %{_libdir}/samba/service
 %{_libdir}/samba/process_model
@@ -967,7 +962,6 @@ fi
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
-%{_sysconfdir}/ld.so.conf.d
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
@@ -975,110 +969,111 @@ fi
 
 %files libs
 %dir %{_libdir}/%{name}
-%{_libdir}/samba/libCHARSET3.so
-%{_libdir}/samba/libHDB_SAMBA4.so
-%{_libdir}/samba/libLIBWBCLIENT_OLD.so
-%{_libdir}/samba/libMESSAGING.so
-%{_libdir}/samba/libaddns.so
+%{_libdir}/samba/libCHARSET3-samba4.so
+%{_libdir}/samba/libHDB-SAMBA4-samba4.so
+%{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
+%{_libdir}/samba/libMESSAGING-samba4.so
+%{_libdir}/samba/libaddns-samba4.so
+%{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
-%{_libdir}/samba/libads.so
+%{_libdir}/samba/libads-samba4.so
 %endif
 %{_libdir}/samba/libasn1-samba4.so.8*
-%{_libdir}/samba/libasn1util.so
-%{_libdir}/samba/libauth.so
-%{_libdir}/samba/libauth4.so
-%{_libdir}/samba/libauth_sam_reply.so
-%{_libdir}/samba/libauth_unix_token.so
-%{_libdir}/samba/libauthkrb5.so
-%{_libdir}/samba/libccan.so
-%{_libdir}/samba/libcli-ldap-common.so
-%{_libdir}/samba/libcli-ldap.so
-%{_libdir}/samba/libcli-nbt.so
-%{_libdir}/samba/libcli_cldap.so
-%{_libdir}/samba/libcli_smb_common.so
-%{_libdir}/samba/libcli_spoolss.so
-%{_libdir}/samba/libcliauth.so
-%{_libdir}/samba/libcluster.so
-%{_libdir}/samba/libcmdline-credentials.so
-%{_libdir}/samba/libdb-glue.so
-%{_libdir}/samba/libdbwrap.so
-%{_libdir}/samba/libdcerpc-samba.so
+%{_libdir}/samba/libasn1util-samba4.so
+%{_libdir}/samba/libauth-samba4.so
+%{_libdir}/samba/libauth4-samba4.so
+%{_libdir}/samba/libauth-sam-reply-samba4.so
+%{_libdir}/samba/libauth-unix-token-samba4.so
+%{_libdir}/samba/libauthkrb5-samba4.so
+%{_libdir}/samba/libccan-samba4.so
+%{_libdir}/samba/libcli-ldap-common-samba4.so
+%{_libdir}/samba/libcli-ldap-samba4.so
+%{_libdir}/samba/libcli-nbt-samba4.so
+%{_libdir}/samba/libcli-cldap-samba4.so
+%{_libdir}/samba/libcli-smb-common-samba4.so
+%{_libdir}/samba/libcli-spoolss-samba4.so
+%{_libdir}/samba/libcliauth-samba4.so
+%{_libdir}/samba/libcluster-samba4.so
+%{_libdir}/samba/libcmdline-credentials-samba4.so
+%{_libdir}/samba/libdb-glue-samba4.so
+%{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
-%{_libdir}/samba/libdfs_server_ad.so
-%{_libdir}/samba/libdlz_bind9_for_torture.so
-%{_libdir}/samba/libdnsserver_common.so
-%{_libdir}/samba/libdsdb-module.so
-%{_libdir}/samba/liberrors.so
-%{_libdir}/samba/libevents.so
-%{_libdir}/samba/libflag_mapping.so
-%{_libdir}/samba/libgpo.so
-%{_libdir}/samba/libgse.so
+%{_libdir}/samba/libdcerpc-samba-samba4.so
+%{_libdir}/samba/libdfs-server-ad-samba4.so
+%{_libdir}/samba/libdlz-bind9-for-torture-samba4.so
+%{_libdir}/samba/libdnsserver-common-samba4.so
+%{_libdir}/samba/libdsdb-module-samba4.so
+%{_libdir}/samba/liberrors-samba4.so
+%{_libdir}/samba/libevents-samba4.so
+%{_libdir}/samba/libflag-mapping-samba4.so
+%{_libdir}/samba/libgpo-samba4.so
+%{_libdir}/samba/libgse-samba4.so
 %{_libdir}/samba/libgssapi-samba4.so.2*
 %{_libdir}/samba/libhcrypto-samba4.so.5*
 %{_libdir}/samba/libhdb-samba4.so.11*
 %{_libdir}/samba/libheimbase-samba4.so.1*
 %{_libdir}/samba/libheimntlm-samba4.so.1*
 %{_libdir}/samba/libhx509-samba4.so.5*
-%{_libdir}/samba/libidmap.so
-%{_libdir}/samba/libiniparser.so
-%{_libdir}/samba/libinterfaces.so
+%{_libdir}/samba/libhttp-samba4.so
+%{_libdir}/samba/libidmap-samba4.so
+%{_libdir}/samba/libinterfaces-samba4.so
 %{_libdir}/samba/libkdc-samba4.so.2*
 %{_libdir}/samba/libkrb5-samba4.so.26*
-%{_libdir}/samba/libkrb5samba.so
-%{_libdir}/samba/libldbsamba.so
-%{_libdir}/samba/liblibcli_lsa3.so
-%{_libdir}/samba/liblibcli_netlogon3.so
-%{_libdir}/samba/liblibsmb.so
-%{_libdir}/samba/libmsrpc3.so
-%{_libdir}/samba/libndr-samba.so
+%{_libdir}/samba/libkrb5samba-samba4.so
+%{_libdir}/samba/libldbsamba-samba4.so
+%{_libdir}/samba/liblibcli-lsa3-samba4.so
+%{_libdir}/samba/liblibcli-netlogon3-samba4.so
+%{_libdir}/samba/liblibsmb-samba4.so
+%{_libdir}/samba/libmsrpc3-samba4.so
+%{_libdir}/samba/libndr-samba-samba4.so
 %{_libdir}/samba/libndr-samba4.so
-%{_libdir}/samba/libnet_keytab.so
-%{_libdir}/samba/libnetif.so
-%{_libdir}/samba/libnon_posix_acls.so
-%{_libdir}/samba/libnpa_tstream.so
-%{_libdir}/samba/libnss_info.so
-%{_libdir}/samba/libnss_wrapper.so
-%{_libdir}/samba/libntdb.so.0*
-%{_libdir}/samba/libntvfs.so
-%{_libdir}/samba/libpac.so
-%{_libdir}/samba/libpopt_samba3.so
-%{_libdir}/samba/libposix_eadb.so
-%{_libdir}/samba/libprinting_migrate.so
-%{_libdir}/samba/libprocess_model.so
-%{_libdir}/samba/libreplace.so
+%{_libdir}/samba/libnet-keytab-samba4.so
+%{_libdir}/samba/libnetif-samba4.so
+%{_libdir}/samba/libnon-posix-acls-samba4.so
+%{_libdir}/samba/libnpa-tstream-samba4.so
+%{_libdir}/samba/libnss-info-samba4.so
+%{_libdir}/samba/libntdb.so.1*
+%{_libdir}/samba/libntvfs-samba4.so
+%{_libdir}/samba/libpac-samba4.so
+%{_libdir}/samba/libpopt-samba3-samba4.so
+%{_libdir}/samba/libposix-eadb-samba4.so
+%{_libdir}/samba/libprinting-migrate-samba4.so
+%{_libdir}/samba/libprocess-model-samba4.so
+%{_libdir}/samba/libreplace-samba4.so
 %{_libdir}/samba/libroken-samba4.so.19*
-%{_libdir}/samba/libsamba-modules.so
-%{_libdir}/samba/libsamba-net.so
-%{_libdir}/samba/libsamba-security.so
-%{_libdir}/samba/libsamba-sockets.so
-%{_libdir}/samba/libsamba3-util.so
-%{_libdir}/samba/libsamba_python.so
-%{_libdir}/samba/libsamdb-common.so
-%{_libdir}/samba/libsecrets3.so
-%{_libdir}/samba/libserver-role.so
-%{_libdir}/samba/libservice.so
-%{_libdir}/samba/libshares.so
-%{_libdir}/samba/libsmb_transport.so
-%{_libdir}/samba/libsmbd_base.so
-%{_libdir}/samba/libsmbd_conn.so
-%{_libdir}/samba/libsmbd_shim.so
-%{_libdir}/samba/libsmbldaphelper.so
-%{_libdir}/samba/libsmbpasswdparser.so
-%{_libdir}/samba/libsmbregistry.so
-%{_libdir}/samba/libsocket_wrapper.so
-%{_libdir}/samba/libsubunit.so
-%{_libdir}/samba/libtdb-wrap.so
-%{_libdir}/samba/libtdb_compat.so
-%{_libdir}/samba/libtrusts_util.so
-%{_libdir}/samba/libuid_wrapper.so
-%{_libdir}/samba/libutil_cmdline.so
-%{_libdir}/samba/libutil_ntdb.so
-%{_libdir}/samba/libutil_reg.so
-%{_libdir}/samba/libutil_setid.so
-%{_libdir}/samba/libutil_tdb.so
-%{_libdir}/samba/libwinbind-client.so
+%{_libdir}/samba/libsamba-cluster-support-samba4.so
+%{_libdir}/samba/libsamba-debug-samba4.so
+%{_libdir}/samba/libsamba-modules-samba4.so
+%{_libdir}/samba/libsamba-net-samba4.so
+%{_libdir}/samba/libsamba-security-samba4.so
+%{_libdir}/samba/libsamba-sockets-samba4.so
+%{_libdir}/samba/libsamba3-util-samba4.so
+%{_libdir}/samba/libsamba-python-samba4.so
+%{_libdir}/samba/libsamdb-common-samba4.so
+%{_libdir}/samba/libsecrets3-samba4.so
+%{_libdir}/samba/libserver-role-samba4.so
+%{_libdir}/samba/libservice-samba4.so
+%{_libdir}/samba/libshares-samba4.so
+%{_libdir}/samba/libsmb-transport-samba4.so
+%{_libdir}/samba/libsmbd-base-samba4.so
+%{_libdir}/samba/libsmbd-conn-samba4.so
+%{_libdir}/samba/libsmbd-shim-samba4.so
+%{_libdir}/samba/libsmbldaphelper-samba4.so
+%{_libdir}/samba/libsmbpasswdparser-samba4.so
+%{_libdir}/samba/libsmbregistry-samba4.so
+%{_libdir}/samba/libsocket-blocking-samba4.so
+%{_libdir}/samba/libsubunit-samba4.so
+%{_libdir}/samba/libtdb-wrap-samba4.so
+%{_libdir}/samba/libtdb-compat-samba4.so
+%{_libdir}/samba/libtrusts-util-samba4.so
+%{_libdir}/samba/libutil-cmdline-samba4.so
+%{_libdir}/samba/libutil-ntdb-samba4.so
+%{_libdir}/samba/libutil-reg-samba4.so
+%{_libdir}/samba/libutil-setid-samba4.so
+%{_libdir}/samba/libutil-tdb-samba4.so
+%{_libdir}/samba/libwinbind-client-samba4.so
 %{_libdir}/samba/libwind-samba4.so.0*
-%{_libdir}/samba/libxattr_tdb.so
+%{_libdir}/samba/libxattr-tdb-samba4.so
 
 %if %{with doc}
 %files doc
@@ -1095,7 +1090,6 @@ fi
 %{_bindir}/eventlogadm
 %{_bindir}/net
 %{_bindir}/nmblookup
-%{_bindir}/nmblookup4
 %{_bindir}/ntdbbackup
 %{_bindir}/ntdbdump
 %{_bindir}/ntdbrestore
@@ -1108,7 +1102,6 @@ fi
 %{_bindir}/samba-tool
 %{_bindir}/smbcacls
 %{_bindir}/smbclient
-%{_bindir}/smbclient4
 %{_bindir}/smbcontrol
 %{_bindir}/smbcquotas
 %{_bindir}/smbget
@@ -1121,7 +1114,6 @@ fi
 %{_sbindir}/samba_kcc
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
-%{_mandir}/man1/nmblookup4.1*
 %{_mandir}/man1/profiles.1*
 %{_mandir}/man1/rpcclient.1*
 %{_mandir}/man1/sharesec.1*
@@ -1147,6 +1139,11 @@ fi
 %{_mandir}/man8/vfs_btrfs.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
+%{_mandir}/man8/vfs_ceph.8.*
+%{_mandir}/man8/vfs_fruit.8.*
+%{_mandir}/man8/vfs_glusterfs.8.*
+%{_mandir}/man8/vfs_snapper.8.*
+%{_mandir}/man8/vfs_worm.8.*
 
 # Link of smbspool to CUPS
 %if %{build_cupspc}
@@ -1293,6 +1290,8 @@ fi
 %{_includedir}/samba-4.0/smb_signing.h
 %{_includedir}/samba-4.0/smb_unix_ext.h
 %{_includedir}/samba-4.0/smb_util.h
+%{_includedir}/samba-4.0/smb2_lease_struct.h
+%{_includedir}/samba-4.0/tstream_smbXcli_np.h
 /%{_lib}/libnss_winbind.so
 /%{_lib}/libnss_wins.so
 %{_mandir}/man3/ntdb.3*
@@ -1300,7 +1299,7 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
-%{perl_vendorlib}/Parse/Yapp*
+#%{perl_vendorlib}/Parse/Yapp*
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
@@ -1354,11 +1353,11 @@ fi
 %{_includedir}/samba-4.0/netapi.h
 %{_libdir}/pkgconfig/netapi.pc
 
-%files -n %{libpdb}
-%{_libdir}/libpdb.so.%{major}*
+%files -n %{libsambapassdb}
+%{_libdir}/libsamba-passdb.so.%{major}*
 
-%files -n %{devpdb}
-%{_libdir}/libpdb.so
+%files -n %{devsambapassdb}
+%{_libdir}/libsamba-passdb.so
 
 %files -n %{libregistry}
 %{_libdir}/libregistry.so.%{major}*
@@ -1431,14 +1430,6 @@ fi
 %files -n %{devsmbldap}
 %{_includedir}/samba-4.0/smbldap.h
 %{_libdir}/libsmbldap.so
-
-%files -n %{libsmbsharemodes}
-%{_libdir}/libsmbsharemodes.so.%{major}*
-
-%files -n %{devsmbsharemodes}
-%{_includedir}/samba-4.0/smb_share_modes.h
-%{_libdir}/libsmbsharemodes.so
-%{_libdir}/pkgconfig/smbsharemodes.pc
 
 %files -n %{libtevent_util}
 %{_libdir}/libtevent-util.so.%{major}*
