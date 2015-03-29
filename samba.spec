@@ -104,8 +104,6 @@ Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
-# xdr_* functions have moved from glibc into libtirpc
-#Patch2:		samba-4.0.0-tirpc.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -701,13 +699,12 @@ else
 fi
 
 %setup -q
-#patch2 -p1 -b .tirpc~
 
 %build
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
 
-#LDFLAGS=-ltirpc %{__python} buildtools/bin/waf configure \
+# xdr_* functions have moved from glibc into libtirpc
 LDFLAGS=-ltirpc  %configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
@@ -731,9 +728,9 @@ LDFLAGS=-ltirpc  %configure \
 	--disable-rpath-private-install \
 	--enable-pthreadpool \
 	--enable-avahi \
-    --with-pie \
-    --with-relro \
-    --without-fam \
+	--with-pie \
+    	--with-relro \
+    	--without-fam \
 	--with-iconv \
 	--with-acl-support \
 	--with-dnsupdate \
@@ -752,9 +749,9 @@ LDFLAGS=-ltirpc  %configure \
 	--datadir=%{_datadir} \
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
-    --with-sockets-dir=/run/samba \
-    --with-lockdir=/var/lib/samba \
-    --with-cachedir=/var/lib/samba
+    	--with-sockets-dir=/run/samba \
+    	--with-lockdir=/var/lib/samba \
+    	--with-cachedir=/var/lib/samba
 
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
