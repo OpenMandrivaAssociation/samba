@@ -741,6 +741,8 @@ LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--with-sendfile-support \
 	--with-dnsupdate \
 	--with-systemd \
+    --enable-socket-wrapper \
+    --enable-nss-wrapper \
 	--with-piddir=/run \
 	--without-cluster \
 	--prefix=%{_prefix} \
