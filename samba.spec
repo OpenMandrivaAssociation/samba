@@ -1307,7 +1307,7 @@ fi
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
     #	NOTE: To build locally you will need to comment out 
-	the line below and install the perl YAPP package.
+	#	the line below and install the perl YAPP package.
 %{perl_vendorlib}/Parse/Yapp*
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
