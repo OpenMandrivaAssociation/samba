@@ -104,6 +104,8 @@ Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
+Patch00:	local-py2-configure.patch
+Patch01:	samba-pid-location.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -129,6 +131,8 @@ BuildRequires:	pkgconfig(pytalloc-util)
 BuildRequires:	pkgconfig(talloc)
 BuildRequires:	pkgconfig(tdb) >= 1.2.1
 BuildRequires:	pkgconfig(tevent)
+BuildRequires:	pkgconfig(libsystemd-daemon)
+BuildRequires:	pkgconfig(libarchive)
 %if %{with ads}
 BuildRequires:	krb5-devel
 %endif
@@ -633,6 +637,7 @@ The samba-domainjoin-gui package includes a domainjoin gtk application
 
 
 %prep
+
 # Allow users to query build options with --with options:
 #%%define opt_status(%1)	%(echo %{1})
 %if %{?_with_options:1}%{!?_with_options:0}
@@ -699,7 +704,8 @@ else
 fi
 
 %setup -q
-
+%patch00 -p1
+%patch01 -p1
 %build
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
@@ -728,6 +734,7 @@ LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--disable-rpath-private-install \
 	--enable-pthreadpool \
 	--enable-avahi \
+	--with-libarchive \
 	--with-pie \
     	--with-relro \
     	--without-fam \
@@ -741,9 +748,7 @@ LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--with-sendfile-support \
 	--with-dnsupdate \
 	--with-systemd \
-    --enable-socket-wrapper \
-    --enable-nss-wrapper \
-	--with-piddir=/run \
+	--with-piddir=/run/samba \
 	--without-cluster \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
@@ -751,7 +756,7 @@ LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--datadir=%{_datadir} \
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
-    	--with-sockets-dir=/run/samba \
+	--with-sockets-dir=/run/samba \
     	--with-lockdir=/var/lib/samba \
     	--with-cachedir=/var/lib/samba
 
@@ -1301,6 +1306,8 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
+    #	NOTE: To build locally you will need to comment out 
+	the line below and install the perl YAPP package.
 %{perl_vendorlib}/Parse/Yapp*
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
