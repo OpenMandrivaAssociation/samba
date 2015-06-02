@@ -104,8 +104,9 @@ Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
-Patch00:	local-py2-configure.patch
-Patch01:	samba-pid-location.patch
+Patch0:		local-py2-configure.patch
+Patch1:		samba-pid-location.patch
+Patch2:		0001-fix-build-with-gnutls-3.4.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -704,8 +705,8 @@ else
 fi
 
 %setup -q
-%patch00 -p1
-%patch01 -p1
+%apply_patches
+
 %build
 # samba doesnt support python3 yet
 export PYTHON=%{__python2}
