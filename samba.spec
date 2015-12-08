@@ -84,8 +84,8 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.1.17
-Release:	2
+Version:	4.1.21
+Release:	1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -1145,6 +1145,7 @@ fi
 %{_mandir}/man8/smbspool.8*
 %{_mandir}/man8/smbta-util.8*
 %{_mandir}/man8/vfs_btrfs.8*
+%{_mandir}/man8/vfs_glusterfs.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
 
