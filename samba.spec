@@ -83,8 +83,8 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.2.2
-Release:	2
+Version:	4.3.3
+Release:	1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -104,9 +104,8 @@ Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
-Patch0:		local-py2-configure.patch
 Patch1:		samba-pid-location.patch
-Patch2:		0001-fix-build-with-gnutls-3.4.patch
+Patch2:		samba-4.3.3-async_connect_send_test.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -715,7 +714,7 @@ export PYTHON=%{__python2}
 LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
-	--bundled-libraries=ntdb,heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
+	--bundled-libraries=heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
 	--enable-gnutls \
 	--enable-cups \
 	--enable-avahi \
@@ -953,7 +952,6 @@ fi
 %{_libdir}/samba/auth
 %{_libdir}/samba/bind9
 %dir %{_libdir}/samba/vfs
-%{_libdir}/mit_samba.so
 %{_sbindir}/smbd
 %{_sbindir}/nmbd
 %{_sbindir}/samba_upgradedns
@@ -993,7 +991,6 @@ fi
 %{_libdir}/samba/libauth-sam-reply-samba4.so
 %{_libdir}/samba/libauth-unix-token-samba4.so
 %{_libdir}/samba/libauthkrb5-samba4.so
-%{_libdir}/samba/libccan-samba4.so
 %{_libdir}/samba/libcli-ldap-common-samba4.so
 %{_libdir}/samba/libcli-ldap-samba4.so
 %{_libdir}/samba/libcli-nbt-samba4.so
@@ -1014,6 +1011,7 @@ fi
 %{_libdir}/samba/liberrors-samba4.so
 %{_libdir}/samba/libevents-samba4.so
 %{_libdir}/samba/libflag-mapping-samba4.so
+%{_libdir}/samba/libgenrand-samba4.so
 %{_libdir}/samba/libgpo-samba4.so
 %{_libdir}/samba/libgse-samba4.so
 %{_libdir}/samba/libgssapi-samba4.so.2*
@@ -1025,6 +1023,7 @@ fi
 %{_libdir}/samba/libhttp-samba4.so
 %{_libdir}/samba/libidmap-samba4.so
 %{_libdir}/samba/libinterfaces-samba4.so
+%{_libdir}/samba/libiov-buf-samba4.so
 %{_libdir}/samba/libkdc-samba4.so.2*
 %{_libdir}/samba/libkrb5-samba4.so.26*
 %{_libdir}/samba/libkrb5samba-samba4.so
@@ -1032,6 +1031,9 @@ fi
 %{_libdir}/samba/liblibcli-lsa3-samba4.so
 %{_libdir}/samba/liblibcli-netlogon3-samba4.so
 %{_libdir}/samba/liblibsmb-samba4.so
+%{_libdir}/samba/libmessages-dgm-samba4.so
+%{_libdir}/samba/libmessages-util-samba4.so
+%{_libdir}/samba/libmsghdr-samba4.so
 %{_libdir}/samba/libmsrpc3-samba4.so
 %{_libdir}/samba/libndr-samba-samba4.so
 %{_libdir}/samba/libndr-samba4.so
@@ -1040,7 +1042,6 @@ fi
 %{_libdir}/samba/libnon-posix-acls-samba4.so
 %{_libdir}/samba/libnpa-tstream-samba4.so
 %{_libdir}/samba/libnss-info-samba4.so
-%{_libdir}/samba/libntdb.so.1*
 %{_libdir}/samba/libntvfs-samba4.so
 %{_libdir}/samba/libpac-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
@@ -1059,6 +1060,7 @@ fi
 %{_libdir}/samba/libsamba-python-samba4.so
 %{_libdir}/samba/libsamdb-common-samba4.so
 %{_libdir}/samba/libsecrets3-samba4.so
+%{_libdir}/samba/libserver-id-db-samba4.so
 %{_libdir}/samba/libserver-role-samba4.so
 %{_libdir}/samba/libservice-samba4.so
 %{_libdir}/samba/libshares-samba4.so
@@ -1069,13 +1071,13 @@ fi
 %{_libdir}/samba/libsmbldaphelper-samba4.so
 %{_libdir}/samba/libsmbpasswdparser-samba4.so
 %{_libdir}/samba/libsmbregistry-samba4.so
+%{_libdir}/samba/libsys-rw-samba4.so
 %{_libdir}/samba/libsocket-blocking-samba4.so
-%{_libdir}/samba/libsubunit-samba4.so
+%{_libdir}/samba/libtalloc-report-samba4.so
 %{_libdir}/samba/libtdb-wrap-samba4.so
-%{_libdir}/samba/libtdb-compat-samba4.so
+%{_libdir}/samba/libtime-basic-samba4.so
 %{_libdir}/samba/libtrusts-util-samba4.so
 %{_libdir}/samba/libutil-cmdline-samba4.so
-%{_libdir}/samba/libutil-ntdb-samba4.so
 %{_libdir}/samba/libutil-reg-samba4.so
 %{_libdir}/samba/libutil-setid-samba4.so
 %{_libdir}/samba/libutil-tdb-samba4.so
@@ -1098,10 +1100,6 @@ fi
 %{_bindir}/eventlogadm
 %{_bindir}/net
 %{_bindir}/nmblookup
-%{_bindir}/ntdbbackup
-%{_bindir}/ntdbdump
-%{_bindir}/ntdbrestore
-%{_bindir}/ntdbtool
 %{_bindir}/pdbedit
 %{_bindir}/profiles
 %{_bindir}/rpcclient
@@ -1134,10 +1132,6 @@ fi
 %{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man8/eventlogadm.8*
 %{_mandir}/man8/net.8*
-%{_mandir}/man8/ntdbbackup.8*
-%{_mandir}/man8/ntdbdump.8*
-%{_mandir}/man8/ntdbrestore.8*
-%{_mandir}/man8/ntdbtool.8*
 %{_mandir}/man8/pdbedit.8*
 %{_mandir}/man8/samba-regedit.8*
 %{_mandir}/man8/samba-tool.8*
@@ -1166,7 +1160,6 @@ fi
 %(for i in %{_bindir}/{%{commonbin}};do echo $i;done)
 %(for i in %{_mandir}/man?/{%{commonbin}}\.[0-9]*;do echo $i|grep -v testparm;done)
 %dir %{_datadir}/%{name}
-%{_datadir}/samba/codepages
 %dir %{_sysconfdir}/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb.conf
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/lmhosts
@@ -1203,7 +1196,6 @@ fi
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_netatalk.8*
-%{_mandir}/man8/vfs_notify_fam.8*
 %{_mandir}/man8/vfs_prealloc.8*
 %{_mandir}/man8/vfs_preopen.8*
 %{_mandir}/man8/vfs_readahead.8*
@@ -1212,11 +1204,13 @@ fi
 %{_mandir}/man8/vfs_scannedonly.8*
 %{_mandir}/man8/vfs_shadow_copy.8*
 %{_mandir}/man8/vfs_shadow_copy2.8*
+%{_mandir}/man8/vfs_shell_snap.8*
 %{_mandir}/man8/vfs_smb_traffic_analyzer.8*
 %{_mandir}/man8/vfs_streams_depot.8*
 %{_mandir}/man8/vfs_streams_xattr.8*
 %{_mandir}/man8/vfs_time_audit.8*
 %{_mandir}/man8/vfs_tsmsm.8*
+%{_mandir}/man8/vfs_unityed_media.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
 
 %files winbind
@@ -1245,7 +1239,6 @@ fi
 
 %files python
 %{py2_platsitedir}/samba
-%{_libdir}/python2.7/site-packages/ntdb.so
 
 %if %{build_test}
 %files test
@@ -1302,7 +1295,6 @@ fi
 %{_includedir}/samba-4.0/tstream_smbXcli_np.h
 /%{_lib}/libnss_winbind.so
 /%{_lib}/libnss_wins.so
-%{_mandir}/man3/ntdb.3*
 
 %files pidl
 %{_bindir}/pidl
