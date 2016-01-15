@@ -83,7 +83,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.3.3
+Version:	4.3.4
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -105,7 +105,6 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 Patch1:		samba-pid-location.patch
-Patch2:		samba-4.3.3-async_connect_send_test.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
@@ -1299,9 +1298,9 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
-    #	NOTE: To build locally you will need to comment out 
-	#	the line below and install the perl YAPP package.
-%{perl_vendorlib}/Parse/Yapp*
+# NOTE: To build locally you will need to comment out 
+# the line below and install the perl YAPP package.
+%optional %{perl_vendorlib}/Parse/Yapp*
 %optional %{_mandir}/man1/pidl.1.*
 %optional %{_mandir}/man3/Parse::Pidl*.3pm.*
 
