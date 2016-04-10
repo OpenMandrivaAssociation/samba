@@ -1136,6 +1136,7 @@ fi
 %{_mandir}/man8/samba-tool.8*
 %{_mandir}/man8/smbpasswd.8*
 %{_mandir}/man8/smbspool.8*
+%{_mandir}/man8/smbspool_krb5_wrapper.8*
 %{_mandir}/man8/smbta-util.8*
 %{_mandir}/man8/vfs_btrfs.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
