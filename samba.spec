@@ -381,6 +381,7 @@ Samba library for accessing functions in 'net' binary.
 %package -n %{libsambapassdb}
 Summary:	Library for working with the Samba user database
 Group:		System/Libraries
+Obsoletes:	%{_lib}pdb0
 
 %description -n %{libsambapassdb}
 Library for working with the Samba user database.
