@@ -1,0 +1,33 @@
+--- samba-4.2.0/packaging/systemd/smb.service~	2014-10-01 10:16:21.000000000 +0100
++++ samba-4.2.0/packaging/systemd/smb.service	2015-04-04 22:18:54.507777039 +0100
+@@ -5,7 +5,7 @@
+ [Service]
+ Type=notify
+ NotifyAccess=all
+-PIDFile=/run/smbd.pid
++PIDFile=/run/samba/smbd.pid
+ LimitNOFILE=16384
+ EnvironmentFile=-/etc/sysconfig/samba
+ ExecStart=/usr/sbin/smbd $SMBDOPTIONS
+--- samba-4.2.0/packaging/systemd/nmb.service~	2015-04-04 22:20:50.000000000 +0100
++++ samba-4.2.0/packaging/systemd/nmb.service	2015-04-04 22:21:28.465352886 +0100
+@@ -5,7 +5,7 @@
+ [Service]
+ Type=notify
+ NotifyAccess=all
+-PIDFile=/run/nmbd.pid
++PIDFile=/run/samba/nmbd.pid
+ EnvironmentFile=-/etc/sysconfig/samba
+ ExecStart=/usr/sbin/nmbd $NMBDOPTIONS
+ ExecReload=/usr/bin/kill -HUP $MAINPID
+--- samba-4.2.0/packaging/systemd/winbind.service~	2014-10-01 10:16:21.000000000 +0100
++++ samba-4.2.0/packaging/systemd/winbind.service	2015-04-04 22:19:17.272304210 +0100
+@@ -5,7 +5,7 @@
+ [Service]
+ Type=notify
+ NotifyAccess=all
+-PIDFile=/run/winbindd.pid
++PIDFile=/run/samba/winbindd.pid
+ EnvironmentFile=-/etc/sysconfig/samba
+ ExecStart=/usr/sbin/winbindd "$WINBINDOPTIONS"
+ ExecReload=/usr/bin/kill -HUP $MAINPID
