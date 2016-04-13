@@ -118,6 +118,7 @@ BuildRequires:	keyutils-devel
 BuildRequires:	magic-devel
 BuildRequires:	openldap-devel
 BuildRequires:	pam-devel
+BuildRequires:	perl-devel
 BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
