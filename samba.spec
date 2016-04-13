@@ -84,7 +84,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.3.8
-Release:	2
+Release:	3
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -107,6 +107,7 @@ Source30:	%{name}-tmpfiles.conf
 Patch1:		samba-pid-location.patch
 Patch2:		samba-4.3.8-win10.patch
 
+BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gnupg
 BuildRequires:	python-tdb
@@ -117,6 +118,8 @@ BuildRequires:	keyutils-devel
 BuildRequires:	magic-devel
 BuildRequires:	openldap-devel
 BuildRequires:	pam-devel
+BuildRequires:	perl-devel
+BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
@@ -379,6 +382,7 @@ Samba library for accessing functions in 'net' binary.
 %package -n %{libsambapassdb}
 Summary:	Library for working with the Samba user database
 Group:		System/Libraries
+Obsoletes:	%{_lib}pdb0
 
 %description -n %{libsambapassdb}
 Library for working with the Samba user database.
@@ -1300,11 +1304,8 @@ fi
 %files pidl
 %{_bindir}/pidl
 %{perl_vendorlib}/Parse/Pidl*
-# NOTE: To build locally you will need to comment out 
-# the line below and install the perl YAPP package.
-%optional %{perl_vendorlib}/Parse/Yapp*
-%optional %{_mandir}/man1/pidl.1.*
-%optional %{_mandir}/man3/Parse::Pidl*.3pm.*
+%{_mandir}/man1/pidl.1.*
+%{_mandir}/man3/Parse::Pidl*.3pm.*
 
 %files -n %{libdcerpc}
 %{_libdir}/libdcerpc.so.%{major}*
