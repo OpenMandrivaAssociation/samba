@@ -1117,6 +1117,7 @@ fi
 %{_bindir}/smbget
 %{_bindir}/smbpasswd
 %{_bindir}/smbspool
+%{_bindir}/smbspool_krb5_wrapper
 %{_bindir}/smbstatus
 %{_bindir}/smbta-util
 %{_bindir}/smbtree
