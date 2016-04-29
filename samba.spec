@@ -84,7 +84,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.3.8
-Release:	3
+Release:	4
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -106,6 +106,9 @@ Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 Patch1:		samba-pid-location.patch
 Patch2:		samba-4.3.8-win10.patch
+# lots of regressions in 4.3.8 for guest sessions
+# https://bugzilla.samba.org/show_bug.cgi?id=11849
+Patch3:		samba-4.3.8-11849.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
