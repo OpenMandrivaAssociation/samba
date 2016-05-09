@@ -37,18 +37,16 @@
 %define	major	0
 %define libdcerpc %mklibname dcerpc %{major}
 %define devdcerpc %mklibname -d dcerpc
-%define libgensec %mklibname gensec %{major}
-%define devgensec %mklibname -d gensec
 %define libndr %mklibname ndr %{major}
 %define devndr %mklibname -d ndr
 %define libnetapi %mklibname netapi %{major}
 %define devnetapi %mklibname -d netapi
 %define libsambapassdb %mklibname sambapassdb %{major}
 %define devsambapassdb %mklibname -d sambapassdb
-%define libregistry %mklibname registry %{major}
-%define devregistry %mklibname -d registry
 %define libsambacredentials %mklibname samba-credentials %{major}
 %define devsambacredentials %mklibname -d samba-credentials 
+%define libsambaerrors %mklibname samba-errors 1
+%define devsambaerrors %mklibname -d samba-errors
 %define libsambahostconfig %mklibname samba-hostconfig %{major}
 %define devsambahostconfig %mklibname -d samba-hostconfig
 %define libsambapolicy %mklibname samba-policy %{major}
@@ -63,10 +61,10 @@
 %define devsmbconf %mklibname -d smbconf
 %define libsmbldap %mklibname smbldap %{major}
 %define devsmbldap %mklibname -d smbldap
+%define libtevent_unix_util %mklibname tevent-unix-util %{major}
+%define devtevent_unix_util %mklibname -d tevent-unix-util
 %define libtevent_util %mklibname tevent-util %{major}
 %define devtevent_util %mklibname -d tevent-util
-%define libtorture %mklibname torture %{major}
-%define devtorture %mklibname -d torture 
 %define libwbclient %mklibname wbclient %{major}
 %define devwbclient %mklibname -d wbclient
 
@@ -83,7 +81,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.3.9
+Version:	4.4.3
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -244,7 +242,8 @@ packages of Samba.
 Summary:	Common libraries used by both Samba servers and clients
 Group:		System/Libraries
 Conflicts:	%{name}-server < 1:4.1.12-2
-
+Obsoletes:	%{_lib}registry0 < %{EVRD}
+Obsoletes:	%{_lib}gensec0 < %{EVRD}
 %description libs
 Samba-libs provides common libraries necessary for both the server and client
 packages of Samba.
@@ -333,21 +332,6 @@ Requires:	%{libdcerpc} = %{EVRD}
 %description -n %{devdcerpc}
 Library implementing Samba's memory allocator.
 
-%package -n %{libgensec}
-Summary:	Samba generic security library
-Group:		System/Libraries
-
-%description -n %{libgensec}
-Samba generic security library.
-
-%package -n %{devgensec}
-Summary:	Development files for Samba generic security library
-Group:		Development/C
-Requires:	%{libgensec} = %{EVRD}
-
-%description -n %{devgensec}
-Development files for Samba generic security library.
-
 %package -n %{libndr}
 Summary:	Network Data Representation library from Samba
 Group:		System/Libraries
@@ -395,21 +379,6 @@ Provides:	samba-passdb-devel = %{EVRD}
 %description -n %{devsambapassdb}
 Development files for Samba user database library.
 
-%package -n %{libregistry}
-Summary:	Samba registry library
-Group:		System/Libraries
-
-%description -n %{libregistry}
-Samba registry library.
-
-%package -n %{devregistry}
-Summary:	Development files for Samba registry library
-Group:		Development/C
-Requires:	%{libregistry} = %{EVRD}
-
-%description -n %{devregistry}
-Development files for Samba registry library.
-
 %package -n %{libsambacredentials}
 Summary:	Library for working with Samba credentials
 Group:		System/Libraries
@@ -424,6 +393,21 @@ Requires:	%{libsambacredentials} = %{EVRD}
 
 %description -n %{devsambacredentials}
 Development files for Samba credentials library.
+
+%package -n %{libsambaerrors}
+Summary:        Samba's errors library
+Group:          System/Libraries
+
+%description -n %{libsambaerrors}
+Samba's erros library.
+
+%package -n %{devsambaerrors}
+Summary:        Samba's errors library
+Group:          Development/C
+Requires:       %{libsambaerrors} = %{EVRD}
+
+%description -n %{devsambaerrors}
+Samba's error library.
 
 %package -n %{libsambahostconfig}
 Summary:	Samba's host configuration library
@@ -550,20 +534,20 @@ Requires:	%{libtevent_util} = %{EVRD}
 %description -n %{devtevent_util}
 Development files for Samba Tevent library.
 
-%package -n %{libtorture}
-Summary:	Samba testsuite torture library
-Group:		Networking/Other
+%package -n %{libtevent_unix_util}
+Summary:        Utility library for working with the Tevent library
+Group:          System/Libraries
 
-%description -n %{libtorture}
-Samba testsuite torture library.
+%description -n %{libtevent_unix_util}
+Utility library for working with the Tevent library.
 
-%package -n %{devtorture}
-Summary:	Development files for Samba torture library
-Group:		Development/C
-Requires:	%{libtorture} = %{EVRD}
+%package -n %{devtevent_unix_util}
+Group:          Development/C
+Summary:        Development files for Tevent library
+Requires:       %{libtevent_unix_util} = %{EVRD}
 
-%description -n %{devtorture}
-Development files for Samba torture library.
+%description -n %{devtevent_unix_util}
+Development files for Samba Tevent library.
 
 %package -n %{libwbclient}
 Summary:	Library providing access to winbindd
@@ -722,7 +706,6 @@ LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--enable-cups \
 	--enable-avahi \
 	--with-pam \
-	--with-pam_smbpass \
 %if %{with winbind}
 	--with-winbind \
 %endif
@@ -746,7 +729,6 @@ LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
 	--with-dnsupdate \
 	--with-syslog \
 	--with-automount \
-	--with-aio-support \
 	--with-cluster-support \
 	--with-sendfile-support \
 	--with-dnsupdate \
@@ -946,7 +928,6 @@ fi
 %files server
 %(for i in %{_sbindir}/{%{serversbin}};do echo $i;done)
 %(for i in %{_bindir}/%{serverbin};do echo $i;done)
-%attr(755,root,root) /%{_lib}/security/pam_smbpass*
 %{_libdir}/%{name}/vfs/*.so
 %{_libdir}/samba/ldb
 %{_libdir}/samba/service
@@ -1003,6 +984,7 @@ fi
 %{_libdir}/samba/libcliauth-samba4.so
 %{_libdir}/samba/libcluster-samba4.so
 %{_libdir}/samba/libcmdline-credentials-samba4.so
+%{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
@@ -1011,9 +993,9 @@ fi
 %{_libdir}/samba/libdlz-bind9-for-torture-samba4.so
 %{_libdir}/samba/libdnsserver-common-samba4.so
 %{_libdir}/samba/libdsdb-module-samba4.so
-%{_libdir}/samba/liberrors-samba4.so
 %{_libdir}/samba/libevents-samba4.so
 %{_libdir}/samba/libflag-mapping-samba4.so
+%{_libdir}/samba/libgensec-samba4.so
 %{_libdir}/samba/libgenrand-samba4.so
 %{_libdir}/samba/libgpo-samba4.so
 %{_libdir}/samba/libgse-samba4.so
@@ -1051,6 +1033,7 @@ fi
 %{_libdir}/samba/libposix-eadb-samba4.so
 %{_libdir}/samba/libprinting-migrate-samba4.so
 %{_libdir}/samba/libprocess-model-samba4.so
+%{_libdir}/samba/libregistry-samba4.so
 %{_libdir}/samba/libreplace-samba4.so
 %{_libdir}/samba/libroken-samba4.so.19*
 %{_libdir}/samba/libsamba-cluster-support-samba4.so
@@ -1068,6 +1051,7 @@ fi
 %{_libdir}/samba/libservice-samba4.so
 %{_libdir}/samba/libshares-samba4.so
 %{_libdir}/samba/libsmb-transport-samba4.so
+%{_libdir}/samba/libsmbclient-raw-samba4.so
 %{_libdir}/samba/libsmbd-base-samba4.so
 %{_libdir}/samba/libsmbd-conn-samba4.so
 %{_libdir}/samba/libsmbd-shim-samba4.so
@@ -1079,6 +1063,7 @@ fi
 %{_libdir}/samba/libtalloc-report-samba4.so
 %{_libdir}/samba/libtdb-wrap-samba4.so
 %{_libdir}/samba/libtime-basic-samba4.so
+%{_libdir}/samba/libtorture-samba4.so
 %{_libdir}/samba/libtrusts-util-samba4.so
 %{_libdir}/samba/libutil-cmdline-samba4.so
 %{_libdir}/samba/libutil-reg-samba4.so
@@ -1116,9 +1101,8 @@ fi
 %{_bindir}/smbget
 %{_bindir}/smbpasswd
 %{_bindir}/smbspool
-%{_bindir}/smbspool_krb5_wrapper
+%{_libexecdir}/samba/smbspool_krb5_wrapper
 %{_bindir}/smbstatus
-%{_bindir}/smbta-util
 %{_bindir}/smbtree
 %{_bindir}/smbtar
 %{_sbindir}/samba_kcc
@@ -1142,7 +1126,6 @@ fi
 %{_mandir}/man8/smbpasswd.8*
 %{_mandir}/man8/smbspool.8*
 %{_mandir}/man8/smbspool_krb5_wrapper.8*
-%{_mandir}/man8/smbta-util.8*
 %{_mandir}/man8/vfs_btrfs.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
@@ -1179,6 +1162,7 @@ fi
 %{_mandir}/man5/smb.conf.5*
 %{_mandir}/man5/smbgetrc.5*
 %{_mandir}/man7/samba.7*
+%{_mandir}/man8/cifsdd.8*
 %{_mandir}/man8/nmbd.8*
 %{_mandir}/man8/smbd.8*
 %{_mandir}/man8/vfs_acl_tdb.8*
@@ -1201,16 +1185,15 @@ fi
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_netatalk.8*
+%{_mandir}/man8/vfs_offline.8*
 %{_mandir}/man8/vfs_prealloc.8*
 %{_mandir}/man8/vfs_preopen.8*
 %{_mandir}/man8/vfs_readahead.8*
 %{_mandir}/man8/vfs_readonly.8*
 %{_mandir}/man8/vfs_recycle.8*
-%{_mandir}/man8/vfs_scannedonly.8*
 %{_mandir}/man8/vfs_shadow_copy.8*
 %{_mandir}/man8/vfs_shadow_copy2.8*
 %{_mandir}/man8/vfs_shell_snap.8*
-%{_mandir}/man8/vfs_smb_traffic_analyzer.8*
 %{_mandir}/man8/vfs_streams_depot.8*
 %{_mandir}/man8/vfs_streams_xattr.8*
 %{_mandir}/man8/vfs_time_audit.8*
@@ -1255,15 +1238,12 @@ fi
 %{_includedir}/samba-4.0/charset.h
 %dir %{_includedir}/samba-4.0/core
 %{_includedir}/samba-4.0/core/*.h
-%{_includedir}/samba-4.0/dlinklist.h
 %{_includedir}/samba-4.0/domain_credentials.h
 %dir %{_includedir}/samba-4.0/gen_ndr
 %{_includedir}/samba-4.0/gen_ndr/*.h
-%{_includedir}/samba-4.0/ldap*.h
 %{_includedir}/samba-4.0/param.h
 %{_includedir}/samba-4.0/samba/
 %{_includedir}/samba-4.0/share.h
-%{_includedir}/samba-4.0/smb2_lease.h
 %{_includedir}/samba-4.0/tdr.h
 %{_includedir}/samba-4.0/tsocket.h
 %{_includedir}/samba-4.0/tsocket_internal.h
@@ -1275,29 +1255,8 @@ fi
 %{_includedir}/samba-4.0/lookup_sid.h
 %{_includedir}/samba-4.0/machine_sid.h
 %{_includedir}/samba-4.0/passdb.h
-%{_includedir}/samba-4.0/read_smb.h
-%{_includedir}/samba-4.0/roles.h
-%{_includedir}/samba-4.0/smb2.h
-%{_includedir}/samba-4.0/smb2_constants.h
-%{_includedir}/samba-4.0/smb2_create_blob.h
-%{_includedir}/samba-4.0/smb2_signing.h
-%{_includedir}/samba-4.0/smb_cli.h
-%{_includedir}/samba-4.0/smb_cliraw.h
-%{_includedir}/samba-4.0/smb_common.h
-%{_includedir}/samba-4.0/smb_composite.h
-%{_includedir}/samba-4.0/smb_constants.h
 %{_includedir}/samba-4.0/smb_ldap.h
-%{_includedir}/samba-4.0/smb_raw.h
-%{_includedir}/samba-4.0/smb_raw_interfaces.h
-%{_includedir}/samba-4.0/smb_raw_signing.h
-%{_includedir}/samba-4.0/smb_raw_trans2.h
-%{_includedir}/samba-4.0/smb_request.h
-%{_includedir}/samba-4.0/smb_seal.h
-%{_includedir}/samba-4.0/smb_signing.h
-%{_includedir}/samba-4.0/smb_unix_ext.h
-%{_includedir}/samba-4.0/smb_util.h
 %{_includedir}/samba-4.0/smb2_lease_struct.h
-%{_includedir}/samba-4.0/tstream_smbXcli_np.h
 /%{_lib}/libnss_winbind.so
 /%{_lib}/libnss_wins.so
 
@@ -1309,7 +1268,6 @@ fi
 
 %files -n %{libdcerpc}
 %{_libdir}/libdcerpc.so.%{major}*
-%{_libdir}/libdcerpc-atsvc.so.%{major}*
 %{_libdir}/libdcerpc-binding.so.%{major}*
 %{_libdir}/libdcerpc-samr.so.%{major}*
 %{_libdir}/libdcerpc-server.so.%{major}*
@@ -1318,18 +1276,9 @@ fi
 %{_libdir}/pkgconfig/dcerpc*.pc
 %{_includedir}/samba-4.0/dcerpc*.h
 %{_libdir}/libdcerpc.so
-%{_libdir}/libdcerpc-atsvc.so
 %{_libdir}/libdcerpc-binding.so
 %{_libdir}/libdcerpc-samr.so
 %{_libdir}/libdcerpc-server.so
-
-%files -n %{libgensec}
-%{_libdir}/libgensec.so.%{major}*
-
-%files -n %{devgensec}
-%{_includedir}/samba-4.0/gensec.h
-%{_libdir}/libgensec.so
-%{_libdir}/pkgconfig/gensec.pc
 
 %files -n %{libndr}
 %{_libdir}/libndr.so.%{major}*
@@ -1363,14 +1312,6 @@ fi
 %files -n %{devsambapassdb}
 %{_libdir}/libsamba-passdb.so
 
-%files -n %{libregistry}
-%{_libdir}/libregistry.so.%{major}*
-
-%files -n %{devregistry}
-%{_includedir}/samba-4.0/registry.h
-%{_libdir}/libregistry.so
-%{_libdir}/pkgconfig/registry.pc
-
 %files -n %{libsambacredentials}
 %{_libdir}/libsamba-credentials.so.%{major}*
 
@@ -1378,6 +1319,12 @@ fi
 %{_includedir}/samba-4.0/credentials.h
 %{_libdir}/libsamba-credentials.so
 %{_libdir}/pkgconfig/samba-credentials.pc
+
+%files -n %{libsambaerrors}
+%{_libdir}/libsamba-errors.so.1*
+
+%files -n %{devsambaerrors}
+%{_libdir}/libsamba-errors.so
 
 %files -n %{libsambahostconfig}
 %{_libdir}/libsamba-hostconfig.so.%{major}*
@@ -1398,7 +1345,6 @@ fi
 %{_libdir}/libsamba-util.so.%{major}*
 
 %files -n %{devsambautil}
-%{_includedir}/samba-4.0/samba_util.h
 %{_libdir}/libsamba-util.so
 %{_libdir}/pkgconfig/samba-util.pc
 
@@ -1411,15 +1357,12 @@ fi
 
 %files -n %{libsmbclient}
 %{_libdir}/libsmbclient.so.%{major}*
-%{_libdir}/libsmbclient-raw.so.%{major}*
 
 %files -n %{devsmbclient}
 %{_includedir}/samba-4.0/libsmbclient.h
 %{_libdir}/libsmbclient.so
-%{_libdir}/libsmbclient-raw.so
 %{_mandir}/man7/libsmbclient.7*
 %{_libdir}/pkgconfig/smbclient.pc
-%{_libdir}/pkgconfig/smbclient-raw.pc
 
 %files -n %{libsmbconf}
 %{_libdir}/libsmbconf.so.%{major}*
@@ -1441,13 +1384,11 @@ fi
 %files -n %{devtevent_util}
 %{_libdir}/libtevent-util.so
 
-%files -n %{libtorture}
-%{_libdir}/libtorture.so.%{major}*
+%files -n %{libtevent_unix_util}
+%{_libdir}/libtevent-unix-util.so.%{major}*
 
-%files -n %{devtorture}
-%{_includedir}/samba-4.0/torture.h
-%{_libdir}/libtorture.so
-%{_libdir}/pkgconfig/torture.pc
+%files -n %{devtevent_unix_util}
+%{_libdir}/libtevent-unix-util.so
 
 %files -n %{libwbclient}
 %{_libdir}/libwbclient.so.%{major}*

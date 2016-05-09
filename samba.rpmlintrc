@@ -8,4 +8,4 @@ addFilter("devel-file-in-non-devel-package")
 # "invalid" (unversioned) sonames on files that are dlopen-ed
 addFilter("invalid-soname")
 addFilter("E: incoherent-version-in-name")
-addFIlter("E: no-dependency-on")
+addFilter("E: no-dependency-on")
