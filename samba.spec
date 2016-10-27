@@ -83,7 +83,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.5.0
+Version:	4.5.1
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -955,6 +955,7 @@ fi
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
 %{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
+%{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads-samba4.so
