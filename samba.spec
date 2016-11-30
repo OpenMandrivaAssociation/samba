@@ -1043,7 +1043,6 @@ fi
 %{_libdir}/samba/libnon-posix-acls-samba4.so
 %{_libdir}/samba/libnpa-tstream-samba4.so
 %{_libdir}/samba/libnss-info-samba4.so
-%{_libdir}/samba/libntvfs-samba4.so
 %{_libdir}/samba/libpac-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
 %{_libdir}/samba/libposix-eadb-samba4.so
