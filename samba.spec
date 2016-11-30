@@ -83,7 +83,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.3.6
+Version:	4.3.12
 Release:	0.1
 License:	GPLv3
 Group:		System/Servers
@@ -105,7 +105,7 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 Patch1:		samba-pid-location.patch
-Patch2:		samba-4.3.8-win10.patch
+Patch3:		samba-4.5.1-smb4k.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
