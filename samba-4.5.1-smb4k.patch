@@ -1,0 +1,24 @@
+--- a/source3/utils/net_util.c.orig	2016-11-30 00:09:59.368494419 +0000
++++ a/source3/utils/net_util.c	2016-11-30 00:10:09.914099362 +0000
+@@ -106,6 +106,12 @@
+ {
+ 	NTSTATUS nt_status;
+ 	int flags = 0;
++	int signing_state = SMB_SIGNING_IPC_DEFAULT;
++
++	if(((struct functable*)c->private_data)->valid_transports == NET_TRANSPORT_RAP)
++	{
++                signing_state = SMB_SIGNING_DEFAULT;
++	}
+ 
+ 	c->opt_password = net_prompt_pass(c, c->opt_user_name);
+ 
+@@ -127,7 +133,7 @@
+ 					service_name, service_type,
+ 					c->opt_user_name, c->opt_workgroup,
+ 					c->opt_password, flags,
+-					SMB_SIGNING_IPC_DEFAULT);
++					signing_state);
+ 	if (!NT_STATUS_IS_OK(nt_status)) {
+ 		d_fprintf(stderr, _("Could not connect to server %s\n"),
+ 			  server_name);

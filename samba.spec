@@ -84,7 +84,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.5.1
-Release:	1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -107,6 +107,8 @@ Source30:	%{name}-tmpfiles.conf
 Patch1:		samba-pid-location.patch
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
+# Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
+Patch4:		samba-4.5.1-smb4k.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
