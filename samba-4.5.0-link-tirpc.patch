@@ -1,0 +1,12 @@
+--- samba-4.5.0/wscript.omv~	2016-10-13 04:23:27.727174593 +0200
++++ samba-4.5.0/wscript	2016-10-13 04:24:23.161661814 +0200
+@@ -199,6 +199,9 @@ def configure(conf):
+     if not conf.CHECK_NEED_LC("-lc not needed"):
+         conf.ADD_LDFLAGS('-lc', testflags=False)
+ 
++    # Heavy use of xdr_* functions that no longer exist in glibc...
++    conf.ADD_LDFLAGS('-ltirpc')
++
+     if not conf.CHECK_CODE('#include "tests/summary.c"',
+                            define='SUMMARY_PASSES',
+                            addmain=False,

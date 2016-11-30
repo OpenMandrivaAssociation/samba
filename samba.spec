@@ -61,12 +61,14 @@
 %define devsmbconf %mklibname -d smbconf
 %define libsmbldap %mklibname smbldap %{major}
 %define devsmbldap %mklibname -d smbldap
-%define libtevent_unix_util %mklibname tevent-unix-util %{major}
-%define devtevent_unix_util %mklibname -d tevent-unix-util
 %define libtevent_util %mklibname tevent-util %{major}
 %define devtevent_util %mklibname -d tevent-util
 %define libwbclient %mklibname wbclient %{major}
 %define devwbclient %mklibname -d wbclient
+# Obsolete (now part of tevent_util), but we need to obsolete the packages
+# so we still need their names
+%define libtevent_unix_util %mklibname tevent-unix-util %{major}
+%define devtevent_unix_util %mklibname -d tevent-unix-util
 
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin	testparm,regdiff,regpatch,regshell,regtree
@@ -81,8 +83,8 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.4.5
-Release:	1
+Version:	4.5.1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -103,6 +105,10 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 Patch1:		samba-pid-location.patch
+Patch2:		samba-4.5.0-link-tirpc.patch
+Patch3:		samba-4.5.0-bug12274.patch
+# Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
+Patch4:		samba-4.5.1-smb4k.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
@@ -522,6 +528,7 @@ Development files for Samba smbldap library.
 %package -n %{libtevent_util}
 Summary:	Utility library for working with the Tevent library
 Group:		System/Libraries
+Obsoletes:	%{libtevent_unix_util} < %{EVRD}
 
 %description -n %{libtevent_util}
 Utility library for working with the Tevent library.
@@ -530,23 +537,9 @@ Utility library for working with the Tevent library.
 Group:		Development/C
 Summary:	Development files for Tevent library
 Requires:	%{libtevent_util} = %{EVRD}
+Obsoletes:	%{devtevent_unix_util} < %{EVRD}
 
 %description -n %{devtevent_util}
-Development files for Samba Tevent library.
-
-%package -n %{libtevent_unix_util}
-Summary:        Utility library for working with the Tevent library
-Group:          System/Libraries
-
-%description -n %{libtevent_unix_util}
-Utility library for working with the Tevent library.
-
-%package -n %{devtevent_unix_util}
-Group:          Development/C
-Summary:        Development files for Tevent library
-Requires:       %{libtevent_unix_util} = %{EVRD}
-
-%description -n %{devtevent_unix_util}
 Development files for Samba Tevent library.
 
 %package -n %{libwbclient}
@@ -698,7 +691,7 @@ fi
 export PYTHON=%{__python2}
 
 # xdr_* functions have moved from glibc into libtirpc
-LDFLAGS=-ltirpc %{__python2} buildtools/bin/waf configure \
+%{__python2} buildtools/bin/waf configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
@@ -964,6 +957,7 @@ fi
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
 %{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
+%{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads-samba4.so
@@ -1027,7 +1021,6 @@ fi
 %{_libdir}/samba/libnon-posix-acls-samba4.so
 %{_libdir}/samba/libnpa-tstream-samba4.so
 %{_libdir}/samba/libnss-info-samba4.so
-%{_libdir}/samba/libntvfs-samba4.so
 %{_libdir}/samba/libpac-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
 %{_libdir}/samba/libposix-eadb-samba4.so
@@ -1086,6 +1079,7 @@ fi
 %{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool
 %{_bindir}/eventlogadm
+%{_bindir}/findsmb
 %{_bindir}/net
 %{_bindir}/nmblookup
 %{_bindir}/pdbedit
@@ -1383,12 +1377,6 @@ fi
 
 %files -n %{devtevent_util}
 %{_libdir}/libtevent-util.so
-
-%files -n %{libtevent_unix_util}
-%{_libdir}/libtevent-unix-util.so.%{major}*
-
-%files -n %{devtevent_unix_util}
-%{_libdir}/libtevent-unix-util.so
 
 %files -n %{libwbclient}
 %{_libdir}/libwbclient.so.%{major}*
