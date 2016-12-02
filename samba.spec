@@ -84,7 +84,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.5.1
-Release:	2
+Release:	3
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
