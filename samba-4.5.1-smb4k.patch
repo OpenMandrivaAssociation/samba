@@ -1,41 +1,19 @@
---- samba-4.5.1/source3/utils/net.h.orig	2016-12-02 00:04:27.218006463 +0000
-+++ samba-4.5.1/source3/utils/net.h	2016-12-02 00:09:43.384092574 +0000
-@@ -93,6 +93,8 @@
- 	struct messaging_context *msg_ctx;
- 	struct netlogon_creds_cli_context *netlogon_creds;
- 
-+	bool smb_rap;
-+
- 	bool display_usage;
- 	void *private_data;
- };
---- samba-4.5.1/source3/utils/net_rap.c.orig	2016-12-02 00:03:32.343728252 +0000
-+++ samba-4.5.1/source3/utils/net_rap.c	2016-12-02 00:04:54.250158421 +0000
-@@ -1374,6 +1374,8 @@
- 		{NULL, NULL, 0, NULL, NULL}
- 	};
- 
-+        c->smb_rap = true;
-+
- 	return net_run_function(c, argc, argv, "net rap", func);
- }
- 
---- samba-4.5.1/source3/utils/net_util.c.orig	2016-12-02 00:08:28.778431139 +0000
-+++ samba-4.5.1/source3/utils/net_util.c	2016-12-02 00:09:22.576744753 +0000
+--- a/source3/utils/net_util.c.orig	2016-11-30 00:09:59.368494419 +0000
++++ a/source3/utils/net_util.c	2016-11-30 00:10:09.914099362 +0000
 @@ -106,6 +106,12 @@
  {
  	NTSTATUS nt_status;
  	int flags = 0;
 +	int signing_state = SMB_SIGNING_IPC_DEFAULT;
 +
-+	if(c->smb_rap)
++	if(((struct functable*)c->private_data)->valid_transports == NET_TRANSPORT_RAP)
 +	{
 +                signing_state = SMB_SIGNING_DEFAULT;
 +	}
  
  	c->opt_password = net_prompt_pass(c, c->opt_user_name);
  
-@@ -126,7 +132,7 @@
+@@ -127,7 +133,7 @@
  					service_name, service_type,
  					c->opt_user_name, c->opt_workgroup,
  					c->opt_password, flags,
