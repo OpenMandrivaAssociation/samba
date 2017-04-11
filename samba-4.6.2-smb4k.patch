@@ -1,0 +1,14 @@
+--- a/source3/utils/net_util.c.orig	2017-04-10 21:48:16.087981836 +0100
++++ a/source3/utils/net_util.c	2017-04-10 21:49:59.470341165 +0100
+@@ -126,6 +127,11 @@
+ 		signing_setting = SMB_SIGNING_IPC_DEFAULT;
+ 	}
+ 
++        if(((struct functable*)c->private_data)->valid_transports == NET_TRANSPORT_RAP)
++        {
++                signing_setting = SMB_SIGNING_DEFAULT;
++        }
++
+ 	nt_status = cli_full_connection(cli_ctx, NULL, server_name,
+ 					server_ss, c->opt_port,
+ 					service_name, service_type,

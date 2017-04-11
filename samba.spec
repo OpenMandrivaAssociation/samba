@@ -71,7 +71,7 @@
 %define devtevent_unix_util %mklibname -d tevent-unix-util
 
 #Define sets of binaries that we can use in globs and loops:
-%global commonbin	testparm,regdiff,regpatch,regshell,regtree
+%global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr
 %global serverbin 	oLschema2ldif
 %global serversbin	samba,samba_dnsupdate,samba_spnupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
@@ -83,7 +83,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.5.5
+Version:	4.6.2
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -108,7 +108,7 @@ Patch1:		samba-pid-location.patch
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
 # Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
-Patch4:		samba-4.5.1-smb4k.patch
+Patch4:		samba-4.6.2-smb4k.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
@@ -126,7 +126,7 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb)
+BuildRequires:	pkgconfig(ldb) >= 1.1.29
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
@@ -134,8 +134,8 @@ BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(pyldb-util)
 BuildRequires:	pkgconfig(pytalloc-util)
-BuildRequires:	pkgconfig(talloc)
-BuildRequires:	pkgconfig(tdb) >= 1.2.1
+BuildRequires:	pkgconfig(talloc) >= 2.1.9
+BuildRequires:	pkgconfig(tdb) >= 1.3.12
 BuildRequires:	pkgconfig(tevent)
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
@@ -1050,7 +1050,6 @@ fi
 %{_libdir}/samba/libsmbd-shim-samba4.so
 %{_libdir}/samba/libsmbldaphelper-samba4.so
 %{_libdir}/samba/libsmbpasswdparser-samba4.so
-%{_libdir}/samba/libsmbregistry-samba4.so
 %{_libdir}/samba/libsys-rw-samba4.so
 %{_libdir}/samba/libsocket-blocking-samba4.so
 %{_libdir}/samba/libtalloc-report-samba4.so
