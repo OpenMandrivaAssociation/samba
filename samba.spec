@@ -112,6 +112,7 @@ Patch4:		samba-4.6.2-smb4k.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
+BuildRequires:	docbook-dtd42-xml
 BuildRequires:	gnupg
 BuildRequires:	python-tdb
 BuildRequires:	python-tevent
