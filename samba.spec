@@ -59,7 +59,9 @@
 %define devsmbclient %mklibname -d smbclient 
 %define libsmbconf %mklibname smbconf %{major}
 %define devsmbconf %mklibname -d smbconf
-%define libsmbldap %mklibname smbldap %{major}
+%define ldapmajor 2
+%define libsmbldap %mklibname smbldap %{ldapmajor}
+%define oldsmbldap %mklibname smbldap 0
 %define devsmbldap %mklibname -d smbldap
 %define libtevent_util %mklibname tevent-util %{major}
 %define devtevent_util %mklibname -d tevent-util
@@ -83,7 +85,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.6.9
+Version:	4.7.4
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -514,6 +516,7 @@ Development files for Samba smbconf library.
 %package -n %{libsmbldap}
 Summary:	Samba LDAP library
 Group:		System/Libraries
+Obsoletes:	%{oldsmbldap} < %{EVRD}
 
 %description -n %{libsmbldap}
 Samba LDAP library
@@ -820,8 +823,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/security
 #        install -m644 packaging/Mandrake/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
-install -m644 packaging/LSB/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
-cat packaging/LSB/smb.conf | \
+install -m644 packaging/RHEL/setup/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+cat packaging/RHEL/setup/smb.conf | \
 touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >%{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 %if %{build_cupspc}
@@ -967,7 +970,6 @@ fi
 %{_libdir}/samba/libasn1util-samba4.so
 %{_libdir}/samba/libauth-samba4.so
 %{_libdir}/samba/libauth4-samba4.so
-%{_libdir}/samba/libauth-sam-reply-samba4.so
 %{_libdir}/samba/libauth-unix-token-samba4.so
 %{_libdir}/samba/libauthkrb5-samba4.so
 %{_libdir}/samba/libcli-ldap-common-samba4.so
@@ -980,6 +982,8 @@ fi
 %{_libdir}/samba/libcluster-samba4.so
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcom_err-samba4.so*
+%{_libdir}/samba/libcommon-auth-samba4.so
+%{_libdir}/samba/libcmocka-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
@@ -1013,6 +1017,7 @@ fi
 %{_libdir}/samba/liblibsmb-samba4.so
 %{_libdir}/samba/libmessages-dgm-samba4.so
 %{_libdir}/samba/libmessages-util-samba4.so
+%{_libdir}/samba/libMESSAGING-SEND-samba4.so
 %{_libdir}/samba/libmsghdr-samba4.so
 %{_libdir}/samba/libmsrpc3-samba4.so
 %{_libdir}/samba/libndr-samba-samba4.so
@@ -1366,7 +1371,7 @@ fi
 %{_libdir}/libsmbconf.so
 
 %files -n %{libsmbldap}
-%{_libdir}/libsmbldap.so.%{major}*
+%{_libdir}/libsmbldap.so.%{ldapmajor}*
 
 %files -n %{devsmbldap}
 %{_includedir}/samba-4.0/smbldap.h
