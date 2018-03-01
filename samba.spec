@@ -85,7 +85,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.7.4
+Version:	4.7.5
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -811,7 +811,7 @@ done
 # Install other stuff
 
         install -m644 %{SOURCE28} %{buildroot}/%{_sysconfdir}/pam.d/%{name}
-	install -m644 %{SOURCE29} %{buildroot}/%{_sysconfdir}/pam.d/system-auth-winbind
+        install -m644 %{SOURCE29} %{buildroot}/%{_sysconfdir}/pam.d/system-auth-winbind
 #
         install -m644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{name}
 
@@ -861,6 +861,12 @@ rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 
 # tmpfiles for runtime dir creation
 install -D -p -m 0644 %{SOURCE30} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -d %{buildroot}%{_presetdir}
+cat > %{buildroot}%{_presetdir}/86-samba.preset << EOF
+enable nmb.service
+enable smb.service
+disable winbind.service
+EOF
 
 # install NM dispatcher file
 install -d -m 0755 %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d/
@@ -1153,6 +1159,7 @@ fi
 %dir %{_localstatedir}/lib/%{name}
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_tmpfilesdir}/%{name}.conf
+%{_presetdir}/86-samba.preset
 %{_mandir}/man1/findsmb.1*
 %{_mandir}/man1/smbtar.1*
 %{_mandir}/man1/smbtree.1*
