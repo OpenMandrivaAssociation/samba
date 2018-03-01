@@ -142,6 +142,7 @@ BuildRequires:	pkgconfig(tdb) >= 1.3.12
 BuildRequires:	pkgconfig(tevent)
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
+BuildRequires:	pkgconfig(jansson)
 %if %{with ads}
 BuildRequires:	krb5-devel
 %endif
