@@ -86,7 +86,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.7.5
-Release:	1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -142,6 +142,7 @@ BuildRequires:	pkgconfig(tdb) >= 1.3.12
 BuildRequires:	pkgconfig(tevent)
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
+BuildRequires:	pkgconfig(jansson)
 %if %{with ads}
 BuildRequires:	krb5-devel
 %endif
@@ -740,7 +741,8 @@ export PYTHON=%{__python2}
 	--with-modulesdir=%{_libdir}/%{name} \
 	--with-sockets-dir=/run/samba \
     	--with-lockdir=/var/lib/samba \
-    	--with-cachedir=/var/lib/samba
+    	--with-cachedir=/var/lib/samba \
+	--with-logdir=/var/log/samba
 
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
