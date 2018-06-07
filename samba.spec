@@ -865,8 +865,8 @@ rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 install -D -p -m 0644 %{SOURCE30} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 install -d %{buildroot}%{_presetdir}
 cat > %{buildroot}%{_presetdir}/86-samba.preset << EOF
-enable nmb.service
-enable smb.service
+disable nmb.service
+disable smb.service
 disable winbind.service
 EOF
 
