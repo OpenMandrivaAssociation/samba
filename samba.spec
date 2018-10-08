@@ -102,8 +102,8 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.8.2
-Release:	2
+Version:	4.8.5
+Release:	1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -123,7 +123,7 @@ Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
-Patch1:		samba-pid-location.patch
+Source31:	smb.conf
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
 # Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
@@ -704,7 +704,8 @@ else
 	echo "Source verification failed!" >&2
 fi
 
-%autosetup -p1
+%setup -q
+%apply_patches
 
 %build
 # samba doesnt support python3 yet
@@ -755,6 +756,7 @@ export PYTHON=%{__python2}
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
 	--with-sockets-dir=/run/samba \
+	--with-piddir=/run/samba \
     	--with-lockdir=/var/lib/samba \
     	--with-cachedir=/var/lib/samba \
 	--with-logdir=/var/log/samba
@@ -840,9 +842,9 @@ mkdir -p %{buildroot}%{_sysconfdir}/security
 #        install -m644 packaging/Mandrake/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
-install -m644 packaging/RHEL/setup/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
-cat packaging/RHEL/setup/smb.conf | \
-touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+install -m644 %{SOURCE31} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+#cat %{SOURCE31} | \
+#touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >%{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 %if %{build_cupspc}
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
@@ -858,7 +860,7 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 install -c -m 755 %{SOURCE10} %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
 
 # Move some stuff where it belongs...
-mkdir -p %{buildroot}%{_lib}
+mkdir -p %{buildroot}/%{_lib}
 mv %{buildroot}%{_libdir}/libnss* %{buildroot}/%{_lib}/
 
 rm -f %{buildroot}/%{_mandir}/man1/testprns*
@@ -869,7 +871,7 @@ cat >%{buildroot}%{_sysconfdir}/ld.so.conf.d/samba.conf <<EOF
 EOF
 
 mkdir -p %{buildroot}%{_unitdir} %{buildroot}%{_sysconfdir}/sysconfig
-cp -a packaging/systemd/*.service %{buildroot}%{_unitdir}/
+cp -a bin/default/packaging/systemd/*.service %{buildroot}%{_unitdir}/
 cp -a packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
 
 # MD removal of orphan manpages 
@@ -1006,7 +1008,6 @@ fi
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libcommon-auth-samba4.so
-%{_libdir}/samba/libcmocka-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
@@ -1019,7 +1020,7 @@ fi
 %{_libdir}/samba/libflag-mapping-samba4.so
 %{_libdir}/samba/libgensec-samba4.so
 %{_libdir}/samba/libgenrand-samba4.so
-%{_libdir}/samba/libgpo-samba4.so
+%{_libdir}/samba/libgpext-samba4.so
 %{_libdir}/samba/libgse-samba4.so
 %{_libdir}/samba/libgssapi-samba4.so.2*
 %{_libdir}/samba/libhcrypto-samba4.so.5*
@@ -1188,10 +1189,11 @@ fi
 %{_mandir}/man8/cifsdd.8*
 %{_mandir}/man8/nmbd.8*
 %{_mandir}/man8/smbd.8*
+%{_mandir}/man7/traffic_learner.7.*
+%{_mandir}/man7/traffic_replay.7.*
 %{_mandir}/man8/vfs_acl_tdb.8*
 %{_mandir}/man8/vfs_acl_xattr.8*
 %{_mandir}/man8/vfs_aio_fork.8*
-%{_mandir}/man8/vfs_aio_linux.8*
 %{_mandir}/man8/vfs_aio_pthread.8*
 %{_mandir}/man8/vfs_audit.8*
 %{_mandir}/man8/vfs_cacheprime.8*
@@ -1208,6 +1210,7 @@ fi
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_netatalk.8*
+%{_mandir}/man8/vfs_nfs4acl_xattr.8*
 %{_mandir}/man8/vfs_offline.8*
 %{_mandir}/man8/vfs_prealloc.8*
 %{_mandir}/man8/vfs_preopen.8*
@@ -1222,6 +1225,7 @@ fi
 %{_mandir}/man8/vfs_time_audit.8*
 %{_mandir}/man8/vfs_tsmsm.8*
 %{_mandir}/man8/vfs_unityed_media.8*
+%{_mandir}/man8/vfs_virusfilter.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
 
 %files winbind
@@ -1236,11 +1240,11 @@ fi
 %attr(755,root,root) /%{_lib}/libnss_winbind.so.*
 %{_libdir}/%{name}/idmap
 %{_libdir}/%{name}/nss_info
-%{_libdir}/winbind_krb5_locator.so
+%{_libdir}/samba/krb5/winbind_krb5_locator.so
 %{_mandir}/man1/ntlm_auth.1*
 %{_mandir}/man1/wbinfo.1*
 %{_mandir}/man5/pam_winbind.conf.5*
-%{_mandir}/man7/winbind_krb5_locator.7*
+%{_mandir}/man7/winbind_krb5_locator.8*
 %{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/pam_winbind.8*
 %{_mandir}/man8/winbindd.8*
