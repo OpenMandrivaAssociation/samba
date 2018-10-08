@@ -75,8 +75,25 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr
 %global serverbin 	oLschema2ldif
-%global serversbin	samba,samba_dnsupdate,samba_spnupdate
+%global serversbin	samba,samba_dnsupdate,samba_spnupdate,samba_gpoupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
+
+# filter out some bogues devel() requires
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}devel\\(lib.*-samba4
+
+# filter out some bogus requires/provides
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libdir}/libnss_win.*\\.so
+%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_libdir}/libnss_win.*\\.so
+
+# more filtering
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}lib.*samba4.so\\(
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}lib.*samba4.so\\(
+
+# filter out perl requirements pulled in from examples in the docdir.
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_docdir}
+%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_docdir}/\[^/\]*/\[^M\]
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(VMS|^perl\\(Win32|^perl\\(DB\\)|^perl\\(UNIVERSAL\\)
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(VMS|^perl\\(Win32
 
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
 
@@ -85,8 +102,8 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.7.5
-Release:	2
+Version:	4.8.5
+Release:	1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -106,7 +123,7 @@ Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
-Patch1:		samba-pid-location.patch
+Source31:	smb.conf
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
 # Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
@@ -154,15 +171,12 @@ BuildRequires:	postgresql-devel
 %endif
 
 #### there is no straight samba rpm...
-Requires(pre):	mktemp
 Requires(pre):	psmisc
 Requires(pre):	coreutils
 Requires(pre):	sed
 Requires(pre):	grep
 Requires:	pam >= 0.64
 Requires:	samba-common = %{EVRD}
-
-%define __noautoreq 'devel.*'
 
 %description
 Samba provides an SMB server which can be used to provide
@@ -193,7 +207,7 @@ Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
 # provision requires samba-python
 Requires:	%{name}-python = %{EVRD}
-Requires(pre):	rpm-helper
+Requires(post,postun,preun):	rpm-helper
 %rename	samba
 %rename	samba-server-ldap
 # SWAT is no longer included in 4.1.x. For now it has been removed
@@ -222,6 +236,7 @@ docs directory for implementation details.
 Summary:	Samba (SMB) client programs
 Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
+Requires(post,postun,preun):	rpm-helper
 Requires:	mount-cifs
 # For samba-tool
 Requires:	python-talloc
@@ -243,6 +258,7 @@ Group:		System/Servers
 Requires:	%{name}-python = %{EVRD}
 %rename 	samba-common-ldap
 Conflicts:	samba3-common
+Requires(post,postun,preun):	rpm-helper
 
 %description common
 Samba-common provides files necessary for both the server and client
@@ -282,7 +298,8 @@ and group/user enumeration from a Windows or Samba domain controller.
 Summary:	Name Service Switch service for WINS
 Group:		System/Servers
 Requires:	%{name}-common = %{EVRD}
-Requires(pre):	glibc
+Requires(post):	glibc
+Requires(post,postun,preun):	rpm-helper
 
 %description -n nss_wins
 Provides the libnss_wins shared library which resolves NetBIOS names to 
@@ -620,7 +637,6 @@ The samba-domainjoin-gui package includes a domainjoin gtk application
 #Samba and other projects to store temporary data
 
 
-
 %prep
 
 # Allow users to query build options with --with options:
@@ -740,6 +756,7 @@ export PYTHON=%{__python2}
 	--localstatedir=%{_localstatedir} \
 	--with-modulesdir=%{_libdir}/%{name} \
 	--with-sockets-dir=/run/samba \
+	--with-piddir=/run/samba \
     	--with-lockdir=/var/lib/samba \
     	--with-cachedir=/var/lib/samba \
 	--with-logdir=/var/log/samba
@@ -747,7 +764,7 @@ export PYTHON=%{__python2}
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
 
-%make
+%make_build
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
@@ -825,9 +842,9 @@ mkdir -p %{buildroot}%{_sysconfdir}/security
 #        install -m644 packaging/Mandrake/smb-winbind.conf %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 
 # Some inline fixes for smb.conf for non-winbind use
-install -m644 packaging/RHEL/setup/smb.conf %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
-cat packaging/RHEL/setup/smb.conf | \
-touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+install -m644 %{SOURCE31} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
+#cat %{SOURCE31} | \
+#touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #sed -e 's/^;   printer admin = @adm/   printer admin = @adm/g' >%{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 %if %{build_cupspc}
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
@@ -843,7 +860,7 @@ touch %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 install -c -m 755 %{SOURCE10} %{buildroot}%{_datadir}/%{name}/scripts/print-pdf
 
 # Move some stuff where it belongs...
-mkdir -p %{buildroot}%{_lib}
+mkdir -p %{buildroot}/%{_lib}
 mv %{buildroot}%{_libdir}/libnss* %{buildroot}/%{_lib}/
 
 rm -f %{buildroot}/%{_mandir}/man1/testprns*
@@ -854,7 +871,7 @@ cat >%{buildroot}%{_sysconfdir}/ld.so.conf.d/samba.conf <<EOF
 EOF
 
 mkdir -p %{buildroot}%{_unitdir} %{buildroot}%{_sysconfdir}/sysconfig
-cp -a packaging/systemd/*.service %{buildroot}%{_unitdir}/
+cp -a bin/default/packaging/systemd/*.service %{buildroot}%{_unitdir}/
 cp -a packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
 
 # MD removal of orphan manpages 
@@ -865,8 +882,8 @@ rm -f %{buildroot}%{_mandir}/man1/vfstest.1*
 install -D -p -m 0644 %{SOURCE30} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 install -d %{buildroot}%{_presetdir}
 cat > %{buildroot}%{_presetdir}/86-samba.preset << EOF
-enable nmb.service
-enable smb.service
+disable nmb.service
+disable smb.service
 disable winbind.service
 EOF
 
@@ -908,7 +925,7 @@ fi
 %preun winbind
 if [ $1 = 0 ]; then
 	echo "Removing winbind entries from %{_sysconfdir}/nsswitch.conf"
-	perl -pi -e 's/ winbind//' %{_sysconfdir}/nsswitch.conf
+	sed -i -e 's/ winbind//' %{_sysconfdir}/nsswitch.conf
 
 fi
 
@@ -927,7 +944,7 @@ fi
 %preun -n nss_wins
 if [ $1 = 0 ]; then
 	echo "Removing wins entry from %{_sysconfdir}/nsswitch.conf"
-	perl -pi -e 's/ wins//' %{_sysconfdir}/nsswitch.conf
+	sed -i -e 's/ wins//' %{_sysconfdir}/nsswitch.conf
 fi
 
 %files server
@@ -957,6 +974,7 @@ fi
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
+%{_mandir}/man8/samba_gpoupdate.8*
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
@@ -991,7 +1009,6 @@ fi
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libcommon-auth-samba4.so
-%{_libdir}/samba/libcmocka-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
@@ -1004,7 +1021,7 @@ fi
 %{_libdir}/samba/libflag-mapping-samba4.so
 %{_libdir}/samba/libgensec-samba4.so
 %{_libdir}/samba/libgenrand-samba4.so
-%{_libdir}/samba/libgpo-samba4.so
+%{_libdir}/samba/libgpext-samba4.so
 %{_libdir}/samba/libgse-samba4.so
 %{_libdir}/samba/libgssapi-samba4.so.2*
 %{_libdir}/samba/libhcrypto-samba4.so.5*
@@ -1173,10 +1190,11 @@ fi
 %{_mandir}/man8/cifsdd.8*
 %{_mandir}/man8/nmbd.8*
 %{_mandir}/man8/smbd.8*
+%{_mandir}/man7/traffic_learner.7.*
+%{_mandir}/man7/traffic_replay.7.*
 %{_mandir}/man8/vfs_acl_tdb.8*
 %{_mandir}/man8/vfs_acl_xattr.8*
 %{_mandir}/man8/vfs_aio_fork.8*
-%{_mandir}/man8/vfs_aio_linux.8*
 %{_mandir}/man8/vfs_aio_pthread.8*
 %{_mandir}/man8/vfs_audit.8*
 %{_mandir}/man8/vfs_cacheprime.8*
@@ -1193,6 +1211,7 @@ fi
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_netatalk.8*
+%{_mandir}/man8/vfs_nfs4acl_xattr.8*
 %{_mandir}/man8/vfs_offline.8*
 %{_mandir}/man8/vfs_prealloc.8*
 %{_mandir}/man8/vfs_preopen.8*
@@ -1207,6 +1226,7 @@ fi
 %{_mandir}/man8/vfs_time_audit.8*
 %{_mandir}/man8/vfs_tsmsm.8*
 %{_mandir}/man8/vfs_unityed_media.8*
+%{_mandir}/man8/vfs_virusfilter.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
 
 %files winbind
@@ -1221,11 +1241,11 @@ fi
 %attr(755,root,root) /%{_lib}/libnss_winbind.so.*
 %{_libdir}/%{name}/idmap
 %{_libdir}/%{name}/nss_info
-%{_libdir}/winbind_krb5_locator.so
+%{_libdir}/samba/krb5/winbind_krb5_locator.so
 %{_mandir}/man1/ntlm_auth.1*
 %{_mandir}/man1/wbinfo.1*
 %{_mandir}/man5/pam_winbind.conf.5*
-%{_mandir}/man7/winbind_krb5_locator.7*
+%{_mandir}/man8/winbind_krb5_locator.8*
 %{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/pam_winbind.8*
 %{_mandir}/man8/winbindd.8*
