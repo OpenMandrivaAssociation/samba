@@ -75,7 +75,7 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr
 %global serverbin 	oLschema2ldif
-%global serversbin	samba,samba_dnsupdate,samba_spnupdate
+%global serversbin	samba,samba_dnsupdate,samba_spnupdate,samba_gpoupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
 
 # filter out some bogues devel() requires
@@ -974,6 +974,7 @@ fi
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
+%{_mandir}/man8/samba_gpoupdate.8*
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
@@ -1244,7 +1245,7 @@ fi
 %{_mandir}/man1/ntlm_auth.1*
 %{_mandir}/man1/wbinfo.1*
 %{_mandir}/man5/pam_winbind.conf.5*
-%{_mandir}/man7/winbind_krb5_locator.8*
+%{_mandir}/man8/winbind_krb5_locator.8*
 %{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/pam_winbind.8*
 %{_mandir}/man8/winbindd.8*
