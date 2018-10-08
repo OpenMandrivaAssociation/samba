@@ -78,6 +78,23 @@
 %global serversbin	samba,samba_dnsupdate,samba_spnupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
 
+# filter out some bogues devel() requires
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}devel\\(lib.*-samba4
+
+# filter out some bogus requires/provides
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libdir}/libnss_win.*\\.so
+%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_libdir}/libnss_win.*\\.so
+
+# more filtering
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}lib.*samba4.so\\(
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}lib.*samba4.so\\(
+
+# filter out perl requirements pulled in from examples in the docdir.
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_docdir}
+%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_docdir}/\[^/\]*/\[^M\]
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(VMS|^perl\\(Win32|^perl\\(DB\\)|^perl\\(UNIVERSAL\\)
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(VMS|^perl\\(Win32
+
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
 
 %define _serverbuild_flags -fstack-protector-all
@@ -86,7 +103,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.8.2
-Release:	1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -154,15 +171,12 @@ BuildRequires:	postgresql-devel
 %endif
 
 #### there is no straight samba rpm...
-Requires(pre):	mktemp
 Requires(pre):	psmisc
 Requires(pre):	coreutils
 Requires(pre):	sed
 Requires(pre):	grep
 Requires:	pam >= 0.64
 Requires:	samba-common = %{EVRD}
-
-%define __noautoreq 'devel.*'
 
 %description
 Samba provides an SMB server which can be used to provide
@@ -193,7 +207,7 @@ Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
 # provision requires samba-python
 Requires:	%{name}-python = %{EVRD}
-Requires(pre):	rpm-helper
+Requires(post,postun,preun):	rpm-helper
 %rename	samba
 %rename	samba-server-ldap
 # SWAT is no longer included in 4.1.x. For now it has been removed
@@ -222,6 +236,7 @@ docs directory for implementation details.
 Summary:	Samba (SMB) client programs
 Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
+Requires(post,postun,preun):	rpm-helper
 Requires:	mount-cifs
 # For samba-tool
 Requires:	python-talloc
@@ -243,6 +258,7 @@ Group:		System/Servers
 Requires:	%{name}-python = %{EVRD}
 %rename 	samba-common-ldap
 Conflicts:	samba3-common
+Requires(post,postun,preun):	rpm-helper
 
 %description common
 Samba-common provides files necessary for both the server and client
@@ -282,7 +298,8 @@ and group/user enumeration from a Windows or Samba domain controller.
 Summary:	Name Service Switch service for WINS
 Group:		System/Servers
 Requires:	%{name}-common = %{EVRD}
-Requires(pre):	glibc
+Requires(post):	glibc
+Requires(post,postun,preun):	rpm-helper
 
 %description -n nss_wins
 Provides the libnss_wins shared library which resolves NetBIOS names to 
@@ -620,7 +637,6 @@ The samba-domainjoin-gui package includes a domainjoin gtk application
 #Samba and other projects to store temporary data
 
 
-
 %prep
 
 # Allow users to query build options with --with options:
@@ -688,8 +704,7 @@ else
 	echo "Source verification failed!" >&2
 fi
 
-%setup -q
-%apply_patches
+%autosetup -p1
 
 %build
 # samba doesnt support python3 yet
@@ -747,7 +762,7 @@ export PYTHON=%{__python2}
 #	--with-system-mitkrb5 <--- probably a good idea, but causes
 #	samba_upgradeprovision and friends not to be built
 
-%make
+%make_build
 
 %if %{with gtk}
 cd source3/lib/netapi/examples/netdomjoin-gui
@@ -908,7 +923,7 @@ fi
 %preun winbind
 if [ $1 = 0 ]; then
 	echo "Removing winbind entries from %{_sysconfdir}/nsswitch.conf"
-	perl -pi -e 's/ winbind//' %{_sysconfdir}/nsswitch.conf
+	sed -i -e 's/ winbind//' %{_sysconfdir}/nsswitch.conf
 
 fi
 
@@ -927,7 +942,7 @@ fi
 %preun -n nss_wins
 if [ $1 = 0 ]; then
 	echo "Removing wins entry from %{_sysconfdir}/nsswitch.conf"
-	perl -pi -e 's/ wins//' %{_sysconfdir}/nsswitch.conf
+	sed -i -e 's/ wins//' %{_sysconfdir}/nsswitch.conf
 fi
 
 %files server
