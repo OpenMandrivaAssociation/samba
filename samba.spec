@@ -75,7 +75,7 @@
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr
 %global serverbin 	oLschema2ldif
-%global serversbin	samba,samba_dnsupdate,samba_spnupdate,samba_gpoupdate
+%global serversbin	samba,samba_dnsupdate,samba_spnupdate,samba-gpupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
 
 # filter out some bogues devel() requires
@@ -102,7 +102,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
-Version:	4.8.5
+Version:	4.9.1
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -974,7 +974,7 @@ fi
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
-%{_mandir}/man8/samba_gpoupdate.8*
+%{_mandir}/man8/samba-gpupdate.8*
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
@@ -988,6 +988,7 @@ fi
 %{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
+%{_libdir}/samba/libscavenge-dns-records-samba4.so
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads-samba4.so
@@ -1109,7 +1110,7 @@ fi
 %files client
 %{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool
-%{_bindir}/eventlogadm
+%{_sbindir}/eventlogadm
 %{_bindir}/findsmb
 %{_bindir}/net
 %{_bindir}/nmblookup
