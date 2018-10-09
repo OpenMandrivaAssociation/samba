@@ -1009,6 +1009,7 @@ fi
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libcommon-auth-samba4.so
+%{_libdir}/samba/libcmocka-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
