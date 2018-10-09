@@ -78,22 +78,7 @@
 %global serversbin	samba,samba_dnsupdate,samba_spnupdate,samba_gpoupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
 
-# filter out some bogues devel() requires
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}devel\\(lib.*-samba4
-
-# filter out some bogus requires/provides
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libdir}/libnss_win.*\\.so
-%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_libdir}/libnss_win.*\\.so
-
-# more filtering
-%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}lib.*samba4.so\\(
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}lib.*samba4.so\\(
-
-# filter out perl requirements pulled in from examples in the docdir.
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_docdir}
-%global __requires_exclude_from %{?__requires_exclude_from:%__requires_exclude_from|}^%{_docdir}/\[^/\]*/\[^M\]
-%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(VMS|^perl\\(Win32|^perl\\(DB\\)|^perl\\(UNIVERSAL\\)
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(VMS|^perl\\(Win32
+%define __noautoreq 'devel.*'
 
 %define build_expsam xml%{?_with_pgsql:,pgsql}%{?_with_mysql:,mysql}
 
