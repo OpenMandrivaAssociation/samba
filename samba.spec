@@ -785,7 +785,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}/%{_datadir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 
-PYTHON=%{__python2} %makeinstall_std
+export PYTHON=%{__python2}
+%makeinstall_std
 # PAM modules don't go to /usr...
 if [ -e %{buildroot}%{_libdir}/security ]; then
 	mkdir -p %{buildroot}/%{_lib}
