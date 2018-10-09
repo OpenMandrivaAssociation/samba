@@ -133,6 +133,7 @@ BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
 BuildRequires:	docbook-dtd42-xml
 BuildRequires:	gnupg
+BuildRequires:	gpgme-devel
 BuildRequires:	python-tdb
 BuildRequires:	python-tevent
 BuildRequires:	xsltproc
