@@ -103,7 +103,7 @@ Summary:	Samba SMB server
 Name:		samba
 Epoch:		1
 Version:	4.9.1
-Release:	1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
