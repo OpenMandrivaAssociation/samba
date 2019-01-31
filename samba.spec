@@ -133,6 +133,7 @@ BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
 BuildRequires:	pkgconfig(ldb) >= 1.1.29
 BuildRequires:	pkgconfig(libcap)
+BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
