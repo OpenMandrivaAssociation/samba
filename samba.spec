@@ -147,7 +147,7 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 1.1.29
+BuildRequires:	pkgconfig(ldb) >= 1.4.3
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
@@ -155,9 +155,9 @@ BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(pyldb-util)
 BuildRequires:	pkgconfig(pytalloc-util)
-BuildRequires:	pkgconfig(talloc) >= 2.1.9
-BuildRequires:	pkgconfig(tdb) >= 1.3.12
-BuildRequires:	pkgconfig(tevent)
+BuildRequires:	pkgconfig(talloc) >= 2.1.14
+BuildRequires:	pkgconfig(tdb) >= 1.3.16
+BuildRequires:	pkgconfig(tevent) >= 0.9.37
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
 BuildRequires:	pkgconfig(jansson)
