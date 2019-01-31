@@ -149,6 +149,7 @@ BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
 BuildRequires:	pkgconfig(ldb) >= 1.4.3
 BuildRequires:	pkgconfig(libcap)
+BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
@@ -1013,7 +1014,6 @@ fi
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libcommon-auth-samba4.so
-%{_libdir}/samba/libcmocka-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
