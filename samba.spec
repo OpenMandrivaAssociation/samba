@@ -991,10 +991,10 @@ fi
 %{_libdir}/samba/libcli-spoolss-samba4.so
 %{_libdir}/samba/libcliauth-samba4.so
 %{_libdir}/samba/libcluster-samba4.so
+%{_libdir}/samba/libcmdline-contexts-samba4.so
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libcommon-auth-samba4.so
-%{_libdir}/samba/libcmocka-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
@@ -1039,6 +1039,7 @@ fi
 %{_libdir}/samba/libnpa-tstream-samba4.so
 %{_libdir}/samba/libnss-info-samba4.so
 %{_libdir}/samba/libpac-samba4.so
+%{_libdir}/samba/libpopt-samba3-cmdline-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
 %{_libdir}/samba/libposix-eadb-samba4.so
 %{_libdir}/samba/libprinting-migrate-samba4.so
