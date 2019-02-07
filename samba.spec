@@ -1143,7 +1143,7 @@ fi
 %{_mandir}/man8/vfs_syncops.8*
 %{_mandir}/man8/vfs_ceph.8.*
 %{_mandir}/man8/vfs_fruit.8.*
-%{_mandir}/man8/vfs_glusterfs.8.*
+%{_mandir}/man8/vfs_glusterfs*.8.*
 %{_mandir}/man8/vfs_snapper.8.*
 %{_mandir}/man8/vfs_worm.8.*
 
