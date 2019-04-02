@@ -101,8 +101,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Epoch:		1
-Version:	4.9.4
+Version:	4.10.0
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -135,7 +134,7 @@ BuildRequires:	docbook-dtd42-xml
 BuildRequires:	gnupg
 BuildRequires:	gpgme-devel
 BuildRequires:	python-tdb
-BuildRequires:	python-tevent
+BuildRequires:	python-tevent >= 0.10.0
 BuildRequires:	xsltproc
 BuildRequires:	acl-devel
 BuildRequires:	keyutils-devel
@@ -147,18 +146,18 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 1.4.3
+BuildRequires:	pkgconfig(ldb) >= 1.5.0
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
-BuildRequires:	pkgconfig(pyldb-util)
-BuildRequires:	pkgconfig(pytalloc-util)
-BuildRequires:	pkgconfig(talloc) >= 2.1.14
-BuildRequires:	pkgconfig(tdb) >= 1.3.16
-BuildRequires:	pkgconfig(tevent) >= 0.9.37
+BuildRequires:	python-ldb
+BuildRequires:	python-talloc
+BuildRequires:	pkgconfig(talloc) >= 2.2.0
+BuildRequires:	pkgconfig(tdb) >= 1.4.0
+BuildRequires:	pkgconfig(tevent) >= 0.10.0
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
 BuildRequires:	pkgconfig(jansson)
@@ -310,7 +309,7 @@ IP addresses.
 %package python
 Summary:	Samba Python modules
 Group:		Development/Python
-BuildRequires:	pkgconfig(python2)
+BuildRequires:	pkgconfig(python3)
 
 %description python
 Samba Python modules
@@ -710,11 +709,8 @@ fi
 %apply_patches
 
 %build
-# samba doesnt support python3 yet
-export PYTHON=%{__python2}
-
 # xdr_* functions have moved from glibc into libtirpc
-%{__python2} buildtools/bin/waf configure \
+%{__python} buildtools/bin/waf configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
@@ -786,7 +782,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}/%{_datadir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 
-export PYTHON=%{__python2}
 %makeinstall_std
 # PAM modules don't go to /usr...
 if [ -e %{buildroot}%{_libdir}/security ]; then
@@ -1009,6 +1004,9 @@ fi
 %{_libdir}/samba/libcli-smb-common-samba4.so
 %{_libdir}/samba/libcli-spoolss-samba4.so
 %{_libdir}/samba/libcliauth-samba4.so
+%{_libdir}/samba/libclidns-samba4.so
+%{_libdir}/samba/libsamba-net.cpython*.so
+%{_libdir}/samba/libsamba-python.cpython*.so
 %{_libdir}/samba/libcluster-samba4.so
 %{_libdir}/samba/libcmdline-contexts-samba4.so
 %{_libdir}/samba/libcmdline-credentials-samba4.so
@@ -1069,11 +1067,9 @@ fi
 %{_libdir}/samba/libsamba-cluster-support-samba4.so
 %{_libdir}/samba/libsamba-debug-samba4.so
 %{_libdir}/samba/libsamba-modules-samba4.so
-%{_libdir}/samba/libsamba-net-samba4.so
 %{_libdir}/samba/libsamba-security-samba4.so
 %{_libdir}/samba/libsamba-sockets-samba4.so
 %{_libdir}/samba/libsamba3-util-samba4.so
-%{_libdir}/samba/libsamba-python-samba4.so
 %{_libdir}/samba/libsamdb-common-samba4.so
 %{_libdir}/samba/libsecrets3-samba4.so
 %{_libdir}/samba/libserver-id-db-samba4.so
@@ -1157,11 +1153,10 @@ fi
 %{_mandir}/man8/smbspool.8*
 %{_mandir}/man8/smbspool_krb5_wrapper.8*
 %{_mandir}/man8/vfs_btrfs.8*
+%{_mandir}/man8/vfs_glusterfs_fuse.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
-%{_mandir}/man8/vfs_ceph.8.*
 %{_mandir}/man8/vfs_fruit.8.*
-%{_mandir}/man8/vfs_glusterfs.8.*
 %{_mandir}/man8/vfs_snapper.8.*
 %{_mandir}/man8/vfs_worm.8.*
 
@@ -1203,7 +1198,6 @@ fi
 %{_mandir}/man8/vfs_aio_fork.8*
 %{_mandir}/man8/vfs_aio_pthread.8*
 %{_mandir}/man8/vfs_audit.8*
-%{_mandir}/man8/vfs_cacheprime.8*
 %{_mandir}/man8/vfs_cap.8*
 %{_mandir}/man8/vfs_catia.8*
 %{_mandir}/man8/vfs_commit.8*
@@ -1214,12 +1208,9 @@ fi
 %{_mandir}/man8/vfs_fake_perms.8*
 %{_mandir}/man8/vfs_fileid.8*
 %{_mandir}/man8/vfs_full_audit.8*
-%{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_netatalk.8*
-%{_mandir}/man8/vfs_nfs4acl_xattr.8*
 %{_mandir}/man8/vfs_offline.8*
-%{_mandir}/man8/vfs_prealloc.8*
 %{_mandir}/man8/vfs_preopen.8*
 %{_mandir}/man8/vfs_readahead.8*
 %{_mandir}/man8/vfs_readonly.8*
@@ -1230,7 +1221,6 @@ fi
 %{_mandir}/man8/vfs_streams_depot.8*
 %{_mandir}/man8/vfs_streams_xattr.8*
 %{_mandir}/man8/vfs_time_audit.8*
-%{_mandir}/man8/vfs_tsmsm.8*
 %{_mandir}/man8/vfs_unityed_media.8*
 %{_mandir}/man8/vfs_virusfilter.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
@@ -1260,7 +1250,7 @@ fi
 %attr(755,root,root) /%{_lib}/libnss_wins.so.*
 
 %files python
-%{py2_platsitedir}/samba
+%{py_platsitedir}/samba
 
 %if %{build_test}
 %files test
@@ -1368,12 +1358,12 @@ fi
 %{_libdir}/pkgconfig/samba-hostconfig.pc
 
 %files -n %{libsambapolicy}
-%{_libdir}/libsamba-policy.so.%{major}*
+%{_libdir}/libsamba-policy.cpython*.so.%{major}*
 
 %files -n %{devsambapolicy}
 %{_includedir}/samba-4.0/policy.h
-%{_libdir}/libsamba-policy.so
-%{_libdir}/pkgconfig/samba-policy.pc
+%{_libdir}/libsamba-policy.cpython*.so
+%{_libdir}/pkgconfig/samba-policy.cpython*.pc
 
 %files -n %{libsambautil}
 %{_libdir}/libsamba-util.so.%{major}*
