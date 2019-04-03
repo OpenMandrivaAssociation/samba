@@ -162,6 +162,7 @@ BuildRequires:	pkgconfig(tevent) >= 0.10.0
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
 BuildRequires:	pkgconfig(jansson)
+BuildRequires:	pkgconfig(dbus-1)
 %if %{with ads}
 BuildRequires:	krb5-devel
 %endif
