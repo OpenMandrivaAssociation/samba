@@ -156,6 +156,7 @@ BuildRequires:	pkgconfig(popt)
 BuildRequires:	python-ldb
 BuildRequires:	pyldb-util-devel
 BuildRequires:	python-talloc
+BuildRequires:	pytalloc-util-devel
 BuildRequires:	pkgconfig(talloc) >= 2.2.0
 BuildRequires:	pkgconfig(tdb) >= 1.4.0
 BuildRequires:	pkgconfig(tevent) >= 0.10.0
