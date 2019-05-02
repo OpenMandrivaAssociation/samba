@@ -1,3 +1,4 @@
 sources:
   samba-pubkey.asc: 3cf1a279a71d4f263e025f5cd2c85d78940a7e61
-  samba-4.10.1.tar.gz: 4dc043bd680ac625a54bbe94e4df85ac3598359c
+  samba-4.10.2.tar.asc: 5334dc2d30d422dcc78916b2bf0d704352a0df59
+  samba-4.10.2.tar.gz: b0b5dd49e92b266315cea6530dcfc926f27dd4ed
