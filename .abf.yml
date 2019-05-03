@@ -2,7 +2,8 @@ removed_sources:
   samba-4.8.2.tar.gz: f710c0da75455b27da5ad0d8ba3ed95c0d22aa88
   samba-4.8.5.tar.gz: ba66c187932f5275979a2dc19d5ce5fe4ce04b02
   samba-4.8.8.tar.gz: 9e1b4e98fe6a885aeb4c64ef539307b9d2ed60c4
-sources:
-  samba-4.8.9.tar.asc: bc62f4fca8b7408ac1813d9f9daaf8cf8041ea38
   samba-4.8.9.tar.gz: d90b8ef59cb503afba66ffc1c46c52da311abc9d
+sources:
+  samba-4.8.11.tar.asc: aca370c7e80d7b32ef04c8eaedf993ae5235ad71
+  samba-4.8.11.tar.gz: 925b8dc72620e6d2806ab580d274e867b19726dd
   samba-pubkey.asc: 3cf1a279a71d4f263e025f5cd2c85d78940a7e61
