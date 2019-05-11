@@ -102,7 +102,7 @@
 Summary:	Samba SMB server
 Name:		samba
 Version:	4.10.2
-Release:	1
+Release:	2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -271,7 +271,7 @@ packages of Samba.
 %package	libs
 Summary:	Common libraries used by both Samba servers and clients
 Group:		System/Libraries
-Conflicts:	%{name}-server < 1:4.1.12-2
+Conflicts:	%{name}-server < 4.1.12-2
 Obsoletes:	%{_lib}registry0 < %{EVRD}
 Obsoletes:	%{_lib}gensec0 < %{EVRD}
 %description libs
