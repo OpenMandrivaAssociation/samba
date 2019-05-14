@@ -101,8 +101,8 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.10.2
-Release:	2
+Version:	4.10.3
+Release:	1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
