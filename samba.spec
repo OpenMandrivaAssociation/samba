@@ -101,7 +101,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.10.3
+Version:	4.10.4
 Release:	1
 License:	GPLv3
 Group:		System/Servers
@@ -147,6 +147,8 @@ BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
 BuildRequires:	pkgconfig(ldb) >= 1.5.0
+# (tpg) current samba 4.10.x does not build with ldb >= 1.6
+BuildConflicts:	pkgconfig(ldb) > 1.5.999
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
