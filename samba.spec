@@ -251,7 +251,7 @@ Requires:	mount-cifs
 Requires:	python-talloc
 Requires:	python-ldb <= %{ldb_max_ver}
 Requires:	python-tdb
-Requires:	ldb-utils
+Requires:	ldb-utils <= %{ldb_max_ver}
 %rename   	samba3-client
 Obsoletes:	smbfs
 
