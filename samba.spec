@@ -156,7 +156,7 @@ BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	python-ldb
-BuildRequires:	pyldb-util-devel
+BuildRequires:	pyldb-util-devel <= 1.5.999
 BuildRequires:	python-talloc
 BuildRequires:	pytalloc-util-devel
 BuildRequires:	pkgconfig(talloc) >= 2.2.0
