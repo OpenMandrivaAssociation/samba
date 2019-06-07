@@ -99,6 +99,9 @@
 
 %define _serverbuild_flags -fstack-protector-all
 
+# (tpg) set here maximum supported ldb version
+%define ldb_max_ver 1.5.999
+
 Summary:	Samba SMB server
 Name:		samba
 Version:	4.10.4
@@ -148,15 +151,15 @@ BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
 BuildRequires:	pkgconfig(ldb) >= 1.5.0
 # (tpg) current samba 4.10.x does not build with ldb >= 1.6
-BuildConflicts:	pkgconfig(ldb) > 1.5.999
+BuildConflicts:	pkgconfig(ldb) > %{ldb_max_ver}
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
-BuildRequires:	python-ldb
-BuildRequires:	pyldb-util-devel <= 1.5.999
+BuildRequires:	python-ldb <= %{ldb_max_ver}
+BuildRequires:	pyldb-util-devel <= %{ldb_max_ver}
 BuildRequires:	python-talloc
 BuildRequires:	pytalloc-util-devel
 BuildRequires:	pkgconfig(talloc) >= 2.2.0
@@ -246,7 +249,7 @@ Requires(post,postun,preun):	rpm-helper
 Requires:	mount-cifs
 # For samba-tool
 Requires:	python-talloc
-Requires:	python-ldb
+Requires:	python-ldb <= %{ldb_max_ver}
 Requires:	python-tdb
 Requires:	ldb-utils
 %rename   	samba3-client
