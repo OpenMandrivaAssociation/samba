@@ -104,7 +104,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.10.5
+Version:	4.10.6
 Release:	1
 License:	GPLv3
 Group:		System/Servers
