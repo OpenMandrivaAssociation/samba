@@ -100,17 +100,25 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 1.5.999
+%define ldb_max_ver 2.0.999
+
+%define beta rc2
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.10.6
-Release:	1
+Version:	4.11.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
+%if "%{beta}" != ""
+Release:	0.%{beta}.1
+Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
+Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
+%else
+Release:	1
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
+%endif
 Source98:	https://ftp.samba.org/pub/samba/samba-pubkey.asc
 Source1:	samba.log
 #Source7:	README.%{name}-mandrake-rpm
@@ -126,6 +134,7 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 Source31:	smb.conf
+Patch1:		samba-4.11-compile.patch
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
 # Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
@@ -149,9 +158,7 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 1.5.0
-# (tpg) current samba 4.10.x does not build with ldb >= 1.6
-BuildConflicts:	pkgconfig(ldb) > %{ldb_max_ver}
+BuildRequires:	pkgconfig(ldb) >= 2.0.5
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
@@ -159,6 +166,7 @@ BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	python-ldb <= %{ldb_max_ver}
+BuildRequires:	pyldb-util-devel >= 2.0.5
 BuildRequires:	pyldb-util-devel <= %{ldb_max_ver}
 BuildRequires:	python-talloc
 BuildRequires:	pytalloc-util-devel
@@ -345,13 +353,6 @@ Provides:	devel(libdcerpc-samba)
 
 %description devel
 Samba development libraries.
-
-%package pidl
-Summary:	Perl IDL compiler for Samba
-Group:		Development/Perl
-
-%description pidl
-Perl Interface Description Language compiler for Samba.
 
 %package -n %{libdcerpc}
 Summary:	Library implementing DCE/RPC for Samba
@@ -713,8 +714,7 @@ else
 	echo "Source verification failed!" >&2
 fi
 
-%setup -q
-%apply_patches
+%autosetup -p1 -n %{name}-%{version}%{beta}
 
 %build
 # xdr_* functions have moved from glibc into libtirpc
@@ -722,7 +722,6 @@ fi
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
-	--enable-gnutls \
 	--enable-cups \
 	--enable-avahi \
 	--with-pam \
@@ -1033,6 +1032,7 @@ fi
 %{_libdir}/samba/libgensec-samba4.so
 %{_libdir}/samba/libgenrand-samba4.so
 %{_libdir}/samba/libgpext-samba4.so
+%{_libdir}/samba/libgpo-samba4.so
 %{_libdir}/samba/libgse-samba4.so
 %{_libdir}/samba/libgssapi-samba4.so.2*
 %{_libdir}/samba/libhcrypto-samba4.so.5*
@@ -1060,13 +1060,13 @@ fi
 %{_libdir}/samba/libndr-samba4.so
 %{_libdir}/samba/libnet-keytab-samba4.so
 %{_libdir}/samba/libnetif-samba4.so
-%{_libdir}/samba/libnon-posix-acls-samba4.so
 %{_libdir}/samba/libnpa-tstream-samba4.so
 %{_libdir}/samba/libnss-info-samba4.so
 %{_libdir}/samba/libpac-samba4.so
 %{_libdir}/samba/libpopt-samba3-cmdline-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
 %{_libdir}/samba/libposix-eadb-samba4.so
+%{_libdir}/samba/libprinter-driver-samba4.so
 %{_libdir}/samba/libprinting-migrate-samba4.so
 %{_libdir}/samba/libprocess-model-samba4.so
 %{_libdir}/samba/libregistry-samba4.so
@@ -1161,6 +1161,7 @@ fi
 %{_mandir}/man8/smbspool.8*
 %{_mandir}/man8/smbspool_krb5_wrapper.8*
 %{_mandir}/man8/vfs_btrfs.8*
+%{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
@@ -1291,12 +1292,6 @@ fi
 %{_includedir}/samba-4.0/smb2_lease_struct.h
 /%{_lib}/libnss_winbind.so
 /%{_lib}/libnss_wins.so
-
-%files pidl
-%{_bindir}/pidl
-%{perl_vendorlib}/Parse/Pidl*
-%{_mandir}/man1/pidl.1.*
-%{_mandir}/man3/Parse::Pidl*.3pm.*
 
 %files -n %{libdcerpc}
 %{_libdir}/libdcerpc.so.%{major}*
