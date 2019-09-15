@@ -966,6 +966,7 @@ fi
 %{_sbindir}/smbd
 %{_sbindir}/nmbd
 %{_sbindir}/samba_upgradedns
+%{_sbindir}/samba_downgrade_db
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 %(for i in %{_mandir}/man?/%{serverbin}\.[0-9]*;do echo $i;done)
@@ -980,6 +981,7 @@ fi
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
 %{_mandir}/man8/samba-gpupdate.8*
+%{_mandir}/man8/samba_downgrade_db.8*
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
