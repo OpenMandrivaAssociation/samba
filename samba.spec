@@ -102,7 +102,7 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.0.999
 
-%define beta rc4
+%define beta %{nil}
 
 Summary:	Samba SMB server
 Name:		samba
