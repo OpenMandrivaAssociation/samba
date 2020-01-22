@@ -106,16 +106,16 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.11.2
+Version:	4.11.5
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
 %if "%{beta}" != ""
-Release:	2
+Release:	1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
-Release:	2
+Release:	1
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 %endif
