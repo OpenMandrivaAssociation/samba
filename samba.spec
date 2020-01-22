@@ -73,7 +73,7 @@
 %define devtevent_unix_util %mklibname -d tevent-unix-util
 
 #Define sets of binaries that we can use in globs and loops:
-%global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr
+%global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr,dumpmscat
 %global serverbin 	oLschema2ldif
 %global serversbin	samba,samba_dnsupdate,samba_spnupdate,samba-gpupdate
 %global testbin 	smbtorture,masktest,locktest,gentest,ndrdump
@@ -997,6 +997,7 @@ fi
 %{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
+%{_libdir}/samba/libmscat-samba4.so
 %{_libdir}/samba/libscavenge-dns-records-samba4.so
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
