@@ -1185,7 +1185,7 @@ fi
 %dir /var/run/%{name}
 %dir /var/lib/%{name}/private
 %(for i in %{_bindir}/{%{commonbin}};do echo $i;done)
-%(for i in %{_mandir}/man?/{%{commonbin}}\.[0-9]*;do echo $i|grep -v testparm;done)
+%(for i in %{_mandir}/man?/{%{commonbin}}\.[0-9]*;do echo $i|grep -vE '(testparm|dumpmscat)';done)
 %dir %{_datadir}/%{name}
 %dir %{_sysconfdir}/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/%{name}/smb.conf
