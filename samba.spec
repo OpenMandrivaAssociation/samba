@@ -177,6 +177,8 @@ BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
 BuildRequires:	pkgconfig(jansson)
 BuildRequires:	pkgconfig(dbus-1)
+# For asn1Parser
+BuildRequires:	libtasn1-tools
 %if %{with ads}
 BuildRequires:	krb5-devel
 %endif
