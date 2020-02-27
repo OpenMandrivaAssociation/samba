@@ -100,13 +100,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.0.999
+%define ldb_max_ver 2.1.999
 
-%define beta %{nil}
+%define beta rc4
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.11.6
+Version:	4.12.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -158,7 +158,7 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 2.0.5
+BuildRequires:	pkgconfig(ldb) >= 2.1.1
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
@@ -166,7 +166,7 @@ BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	python-ldb <= %{ldb_max_ver}
-BuildRequires:	pyldb-util-devel >= 2.0.5
+BuildRequires:	pyldb-util-devel >= 2.1.1
 BuildRequires:	pyldb-util-devel <= %{ldb_max_ver}
 BuildRequires:	python-talloc
 BuildRequires:	pytalloc-util-devel
