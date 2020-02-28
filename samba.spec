@@ -1223,7 +1223,7 @@ fi
 %{_mandir}/man8/vfs_fileid.8*
 %{_mandir}/man8/vfs_full_audit.8*
 %{_mandir}/man8/vfs_media_harmony.8*
-%{_mandir}/man8/vfs_netatalk.8*
+#{_mandir}/man8/vfs_netatalk.8*
 %{_mandir}/man8/vfs_offline.8*
 %{_mandir}/man8/vfs_preopen.8*
 %{_mandir}/man8/vfs_readahead.8*
