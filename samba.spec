@@ -35,6 +35,7 @@
 %global vfsdir examples.bin/VFS
 
 %define	major	0
+%define	minor	1
 %define libdcerpc %mklibname dcerpc %{major}
 %define devdcerpc %mklibname -d dcerpc
 %define libndr %mklibname ndr %{major}
@@ -1099,6 +1100,7 @@ fi
 %{_libdir}/samba/libsys-rw-samba4.so
 %{_libdir}/samba/libsocket-blocking-samba4.so
 %{_libdir}/samba/libtalloc-report-samba4.so
+%{_libdir}/samba/libtalloc-report-printf-samba4.so
 %{_libdir}/samba/libtdb-wrap-samba4.so
 %{_libdir}/samba/libtime-basic-samba4.so
 %{_libdir}/samba/libtorture-samba4.so
@@ -1127,6 +1129,7 @@ fi
 %{_bindir}/findsmb
 %{_bindir}/net
 %{_bindir}/nmblookup
+%{_bindir}/mdfind
 %{_bindir}/pdbedit
 %{_bindir}/profiles
 %{_bindir}/rpcclient
@@ -1147,6 +1150,7 @@ fi
 %{_sbindir}/samba_kcc
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
+%{_mandir}/man1/mdfind.1.*
 %{_mandir}/man1/profiles.1*
 %{_mandir}/man1/rpcclient.1*
 %{_mandir}/man1/sharesec.1*
@@ -1295,6 +1299,7 @@ fi
 %{_includedir}/samba-4.0/passdb.h
 %{_includedir}/samba-4.0/smb_ldap.h
 %{_includedir}/samba-4.0/smb2_lease_struct.h
+%{_includedir}/samba-4.0/dcesrv_core.h
 /%{_lib}/libnss_winbind.so
 /%{_lib}/libnss_wins.so
 
@@ -1303,6 +1308,7 @@ fi
 %{_libdir}/libdcerpc-binding.so.%{major}*
 %{_libdir}/libdcerpc-samr.so.%{major}*
 %{_libdir}/libdcerpc-server.so.%{major}*
+%{_libdir}/libdcerpc-server-core.so.%{major}*
 
 %files -n %{devdcerpc}
 %{_libdir}/pkgconfig/dcerpc*.pc
@@ -1311,9 +1317,10 @@ fi
 %{_libdir}/libdcerpc-binding.so
 %{_libdir}/libdcerpc-samr.so
 %{_libdir}/libdcerpc-server.so
+%{_libdir}/libdcerpc-server-core.so
 
 %files -n %{libndr}
-#%{_libdir}/libndr.so.%{major}*
+%{_libdir}/libndr.so.%{minor}*
 %{_libdir}/libndr-krb5pac.so.%{major}*
 %{_libdir}/libndr-nbt.so.%{major}*
 %{_libdir}/libndr-standard.so.%{major}*
