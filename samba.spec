@@ -1313,7 +1313,7 @@ fi
 %{_libdir}/libdcerpc-server.so
 
 %files -n %{libndr}
-%{_libdir}/libndr.so.%{major}*
+#%{_libdir}/libndr.so.%{major}*
 %{_libdir}/libndr-krb5pac.so.%{major}*
 %{_libdir}/libndr-nbt.so.%{major}*
 %{_libdir}/libndr-standard.so.%{major}*
