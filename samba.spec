@@ -962,7 +962,7 @@ fi
 %{_libdir}/samba/service
 %{_libdir}/samba/process_model
 %{_libdir}/samba/gensec
-%{_libdir}/samba/auth
+#%{_libdir}/samba/auth
 %{_libdir}/samba/bind9
 %dir %{_libdir}/samba/vfs
 %{_sbindir}/smbd
