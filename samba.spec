@@ -103,11 +103,11 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.1.999
 
-%define beta rc4
+%define beta %{nil}
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.12.0
+Version:	4.12.1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -989,6 +989,7 @@ fi
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
 %config(noreplace) %{_sysconfdir}/sysconfig/samba
+%{_datadir}/samba/mdssvc
 
 %files libs
 %dir %{_libdir}/%{name}
