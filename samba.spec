@@ -182,6 +182,8 @@ BuildRequires:	pkgconfig(dbus-1)
 BuildRequires:	libtasn1-tools
 %if %{with ads}
 BuildRequires:	krb5-devel
+# Needs to know the location of krb5kdc
+BuildRequires:	krb5-server
 %endif
 %if %{build_mysql}
 BuildRequires:	mysql-devel
@@ -733,6 +735,7 @@ fi
 %endif
 %if %{with ads}
 	--with-ads \
+	--with-system-mitkrb5 --with-experimental-mit-ad-dc \
 %else
 	--without-ads \
 %endif
@@ -767,10 +770,7 @@ fi
 	--with-piddir=/run/samba \
     	--with-lockdir=/var/lib/samba \
     	--with-cachedir=/var/lib/samba \
-	--with-logdir=/var/log/samba
-
-#	--with-system-mitkrb5 <--- probably a good idea, but causes
-#	samba_upgradeprovision and friends not to be built
+	--with-logdir=/var/log/samba \
 
 %make_build
 
@@ -994,7 +994,6 @@ fi
 %files libs
 %dir %{_libdir}/%{name}
 %{_libdir}/samba/libCHARSET3-samba4.so
-%{_libdir}/samba/libHDB-SAMBA4-samba4.so
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
 %{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
@@ -1004,8 +1003,10 @@ fi
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads-samba4.so
+%{_libdir}/krb5/plugins/kdb/samba.so
+%{_libdir}/samba/krb5/winbind_krb5_localauth.so
+%{_mandir}/man8/winbind_krb5_localauth.8*
 %endif
-%{_libdir}/samba/libasn1-samba4.so.8*
 %{_libdir}/samba/libasn1util-samba4.so
 %{_libdir}/samba/libauth-samba4.so
 %{_libdir}/samba/libauth4-samba4.so
@@ -1024,7 +1025,6 @@ fi
 %{_libdir}/samba/libcluster-samba4.so
 %{_libdir}/samba/libcmdline-contexts-samba4.so
 %{_libdir}/samba/libcmdline-credentials-samba4.so
-%{_libdir}/samba/libcom_err-samba4.so*
 %{_libdir}/samba/libcommon-auth-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
@@ -1041,18 +1041,10 @@ fi
 %{_libdir}/samba/libgpext-samba4.so
 %{_libdir}/samba/libgpo-samba4.so
 %{_libdir}/samba/libgse-samba4.so
-%{_libdir}/samba/libgssapi-samba4.so.2*
-%{_libdir}/samba/libhcrypto-samba4.so.5*
-%{_libdir}/samba/libhdb-samba4.so.11*
-%{_libdir}/samba/libheimbase-samba4.so.1*
-%{_libdir}/samba/libheimntlm-samba4.so.1*
-%{_libdir}/samba/libhx509-samba4.so.5*
 %{_libdir}/samba/libhttp-samba4.so
 %{_libdir}/samba/libidmap-samba4.so
 %{_libdir}/samba/libinterfaces-samba4.so
 %{_libdir}/samba/libiov-buf-samba4.so
-%{_libdir}/samba/libkdc-samba4.so.2*
-%{_libdir}/samba/libkrb5-samba4.so.26*
 %{_libdir}/samba/libkrb5samba-samba4.so
 %{_libdir}/samba/libldbsamba-samba4.so
 %{_libdir}/samba/liblibcli-lsa3-samba4.so
@@ -1078,7 +1070,6 @@ fi
 %{_libdir}/samba/libprocess-model-samba4.so
 %{_libdir}/samba/libregistry-samba4.so
 %{_libdir}/samba/libreplace-samba4.so
-%{_libdir}/samba/libroken-samba4.so.19*
 %{_libdir}/samba/libsamba-cluster-support-samba4.so
 %{_libdir}/samba/libsamba-debug-samba4.so
 %{_libdir}/samba/libsamba-modules-samba4.so
@@ -1111,7 +1102,6 @@ fi
 %{_libdir}/samba/libutil-setid-samba4.so
 %{_libdir}/samba/libutil-tdb-samba4.so
 %{_libdir}/samba/libwinbind-client-samba4.so
-%{_libdir}/samba/libwind-samba4.so.0*
 %{_libdir}/samba/libxattr-tdb-samba4.so
 
 %if %{with doc}
