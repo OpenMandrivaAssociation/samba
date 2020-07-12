@@ -15,6 +15,11 @@
 %bcond_with cifs
 %bcond_with doc
 %bcond_with gtk
+%ifarch %{x86_64}
+%bcond_without winexe
+%else
+%bcond_with winexe
+%endif
 %define build_test	1
 # CUPS supports functionality for 'printcap name = cups' (9.0 and later):
 %define build_cupspc	1
@@ -101,13 +106,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.1.999
+%define ldb_max_ver 2.2.999
 
-%define beta %{nil}
+%define beta rc1
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.12.1
+Version:	4.13.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -193,6 +198,9 @@ BuildRequires:	mysql-devel
 %endif
 %if %{build_pgsql}
 BuildRequires:	postgresql-devel
+%endif
+%if %{with winexe}
+BuildRequires:	cross-x86_64-w64-mingw32-binutils cross-x86_64-w64-mingw32-gcc cross-x86_64-w64-mingw32-libc
 %endif
 
 #### there is no straight samba rpm...
@@ -983,6 +991,7 @@ fi
 %attr(1777,root,root) %dir /var/spool/%{name}
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/scripts
+%{_datadir}/%{name}/admx
 %{_datadir}/samba/setup
 %attr(0755,root,root) %{_datadir}/%{name}/scripts/print-pdf
 %{_mandir}/man8/samba.8*
@@ -993,6 +1002,9 @@ fi
 %{_unitdir}/nmb.service
 %config(noreplace) %{_sysconfdir}/sysconfig/samba
 %{_datadir}/samba/mdssvc
+%if %{with winexe}
+%{_bindir}/winexe
+%endif
 
 %files libs
 %dir %{_libdir}/%{name}
@@ -1168,9 +1180,10 @@ fi
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
-%{_mandir}/man8/vfs_fruit.8.*
-%{_mandir}/man8/vfs_snapper.8.*
-%{_mandir}/man8/vfs_worm.8.*
+%{_mandir}/man8/vfs_fruit.8*
+%{_mandir}/man8/vfs_snapper.8*
+%{_mandir}/man8/vfs_widelinks.8*
+%{_mandir}/man8/vfs_worm.8*
 
 # Link of smbspool to CUPS
 %if %{build_cupspc}
