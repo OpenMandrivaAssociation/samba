@@ -108,7 +108,7 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.2.999
 
-%define beta rc1
+%define beta rc6
 
 Summary:	Samba SMB server
 Name:		samba
@@ -1004,6 +1004,7 @@ fi
 %{_datadir}/samba/mdssvc
 %if %{with winexe}
 %{_bindir}/winexe
+%{_mandir}/man1/winexe.1*
 %endif
 
 %files libs
