@@ -1,0 +1,12 @@
+diff -up samba-4.13.2/lib/util/fault.c.omv~ samba-4.13.2/lib/util/fault.c
+--- samba-4.13.2/lib/util/fault.c.omv~	2020-11-06 01:01:46.457617756 +0100
++++ samba-4.13.2/lib/util/fault.c	2020-11-06 01:02:24.494203828 +0100
+@@ -19,6 +19,8 @@
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <libunwind/libunwind.h>
++
+ #include "replace.h"
+ #include "system/filesys.h"
+ #include "system/wait.h"

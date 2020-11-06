@@ -1,0 +1,13 @@
+diff -up samba-4.13.2/lib/util/wscript.omv~ samba-4.13.2/lib/util/wscript
+diff -up samba-4.13.2/wscript.omv~ samba-4.13.2/wscript
+--- samba-4.13.2/wscript.omv~	2020-11-06 01:09:23.777664521 +0100
++++ samba-4.13.2/wscript	2020-11-06 01:09:39.947913696 +0100
+@@ -351,6 +351,8 @@ def configure(conf):
+     # Allow for undefined references in libsmbregistry-samba4.so
+     conf.ADD_LDFLAGS('-Wl,--allow-shlib-undefined')
+ 
++    conf.ADD_LDFLAGS('@LIBUNWIND_LIBS@')
++
+     if not conf.CHECK_CODE('#include "tests/summary.c"',
+                            define='SUMMARY_PASSES',
+                            addmain=False,

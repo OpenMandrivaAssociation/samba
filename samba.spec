@@ -108,11 +108,11 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.2.999
 
-%define beta rc6
+%define beta %{nil}
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.13.0
+Version:	4.13.2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -145,6 +145,8 @@ Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
 # Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
 Patch4:		samba-4.6.2-smb4k.patch
+Patch5:		samba-4.13.2-libunwind.patch
+Patch6:		samba-4.13.2-link-libunwind.patch
 
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
@@ -731,6 +733,16 @@ else
 fi
 
 %autosetup -p1 -n %{name}-%{version}%{beta}
+# samba is *weird* and requires all the libunwind sublibs
+%ifarch %{x86_64}
+sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind -lunwind-x86_64,' wscript
+%else
+%ifarch %{aarch64}
+sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind -lunwind-aarch64,' wscript
+%else
+sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
+%endif
+%endif
 
 %build
 # xdr_* functions have moved from glibc into libtirpc
