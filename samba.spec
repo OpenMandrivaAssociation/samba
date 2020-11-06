@@ -173,6 +173,7 @@ BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
+BuildRequires:	pkgconfig(libunwind)
 BuildRequires:	python-ldb <= %{ldb_max_ver}
 BuildRequires:	pyldb-util-devel >= 2.1.1
 BuildRequires:	pyldb-util-devel <= %{ldb_max_ver}
