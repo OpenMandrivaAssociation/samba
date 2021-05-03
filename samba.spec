@@ -49,7 +49,7 @@
 %define devnetapi %mklibname -d netapi
 %define libsambapassdb %mklibname sambapassdb %{major}
 %define devsambapassdb %mklibname -d sambapassdb
-%define libsambacredentials %mklibname samba-credentials %{major}
+%define libsambacredentials %mklibname samba-credentials 1
 %define devsambacredentials %mklibname -d samba-credentials 
 %define libsambaerrors %mklibname samba-errors 1
 %define devsambaerrors %mklibname -d samba-errors
@@ -106,18 +106,18 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.2.999
+%define ldb_max_ver 2.3.999
 
 %define beta %{nil}
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.13.2
+Version:	4.14.4
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
 %if "%{beta}" != ""
-Release:	%{?beta:0.%{beta}.}2
+Release:	%{?beta:0.%{beta}.}1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
@@ -143,8 +143,8 @@ Source31:	smb.conf
 Patch1:		samba-4.11-compile.patch
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
-# Fix broken net rap commands (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
-Patch4:		samba-4.6.2-smb4k.patch
+# TODO: Fix broken net rap commands again (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
+# (previous patch dropped from 4.14.x because it doesn't apply to new codebase easily
 Patch5:		samba-4.13.2-libunwind.patch
 Patch6:		samba-4.13.2-link-libunwind.patch
 
@@ -438,6 +438,7 @@ Development files for Samba user database library.
 %package -n %{libsambacredentials}
 Summary:	Library for working with Samba credentials
 Group:		System/Libraries
+Obsoletes:	%{mklibname samba-credentials 0} < %{EVRD}
 
 %description -n %{libsambacredentials}
 Library for working with Samba credentials.
@@ -1029,6 +1030,8 @@ fi
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
 %{_libdir}/samba/libmscat-samba4.so
 %{_libdir}/samba/libscavenge-dns-records-samba4.so
+%dir %{_libdir}/samba/krb5
+%{_libdir}/samba/krb5/async_dns_krb5_locator.so
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads-samba4.so
@@ -1114,7 +1117,6 @@ fi
 %{_libdir}/samba/libsmb-transport-samba4.so
 %{_libdir}/samba/libsmbclient-raw-samba4.so
 %{_libdir}/samba/libsmbd-base-samba4.so
-%{_libdir}/samba/libsmbd-conn-samba4.so
 %{_libdir}/samba/libsmbd-shim-samba4.so
 %{_libdir}/samba/libsmbldaphelper-samba4.so
 %{_libdir}/samba/libsmbpasswdparser-samba4.so
@@ -1373,7 +1375,7 @@ fi
 %{_libdir}/libsamba-passdb.so
 
 %files -n %{libsambacredentials}
-%{_libdir}/libsamba-credentials.so.%{major}*
+%{_libdir}/libsamba-credentials.so.1*
 
 %files -n %{devsambacredentials}
 %{_includedir}/samba-4.0/credentials.h
@@ -1470,4 +1472,3 @@ fi
 %{_datadir}/pixmaps/samba/logo.png
 %{_datadir}/pixmaps/samba/logo-small.png
 %endif
-
