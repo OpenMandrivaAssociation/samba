@@ -189,6 +189,7 @@ BuildRequires:	pkgconfig(dbus-1)
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig(icu-uc)
+BuildRequires:	python3dist(markdown)
 # For asn1Parser
 BuildRequires:	libtasn1-tools
 %if %{with ads}
