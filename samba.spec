@@ -8,7 +8,7 @@
 # With TLS:
 # ldapsearch -Z -H ldaps://127.0.0.1:636 -x -w 'PASSWORD' -b "DC=lindev,DC=ch" -D "CN=Administrator,CN=Users,DC=lindev,DC=ch"
 %undefine _unpackaged_subdirs_terminate_build
-%define debug_package %{nil}
+%undefine _empty_manifest_terminate_build
 
 # Default options
 %bcond_without ads
@@ -112,7 +112,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.14.4
+Version:	4.14.5
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
