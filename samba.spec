@@ -40,12 +40,14 @@
 %global vfsdir examples.bin/VFS
 
 %define	major	0
-%define	minor	1
+%define netapimajor	1
+%define	ndrmajor	2
+%define ndrsubmajor	0
 %define libdcerpc %mklibname dcerpc %{major}
 %define devdcerpc %mklibname -d dcerpc
 %define libndr %mklibname ndr %{major}
 %define devndr %mklibname -d ndr
-%define libnetapi %mklibname netapi %{major}
+%define libnetapi %mklibname netapi %{netapimajor}
 %define devnetapi %mklibname -d netapi
 %define libsambapassdb %mklibname sambapassdb %{major}
 %define devsambapassdb %mklibname -d sambapassdb
@@ -106,13 +108,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.3.999
+%define ldb_max_ver 2.4.999
 
 %define beta %{nil}
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.14.7
+Version:	4.15.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -134,7 +136,6 @@ Source100:	%{name}.rpmlintrc
 Source20:	smbusers
 Source21:	smbprint
 #Source22:	smbadduser
-Source23:	findsmb
 Source26:	wrepld.init
 Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
@@ -391,16 +392,16 @@ Requires:	%{libdcerpc} = %{EVRD}
 Library implementing Samba's memory allocator.
 
 %package -n %{libndr}
-Summary:	Network Data Representation library from Samba
-Group:		System/Libraries
+Summary:       Network Data Representation library from Samba
+Group:         System/Libraries
 
 %description -n %{libndr}
 Network Data Representation library from Samba.
 
 %package -n %{devndr}
-Summary:	Development files for Network Data Representation library from Samba
-Group:		Development/C
-Requires:	%{libndr} = %{EVRD}
+Summary:       Development files for Network Data Representation library from Samba
+Group:         Development/C
+Requires:      %{libndr} = %{EVRD}
 
 %description -n %{devndr}
 Development files for Network Data Representation library from Samba.
@@ -778,12 +779,10 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
     	--without-fam \
 	--with-iconv \
 	--with-acl-support \
-	--with-dnsupdate \
 	--with-syslog \
 	--with-automount \
 	--with-cluster-support \
 	--with-sendfile-support \
-	--with-dnsupdate \
 	--with-systemd \
 	--with-piddir=/run/samba \
 	--without-cluster \
@@ -926,6 +925,9 @@ EOF
 install -d -m 0755 %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d/
 install -m 0755 packaging/NetworkManager/30-winbind-systemd %{buildroot}%{_sysconfdir}/NetworkManager/dispatcher.d/30-winbind
 
+# install findsmb
+install -c -m 755 examples/scripts/nmb/findsmb %{buildroot}%{_bindir}/findsmb
+
 %post server
 
 # Add a unix group for samba machine accounts
@@ -1058,7 +1060,9 @@ fi
 %{_libdir}/samba/libsamba-python.cpython*.so
 %{_libdir}/samba/libcluster-samba4.so
 %{_libdir}/samba/libcmdline-contexts-samba4.so
-%{_libdir}/samba/libcmdline-credentials-samba4.so
+%{_libdir}/samba/libcmdline-samba4.so
+%{_libdir}/samba/libdcerpc-pkt-auth-samba4.so
+%{_libexecdir}/samba/samba-bgqd
 %{_libdir}/samba/libcommon-auth-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
@@ -1096,8 +1100,6 @@ fi
 %{_libdir}/samba/libnpa-tstream-samba4.so
 %{_libdir}/samba/libnss-info-samba4.so
 %{_libdir}/samba/libpac-samba4.so
-%{_libdir}/samba/libpopt-samba3-cmdline-samba4.so
-%{_libdir}/samba/libpopt-samba3-samba4.so
 %{_libdir}/samba/libposix-eadb-samba4.so
 %{_libdir}/samba/libprinter-driver-samba4.so
 %{_libdir}/samba/libprinting-migrate-samba4.so
@@ -1130,7 +1132,6 @@ fi
 %{_libdir}/samba/libtime-basic-samba4.so
 %{_libdir}/samba/libtorture-samba4.so
 %{_libdir}/samba/libtrusts-util-samba4.so
-%{_libdir}/samba/libutil-cmdline-samba4.so
 %{_libdir}/samba/libutil-reg-samba4.so
 %{_libdir}/samba/libutil-setid-samba4.so
 %{_libdir}/samba/libutil-tdb-samba4.so
@@ -1151,9 +1152,9 @@ fi
 %{_bindir}/dbwrap_tool
 %{_sbindir}/eventlogadm
 %{_bindir}/findsmb
+%{_bindir}/mdsearch
 %{_bindir}/net
 %{_bindir}/nmblookup
-%{_bindir}/mdfind
 %{_bindir}/pdbedit
 %{_bindir}/profiles
 %{_bindir}/rpcclient
@@ -1174,7 +1175,6 @@ fi
 %{_sbindir}/samba_kcc
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
-%{_mandir}/man1/mdfind.1.*
 %{_mandir}/man1/profiles.1*
 %{_mandir}/man1/rpcclient.1*
 %{_mandir}/man1/sharesec.1*
@@ -1183,6 +1183,7 @@ fi
 %{_mandir}/man1/smbcontrol.1*
 %{_mandir}/man1/smbcquotas.1*
 %{_mandir}/man1/smbget.1*
+%{_mandir}/man1/mdsearch.1*
 %{_mandir}/man1/smbstatus.1*
 %{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man8/eventlogadm.8*
@@ -1202,6 +1203,7 @@ fi
 %{_mandir}/man8/vfs_snapper.8*
 %{_mandir}/man8/vfs_widelinks.8*
 %{_mandir}/man8/vfs_worm.8*
+%{_mandir}/man8/samba-bgqd.8*
 
 # Link of smbspool to CUPS
 %if %{build_cupspc}
@@ -1223,7 +1225,6 @@ fi
 %attr(-,root,root) %{_localstatedir}/lib/%{name}/codepages
 %{_tmpfilesdir}/%{name}.conf
 %{_presetdir}/86-samba.preset
-%{_mandir}/man1/findsmb.1*
 %{_mandir}/man1/smbtar.1*
 %{_mandir}/man1/smbtree.1*
 %{_mandir}/man1/testparm.1*
@@ -1345,10 +1346,10 @@ fi
 %{_libdir}/libdcerpc-server-core.so
 
 %files -n %{libndr}
-%{_libdir}/libndr.so.%{minor}*
-%{_libdir}/libndr-krb5pac.so.%{major}*
-%{_libdir}/libndr-nbt.so.%{major}*
-%{_libdir}/libndr-standard.so.%{major}*
+%{_libdir}/libndr.so.%{ndrmajor}*
+%{_libdir}/libndr-krb5pac.so.%{ndrsubmajor}*
+%{_libdir}/libndr-nbt.so.%{ndrsubmajor}*
+%{_libdir}/libndr-standard.so.%{ndrsubmajor}*
 
 %files -n %{devndr}
 %{_includedir}/samba-4.0/ndr.h
@@ -1363,7 +1364,7 @@ fi
 %{_libdir}/libndr-standard.so
 
 %files -n %{libnetapi}
-%{_libdir}/libnetapi.so.%{major}*
+%{_libdir}/libnetapi.so.%{netapimajor}*
 
 %files -n %{devnetapi}
 %{_libdir}/libnetapi*.so
