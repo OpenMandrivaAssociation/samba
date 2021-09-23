@@ -45,7 +45,7 @@
 %define ndrsubmajor	0
 %define libdcerpc %mklibname dcerpc %{major}
 %define devdcerpc %mklibname -d dcerpc
-%define libndr %mklibname ndr %{major}
+%define libndr %mklibname ndr %{ndrmajor}
 %define devndr %mklibname -d ndr
 %define libnetapi %mklibname netapi %{netapimajor}
 %define devnetapi %mklibname -d netapi
@@ -392,8 +392,9 @@ Requires:	%{libdcerpc} = %{EVRD}
 Library implementing Samba's memory allocator.
 
 %package -n %{libndr}
-Summary:       Network Data Representation library from Samba
-Group:         System/Libraries
+Summary:	Network Data Representation library from Samba
+Group:		System/Libraries
+Obsoletes:	%{mklibname ndr 0} < %{EVRD}
 
 %description -n %{libndr}
 Network Data Representation library from Samba.
@@ -409,6 +410,7 @@ Development files for Network Data Representation library from Samba.
 %package -n %{libnetapi}
 Summary:	Samba library for accessing functions in 'net' binary
 Group:		System/Libraries
+Obsoletes:	%{mklibname netapi 0} < %{EVRD}
 
 %description -n %{libnetapi}
 Samba library for accessing functions in 'net' binary.
