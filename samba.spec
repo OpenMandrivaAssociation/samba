@@ -114,7 +114,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.15.0
+Version:	4.15.3
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -419,6 +419,7 @@ Samba library for accessing functions in 'net' binary.
 Summary:	Samba library for accessing functions in 'net' binary
 Group:		Development/C
 Requires:	%{libnetapi} = %{EVRD}
+Requires:	samba-libs = %{EVRD}
 
 %description -n %{devnetapi}
 Samba library for accessing functions in 'net' binary.
@@ -1199,6 +1200,7 @@ fi
 %{_mandir}/man8/vfs_btrfs.8*
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
+%{_mandir}/man8/vfs_io_uring.8*
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_syncops.8*
 %{_mandir}/man8/vfs_fruit.8*
