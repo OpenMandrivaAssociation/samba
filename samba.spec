@@ -187,6 +187,7 @@ BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(libarchive)
 BuildRequires:	pkgconfig(jansson)
 BuildRequires:	pkgconfig(dbus-1)
+BuildRequires:	pkgconfig(liburing)
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig(icu-uc)
