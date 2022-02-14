@@ -110,11 +110,11 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.5.999
 
-%define beta %{nil}
+%define beta rc2
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.15.5
+Version:	4.16.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
