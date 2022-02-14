@@ -1139,7 +1139,7 @@ fi
 %{_libdir}/samba/libutil-reg-samba4.so
 %{_libdir}/samba/libutil-setid-samba4.so
 %{_libdir}/samba/libutil-tdb-samba4.so
-%{_libdir}/samba/libwinbind-client-samba4.so
+#{_libdir}/samba/libwinbind-client-samba4.so
 %{_libdir}/samba/libxattr-tdb-samba4.so
 
 %if %{with doc}
