@@ -1067,11 +1067,16 @@ fi
 %{_libdir}/samba/libcmdline-samba4.so
 %{_libdir}/samba/libdcerpc-pkt-auth-samba4.so
 %{_libexecdir}/samba/samba-bgqd
+%{_libexecdir}/samba/rpcd_*
+%{_libexecdir}/samba/samba-dcerpcd
 %{_libdir}/samba/libcommon-auth-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
 %{_libdir}/samba/libdcerpc-samba-samba4.so
+%{_libdir}/samba/libREG-FULL-samba4.so
+%{_libdir}/samba/libRPC-SERVER-LOOP-samba4.so
+%{_libdir}/samba/libRPC-WORKER-samba4.so
 %{_libdir}/samba/libdfs-server-ad-samba4.so
 %{_libdir}/samba/libdlz-bind9-for-torture-samba4.so
 %{_libdir}/samba/libdnsserver-common-samba4.so
@@ -1190,6 +1195,7 @@ fi
 %{_mandir}/man1/mdsearch.1*
 %{_mandir}/man1/smbstatus.1*
 %{_mandir}/man5/smbpasswd.5*
+%{_mandir}/man8/samba-dcerpcd.8.*
 %{_mandir}/man8/eventlogadm.8*
 %{_mandir}/man8/net.8*
 %{_mandir}/man8/pdbedit.8*
@@ -1199,6 +1205,7 @@ fi
 %{_mandir}/man8/smbspool.8*
 %{_mandir}/man8/smbspool_krb5_wrapper.8*
 %{_mandir}/man8/vfs_btrfs.8*
+%{_mandir}/man8/vfs_expand_msdfs.8.*
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
 %{_mandir}/man8/vfs_io_uring.8*
