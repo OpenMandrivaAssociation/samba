@@ -108,13 +108,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.4.999
+%define ldb_max_ver 2.5.999
 
-%define beta %{nil}
+%define beta rc2
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.15.3
+Version:	4.16.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -123,7 +123,7 @@ Release:	%{?beta:0.%{beta}.}1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
-Release:	2
+Release:	1
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 %endif
@@ -1067,11 +1067,16 @@ fi
 %{_libdir}/samba/libcmdline-samba4.so
 %{_libdir}/samba/libdcerpc-pkt-auth-samba4.so
 %{_libexecdir}/samba/samba-bgqd
+%{_libexecdir}/samba/rpcd_*
+%{_libexecdir}/samba/samba-dcerpcd
 %{_libdir}/samba/libcommon-auth-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
 %{_libdir}/samba/libdcerpc-samba-samba4.so
+%{_libdir}/samba/libREG-FULL-samba4.so
+%{_libdir}/samba/libRPC-SERVER-LOOP-samba4.so
+%{_libdir}/samba/libRPC-WORKER-samba4.so
 %{_libdir}/samba/libdfs-server-ad-samba4.so
 %{_libdir}/samba/libdlz-bind9-for-torture-samba4.so
 %{_libdir}/samba/libdnsserver-common-samba4.so
@@ -1139,7 +1144,7 @@ fi
 %{_libdir}/samba/libutil-reg-samba4.so
 %{_libdir}/samba/libutil-setid-samba4.so
 %{_libdir}/samba/libutil-tdb-samba4.so
-%{_libdir}/samba/libwinbind-client-samba4.so
+#{_libdir}/samba/libwinbind-client-samba4.so
 %{_libdir}/samba/libxattr-tdb-samba4.so
 
 %if %{with doc}
@@ -1190,6 +1195,7 @@ fi
 %{_mandir}/man1/mdsearch.1*
 %{_mandir}/man1/smbstatus.1*
 %{_mandir}/man5/smbpasswd.5*
+%{_mandir}/man8/samba-dcerpcd.8.*
 %{_mandir}/man8/eventlogadm.8*
 %{_mandir}/man8/net.8*
 %{_mandir}/man8/pdbedit.8*
@@ -1199,6 +1205,7 @@ fi
 %{_mandir}/man8/smbspool.8*
 %{_mandir}/man8/smbspool_krb5_wrapper.8*
 %{_mandir}/man8/vfs_btrfs.8*
+%{_mandir}/man8/vfs_expand_msdfs.8.*
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
 %{_mandir}/man8/vfs_io_uring.8*
@@ -1331,8 +1338,8 @@ fi
 %{_includedir}/samba-4.0/smb_ldap.h
 %{_includedir}/samba-4.0/smb2_lease_struct.h
 %{_includedir}/samba-4.0/dcesrv_core.h
-/%{_lib}/libnss_winbind.so
-/%{_lib}/libnss_wins.so
+#/%{_lib}/libnss_winbind.so
+#/%{_lib}/libnss_wins.so
 
 %files -n %{libdcerpc}
 %{_libdir}/libdcerpc.so.%{major}*
