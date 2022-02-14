@@ -1331,8 +1331,8 @@ fi
 %{_includedir}/samba-4.0/smb_ldap.h
 %{_includedir}/samba-4.0/smb2_lease_struct.h
 %{_includedir}/samba-4.0/dcesrv_core.h
-/%{_lib}/libnss_winbind.so
-/%{_lib}/libnss_wins.so
+#/%{_lib}/libnss_winbind.so
+#/%{_lib}/libnss_wins.so
 
 %files -n %{libdcerpc}
 %{_libdir}/libdcerpc.so.%{major}*
