@@ -192,7 +192,7 @@ BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig(icu-uc)
 BuildRequires:	python3dist(markdown)
-BuildRequires:	python3dist(dnspython)
+BuildRequires:	python3-dns
 # For asn1Parser
 BuildRequires:	libtasn1-tools
 %if %{with ads}
