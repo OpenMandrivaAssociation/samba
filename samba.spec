@@ -110,20 +110,20 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.5.999
 
-%define beta rc2
+#define beta rc2
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.16.0
+Version:	4.16.2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
-%if "%{beta}" != ""
-Release:	%{?beta:0.%{beta}.}1
+%if 0%{?beta:1}
+Release:	0.%{beta}.1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
-Release:	2
+Release:	1
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 %endif
@@ -741,7 +741,7 @@ else
 	echo "Source verification failed!" >&2
 fi
 
-%autosetup -p1 -n %{name}-%{version}%{beta}
+%autosetup -p1 -n %{name}-%{version}%{?beta:%{beta}}
 # samba is *weird* and requires all the libunwind sublibs
 %ifarch %{x86_64}
 sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind -lunwind-x86_64,' wscript
@@ -791,6 +791,7 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
 	--with-piddir=/run/samba \
 	--without-cluster \
 	--prefix=%{_prefix} \
+	--sbindir=%{_sbindir} \
 	--libdir=%{_libdir} \
 	--sysconfdir=%{_sysconfdir} \
 	--datadir=%{_datadir} \
@@ -830,7 +831,6 @@ if [ -e %{buildroot}%{_libdir}/security ]; then
 fi
 
 #need to stay
-mkdir -p %{buildroot}/{sbin,bin}
 mkdir -p %{buildroot}%{_sysconfdir}/{logrotate.d,pam.d}
 mkdir -p %{buildroot}/%{_initrddir}
 mkdir -p %{buildroot}/var/cache/%{name}
@@ -843,7 +843,6 @@ mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/printers/{W32X86,WIN40,W32AL
 mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}/codepages/src
 mkdir -p %{buildroot}/%{_lib}/security
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
-mkdir -p %{buildroot}%{_sbindir}
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/vfs
 mkdir -p %{buildroot}%{_datadir}/%{name}/scripts
@@ -861,7 +860,7 @@ install -m 644 source3/lib/netapi/examples/netdomjoin-gui/logo-small.png %{build
 
 %if %{build_test}
 for i in {%{testbin}};do
-  mv %{buildroot}/%{_bindir}/$i %{buildroot}/%{_bindir}/${i} || :
+	mv %{buildroot}/%{_bindir}/$i %{buildroot}/%{_bindir}/${i} || :
 done
 %endif
 
