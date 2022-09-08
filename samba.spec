@@ -41,44 +41,40 @@
 
 %define	major	0
 %define netapimajor	1
-%define	ndrmajor	2
+%define	ndrmajor	3
 %define ndrsubmajor	0
-%define libdcerpc %mklibname dcerpc %{major}
+%define libdcerpc %mklibname dcerpc
 %define devdcerpc %mklibname -d dcerpc
-%define libndr %mklibname ndr %{ndrmajor}
+%define libndr %mklibname ndr
 %define devndr %mklibname -d ndr
-%define libnetapi %mklibname netapi %{netapimajor}
+%define libnetapi %mklibname netapi
 %define devnetapi %mklibname -d netapi
-%define libsambapassdb %mklibname sambapassdb %{major}
+%define libsambapassdb %mklibname sambapassdb
 %define devsambapassdb %mklibname -d sambapassdb
-%define libsambacredentials %mklibname samba-credentials 1
+%define libsambacredentials %mklibname samba-credentials
 %define devsambacredentials %mklibname -d samba-credentials 
-%define libsambaerrors %mklibname samba-errors 1
+%define libsambaerrors %mklibname samba-errors
 %define devsambaerrors %mklibname -d samba-errors
-%define libsambahostconfig %mklibname samba-hostconfig %{major}
+%define libsambahostconfig %mklibname samba-hostconfig
 %define devsambahostconfig %mklibname -d samba-hostconfig
-%define libsambapolicy %mklibname samba-policy %{major}
+%define libsambapolicy %mklibname samba-policy
 %define devsambapolicy %mklibname -d samba-policy
-%define libsambautil %mklibname samba-util %{major}
+%define libsambautil %mklibname samba-util
 %define devsambautil %mklibname -d samba-util
-%define libsamdb %mklibname samdb %{major}
+%define libsamdb %mklibname samdb
 %define devsamdb %mklibname -d samdb
-%define libsmbclient %mklibname smbclient %{major}
+%define libsmbclient %mklibname smbclient
 %define devsmbclient %mklibname -d smbclient 
-%define libsmbconf %mklibname smbconf %{major}
+%define libsmbconf %mklibname smbconf
 %define devsmbconf %mklibname -d smbconf
 %define ldapmajor 2
-%define libsmbldap %mklibname smbldap %{ldapmajor}
+%define libsmbldap %mklibname smbldap
 %define oldsmbldap %mklibname smbldap 0
 %define devsmbldap %mklibname -d smbldap
-%define libtevent_util %mklibname tevent-util %{major}
+%define libtevent_util %mklibname tevent-util
 %define devtevent_util %mklibname -d tevent-util
-%define libwbclient %mklibname wbclient %{major}
+%define libwbclient %mklibname wbclient
 %define devwbclient %mklibname -d wbclient
-# Obsolete (now part of tevent_util), but we need to obsolete the packages
-# so we still need their names
-%define libtevent_unix_util %mklibname tevent-unix-util %{major}
-%define devtevent_unix_util %mklibname -d tevent-unix-util
 
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr,dumpmscat
@@ -108,13 +104,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.5.999
+%define ldb_max_ver 2.6.999
 
-#define beta rc2
+%define beta rc5
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.16.2
+Version:	4.17.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -380,6 +376,7 @@ Samba development libraries.
 %package -n %{libdcerpc}
 Summary:	Library implementing DCE/RPC for Samba
 Group:		System/Libraries
+%rename %{mklibname dcerpc 0}
 
 %description -n %{libdcerpc}
 Library implementing DCE/RPC for Samba.
@@ -396,6 +393,8 @@ Library implementing Samba's memory allocator.
 Summary:	Network Data Representation library from Samba
 Group:		System/Libraries
 Obsoletes:	%{mklibname ndr 0} < %{EVRD}
+Obsoletes:	%{mklibname ndr 1} < %{EVRD}
+Obsoletes:	%{mklibname ndr 2} < %{EVRD}
 
 %description -n %{libndr}
 Network Data Representation library from Samba.
@@ -412,6 +411,7 @@ Development files for Network Data Representation library from Samba.
 Summary:	Samba library for accessing functions in 'net' binary
 Group:		System/Libraries
 Obsoletes:	%{mklibname netapi 0} < %{EVRD}
+%rename %{mklibname netapi 1}
 
 %description -n %{libnetapi}
 Samba library for accessing functions in 'net' binary.
@@ -429,6 +429,7 @@ Samba library for accessing functions in 'net' binary.
 Summary:	Library for working with the Samba user database
 Group:		System/Libraries
 Obsoletes:	%{_lib}pdb0
+%rename %{mklibname sambapassdb 0}
 
 %description -n %{libsambapassdb}
 Library for working with the Samba user database.
@@ -446,6 +447,7 @@ Development files for Samba user database library.
 Summary:	Library for working with Samba credentials
 Group:		System/Libraries
 Obsoletes:	%{mklibname samba-credentials 0} < %{EVRD}
+%rename %{mklibname samba-credentials 1}
 
 %description -n %{libsambacredentials}
 Library for working with Samba credentials.
@@ -461,6 +463,7 @@ Development files for Samba credentials library.
 %package -n %{libsambaerrors}
 Summary:        Samba's errors library
 Group:          System/Libraries
+%rename %{mklibname samba-errors 1}
 
 %description -n %{libsambaerrors}
 Samba's erros library.
@@ -476,6 +479,7 @@ Samba's error library.
 %package -n %{libsambahostconfig}
 Summary:	Samba's host configuration library
 Group:		System/Libraries
+%rename %{mklibname samba-hostconfig 0}
 
 %description -n %{libsambahostconfig}
 Samba's host configuration library.
@@ -491,6 +495,7 @@ Samba's host configuration library.
 %package -n %{libsambapolicy}
 Summary:	Samba policy library
 Group:		System/Libraries
+%rename %{mklibname samba-policy 0}
 
 %description -n %{libsambapolicy}
 Samba policy library.
@@ -506,6 +511,7 @@ Development files for Samba policy library.
 %package -n %{libsambautil}
 Group:		System/Libraries
 Summary:	Samba utility library
+%rename %{mklibname samba-util 0}
 
 %description -n %{libsambautil}
 Samba utility library.
@@ -521,6 +527,7 @@ Development files for Samba utility library.
 %package -n %{libsamdb}
 Summary:	Samba samdb library
 Group:		System/Libraries
+%rename %{mklibname samdb 0}
 
 %description -n %{libsamdb}
 Samba samdb library
@@ -537,6 +544,7 @@ Development files for Samba samdb library.
 Summary:	SMB Client Library
 Group:		System/Libraries
 Provides:	libsmbclient = %{EVRD}
+%rename %{mklibname smbclient 0}
 
 %description -n %{libsmbclient}
 This package contains the SMB client library, part of the samba
@@ -556,6 +564,7 @@ the development of other software to access SMB shares.
 %package -n %{libsmbconf}
 Summary:	Library for working with Samba config files
 Group:		System/Libraries
+%rename %{mklibname smbconf 0}
 
 %description -n %{libsmbconf}
 Library for working with Samba config files.
@@ -572,6 +581,7 @@ Development files for Samba smbconf library.
 Summary:	Samba LDAP library
 Group:		System/Libraries
 Obsoletes:	%{oldsmbldap} < %{EVRD}
+%rename %{mklibname smbldap 2}
 
 %description -n %{libsmbldap}
 Samba LDAP library
@@ -587,7 +597,7 @@ Development files for Samba smbldap library.
 %package -n %{libtevent_util}
 Summary:	Utility library for working with the Tevent library
 Group:		System/Libraries
-Obsoletes:	%{libtevent_unix_util} < %{EVRD}
+%rename %{mklibname tevent-util 0}
 
 %description -n %{libtevent_util}
 Utility library for working with the Tevent library.
@@ -596,7 +606,6 @@ Utility library for working with the Tevent library.
 Group:		Development/C
 Summary:	Development files for Tevent library
 Requires:	%{libtevent_util} = %{EVRD}
-Obsoletes:	%{devtevent_unix_util} < %{EVRD}
 
 %description -n %{devtevent_util}
 Development files for Samba Tevent library.
@@ -604,6 +613,7 @@ Development files for Samba Tevent library.
 %package -n %{libwbclient}
 Summary:	Library providing access to winbindd
 Group:		System/Libraries
+%rename %{mklibname wbclient 0}
 
 %description -n %{libwbclient}
 Library providing access to winbindd.
@@ -754,11 +764,12 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
 %endif
 
 %build
-# xdr_* functions have moved from glibc into libtirpc
-%{__python} buildtools/bin/waf configure \
+# Looks like autoconf, but is actually a waf wrapper
+# (and not compatible with the macro)
+./configure \
 	--enable-fhs \
 	--with-privatelibdir=%{_libdir}/%{name} \
-	--bundled-libraries=heimdal,!zlib,!popt,!talloc,!tevent,!tdb,!ldb \
+	--bundled-libraries=NONE \
 	--enable-cups \
 	--enable-avahi \
 	--with-pam \
