@@ -217,7 +217,6 @@ Requires(pre):	sed
 Requires(pre):	grep
 Requires:	pam >= 0.64
 Requires:	samba-common = %{EVRD}
-Requires:	samba-libs = %{EVRD}
 
 %description
 Samba provides an SMB server which can be used to provide
