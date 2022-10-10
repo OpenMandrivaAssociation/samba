@@ -123,7 +123,7 @@ Release:	%{?beta:0.%{beta}.}1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
-Release:	3
+Release:	4
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 %endif
@@ -217,7 +217,7 @@ Requires(pre):	sed
 Requires(pre):	grep
 Requires:	pam >= 0.64
 Requires:	samba-common = %{EVRD}
-Requires:	%{name}-libs
+Requires:	samba-libs
 
 %description
 Samba provides an SMB server which can be used to provide
