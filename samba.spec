@@ -123,7 +123,7 @@ Release:	%{?beta:0.%{beta}.}1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
-Release:	5
+Release:	6
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 %endif
@@ -247,6 +247,7 @@ Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
 # provision requires samba-python
 Requires:	%{name}-python = %{EVRD}
+Requires:	%{name}-libs = %{version}-%{release}
 Requires(post,postun,preun):	rpm-helper
 %rename	samba
 %rename	samba-server-ldap
@@ -276,6 +277,7 @@ docs directory for implementation details.
 Summary:	Samba (SMB) client programs
 Group:		Networking/Other
 Requires:	%{name}-common = %{EVRD}
+Requires:	%{name}-libs = %{EVRD}
 Requires(post,postun,preun):	rpm-helper
 Requires:	mount-cifs
 # For samba-tool
@@ -296,6 +298,7 @@ Summary:	Files used by both Samba servers and clients
 Group:		System/Servers
 # rpcclient etc. use samba python modules
 Requires:	%{name}-python = %{EVRD}
+Requires:	%{name}-libs = %{EVRD}
 %rename 	samba-common-ldap
 Conflicts:	samba3-common
 Requires(post,postun,preun):	rpm-helper
