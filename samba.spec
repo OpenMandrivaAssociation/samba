@@ -114,12 +114,11 @@ Version:	4.17.2
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
+Release:	%{?beta:0.%{beta}.}2
 %if 0%{?beta:1}
-Release:	0.%{beta}.1
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
 %else
-Release:	1
 Source0:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.gz
 Source99:	https://ftp.samba.org/pub/samba/stable/samba-%{version}.tar.asc
 %endif
@@ -945,6 +944,10 @@ install -m 0755 packaging/NetworkManager/30-winbind-systemd %{buildroot}%{_sysco
 # install findsmb
 install -c -m 755 examples/scripts/nmb/findsmb %{buildroot}%{_bindir}/findsmb
 
+# User shares, for kdenetwork-filesharing
+# https://community.kde.org/Distributions/Packaging_Recommendations
+mkdir -p %{buildroot}/var/lib/samba/usershares
+
 %post server
 
 # Add a unix group for samba machine accounts
@@ -1041,6 +1044,7 @@ fi
 %{_bindir}/winexe
 %{_mandir}/man1/winexe.1*
 %endif
+%dir %attr(1770,root,users) /var/lib/samba/usershares
 
 %files libs
 %dir %{_libdir}/%{name}
