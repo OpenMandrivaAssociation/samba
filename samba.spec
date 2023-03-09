@@ -104,13 +104,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.6.999
+%define ldb_max_ver 2.7.999
 
 #define beta rc5
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.17.5
+Version:	4.18.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -136,7 +136,7 @@ Source28:	samba.pamd
 Source29:	system-auth-winbind.pamd
 Source30:	%{name}-tmpfiles.conf
 Source31:	smb.conf
-Patch1:		samba-4.11-compile.patch
+#Patch1:		samba-4.11-compile.patch
 Patch2:		samba-4.5.0-link-tirpc.patch
 Patch3:		samba-4.5.0-bug12274.patch
 # TODO: Fix broken net rap commands again (smb4k uses) https://bugzilla.samba.org/show_bug.cgi?id=12431
@@ -1163,6 +1163,7 @@ fi
 %{_libdir}/samba/libutil-tdb-samba4.so
 #{_libdir}/samba/libwinbind-client-samba4.so
 %{_libdir}/samba/libxattr-tdb-samba4.so
+%{_libdir}/samba/libstable-sort-samba4.so
 
 %if %{with doc}
 %files doc
