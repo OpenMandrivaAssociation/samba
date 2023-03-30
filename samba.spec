@@ -110,7 +110,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.18.0
+Version:	4.18.1
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -162,7 +162,7 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 2.1.1
+BuildRequires:	pkgconfig(ldb) >= 2.7.2
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
