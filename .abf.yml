@@ -1,4 +1,4 @@
 sources:
   samba-pubkey.asc: 3cf1a279a71d4f263e025f5cd2c85d78940a7e61
-  samba-4.18.4.tar.asc: f3342ebb0a1df52a7c5763865688e840cf471c36
-  samba-4.18.4.tar.gz: 1d926fad34c869b0d8d63e9b88d30604123d4f7c
+  samba-4.18.5.tar.asc: 27ba960cab71b95f7940988bee8ccc5472709fe3
+  samba-4.18.5.tar.gz: 0c6d90c00dc1a7f3fffccf13a4d863e8276457dc
