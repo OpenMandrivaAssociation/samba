@@ -1260,7 +1260,6 @@ fi
 %{_mandir}/man1/testparm.1*
 %{_mandir}/man5/lmhosts.5*
 %{_mandir}/man5/smb.conf.5*
-%{_mandir}/man5/smbgetrc.5*
 %{_mandir}/man7/samba.7*
 %{_mandir}/man8/cifsdd.8*
 %{_mandir}/man8/nmbd.8*
