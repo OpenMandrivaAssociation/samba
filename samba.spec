@@ -104,13 +104,13 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.7.999
+%define ldb_max_ver 2.8.999
 
-#define beta rc5
+%define beta rc1
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.18.5
+Version:	4.19.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
