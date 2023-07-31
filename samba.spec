@@ -1015,6 +1015,7 @@ fi
 #%{_libdir}/samba/auth
 %{_libdir}/samba/bind9
 %dir %{_libdir}/samba/vfs
+%{_sbindir}/samba-log-parser
 %{_sbindir}/smbd
 %{_sbindir}/nmbd
 %{_sbindir}/samba_upgradedns
@@ -1035,6 +1036,7 @@ fi
 %{_mandir}/man8/samba.8*
 %{_mandir}/man8/samba-gpupdate.8*
 %{_mandir}/man8/samba_downgrade_db.8*
+%{_mandir}/man1/samba-log-parser.1*
 %{_unitdir}/samba.service
 %{_unitdir}/smb.service
 %{_unitdir}/nmb.service
@@ -1060,6 +1062,7 @@ fi
 %{_sysconfdir}/ld.so.conf.d
 %if %{with ads}
 %{_libdir}/samba/libads-samba4.so
+%{_libdir}/samba/libad-claims-samba4.so
 %{_libdir}/krb5/plugins/kdb/samba.so
 %{_libdir}/samba/krb5/winbind_krb5_localauth.so
 %{_mandir}/man8/winbind_krb5_localauth.8*
@@ -1068,6 +1071,7 @@ fi
 %{_libdir}/samba/libauth-samba4.so
 %{_libdir}/samba/libauth4-samba4.so
 %{_libdir}/samba/libauth-unix-token-samba4.so
+%{_libdir}/samba/libauthn-policy-util-samba4.so
 %{_libdir}/samba/libauthkrb5-samba4.so
 %{_libdir}/samba/libcli-ldap-common-samba4.so
 %{_libdir}/samba/libcli-ldap-samba4.so
