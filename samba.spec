@@ -155,7 +155,7 @@ BuildRequires:	xsltproc
 BuildRequires:	acl-devel
 BuildRequires:	keyutils-devel
 BuildRequires:	magic-devel
-BuildRequires:	openldap-devel
+BuildRequires:	pkgconfig(ldap)
 BuildRequires:	pam-devel
 BuildRequires:	perl-devel
 BuildRequires:	perl-Parse-Yapp
