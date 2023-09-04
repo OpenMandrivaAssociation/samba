@@ -1020,8 +1020,6 @@ fi
 %{_sbindir}/nmbd
 %{_sbindir}/samba_upgradedns
 %{_sbindir}/samba_downgrade_db
-%{_bindir}/winexe
-%{_mandir}/man1/winexe.1*
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 %(for i in %{_mandir}/man?/%{serverbin}\.[0-9]*;do echo $i;done)
