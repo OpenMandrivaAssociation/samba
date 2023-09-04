@@ -106,7 +106,7 @@
 # (tpg) set here maximum supported ldb version
 %define ldb_max_ver 2.8.999
 
-%define beta rc4
+#define beta rc4
 
 Summary:	Samba SMB server
 Name:		samba
@@ -1020,6 +1020,8 @@ fi
 %{_sbindir}/nmbd
 %{_sbindir}/samba_upgradedns
 %{_sbindir}/samba_downgrade_db
+%{_bindir}/winexe
+%{_mandir}/man1/winexe.1*
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(-,root,root) %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 %(for i in %{_mandir}/man?/%{serverbin}\.[0-9]*;do echo $i;done)
