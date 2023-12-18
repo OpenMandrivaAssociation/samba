@@ -114,7 +114,7 @@ Version:	4.19.3
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
-Release:	%{?beta:0.%{beta}.}1
+Release:	%{?beta:0.%{beta}.}2
 %if 0%{?beta:1}
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
@@ -901,8 +901,8 @@ install -m644 %{SOURCE31} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 # Link smbspool to CUPS (does not require installed CUPS)
 
-        mkdir -p %{buildroot}/%{_libdir}/cups/backend
-        ln -s %{_bindir}/smbspool %{buildroot}/%{_libdir}/cups/backend/smb
+        mkdir -p %{buildroot}/%{_prefix}/lib/cups/backend
+        ln -s %{_bindir}/smbspool %{buildroot}/%{_prefix}/lib/cups/backend/smb
 %endif
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
@@ -1241,8 +1241,19 @@ fi
 
 # Link of smbspool to CUPS
 %if %{build_cupspc}
-%{_libdir}/cups/backend/smb
+%{_prefix}/lib/cups/backend/smb
 %endif
+
+%if "%{_lib}" != "lib"
+# FIXME workaround for versions up to 4.19.3-1 (after OMLx 5.0, before ROME 23.12)
+# containing %{_libdir}/cups/backend/smb when cups wants %{_prefix}/lib
+%post client
+if ! [ -h %{_libdir}/cups ]; then
+	rm -rf %{_libdir}/cups
+	ln -s ../lib/cups %{_libdir}/cups
+fi
+%endif
+
 
 %files common
 %dir /var/cache/%{name}
