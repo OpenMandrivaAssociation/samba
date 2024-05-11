@@ -104,7 +104,7 @@
 %define _serverbuild_flags -fstack-protector-all
 
 # (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.8.999
+%define ldb_max_ver 2.9.999
 
 #define beta rc4
 
