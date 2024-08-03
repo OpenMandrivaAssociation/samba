@@ -110,7 +110,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.20.2
+Version:	4.20.3
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
