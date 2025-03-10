@@ -41,7 +41,7 @@
 
 %define	major	0
 %define netapimajor	1
-%define	ndrmajor	4
+%define	ndrmajor	6
 %define ndrsubmajor	0
 %define libdcerpc %mklibname dcerpc
 %define devdcerpc %mklibname -d dcerpc
@@ -75,6 +75,8 @@
 %define devtevent_util %mklibname -d tevent-util
 %define libwbclient %mklibname wbclient
 %define devwbclient %mklibname -d wbclient
+%define libldb %mklibname ldb
+%define devldb %mklibname -d ldb
 
 #Define sets of binaries that we can use in globs and loops:
 %global commonbin	testparm,regdiff,regpatch,regshell,regtree,mvxattr,dumpmscat
@@ -110,11 +112,11 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.20.4
+Version:	4.22.0
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
-Release:	%{?beta:0.%{beta}.}3
+Release:	%{?beta:0.%{beta}.}1
 %if 0%{?beta:1}
 Source0:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.gz
 Source99:	https://download.samba.org/pub/samba/rc/samba-%{version}%{beta}.tar.asc
@@ -170,7 +172,6 @@ BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libunwind)
-BuildRequires:	python-ldb <= %{ldb_max_ver}
 BuildRequires:	pyldb-util-devel >= 2.1.1
 BuildRequires:	pyldb-util-devel <= %{ldb_max_ver}
 BuildRequires:	python-talloc
@@ -277,9 +278,9 @@ Requires(post,postun,preun):	rpm-helper
 Requires:	mount-cifs
 # For samba-tool
 Requires:	python-talloc
-Requires:	python-ldb <= %{ldb_max_ver}
+Requires:	python-ldb = %{EVRD}
 Requires:	python-tdb
-Requires:	ldb-utils <= %{ldb_max_ver}
+Requires:	ldb-utils = %{EVRD}
 %rename   	samba3-client
 Obsoletes:	smbfs
 
@@ -685,6 +686,42 @@ The samba-domainjoin-gui package includes a domainjoin gtk application
 #CTDB is a cluster implementation of the TDB database used by 
 #Samba and other projects to store temporary data
 
+# ldb used to be released as a separate tarball, but as of 4.21.0, now
+# lives inside of samba instead.
+# https://www.samba.org/samba/history/samba-4.21.0.html
+%package -n %{libldb}
+Summary: Library implementing Samba's embedded database
+Group: System/Libraries
+
+%description -n %{libldb}
+Library implementing Samba's embedded database
+
+%package -n python-ldb
+Summary: Python bindings to Samba's ldb database
+Group: Databases
+Obsoletes: %{mklibname pyldb-util} <= 2.9.2-1
+
+%description -n python-ldb
+Python bindings to Samba's ldb database
+
+%package -n ldb-utils
+Group:          Databases
+Summary:        Tools for backing up, restoring, and manipulating Samba's embedded database
+Conflicts:      samba-server < 3.3.2-2
+
+%description -n ldb-utils
+Tools for backing up, restoring, and manipulating Samba's embedded database
+
+%package -n %{devldb}
+Group:          Development/C
+Summary:        Library implementing Samba's embedded database
+Provides:       ldb-devel = %{EVRD}
+Requires:       %{libldb} = %{EVRD}
+Obsoletes:	%{mklibname -d pyldb-util} <= 2.9.2-1
+
+%description -n %{devldb}
+Library implementing Samba's embedded database
+
 
 %prep
 
@@ -770,6 +807,7 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
 # (and not compatible with the macro)
 ./configure \
 	--enable-fhs \
+	--private-libraries='!ldb' \
 	--with-privatelibdir=%{_libdir}/%{name} \
 	--bundled-libraries=NONE \
 	--enable-cups \
@@ -1057,6 +1095,9 @@ fi
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-private-samba.so
 %{_libdir}/samba/libmscat-private-samba.so
 %{_libdir}/samba/libscavenge-dns-records-private-samba.so
+%{_libdir}/samba/libsamba-net-join.cpython-*-private-samba.so
+%{_libdir}/samba/libsamba-net-private-samba.so
+%{_libdir}/samba/libutil-crypt-private-samba.so
 %dir %{_libdir}/samba/krb5
 %{_libdir}/samba/krb5/async_dns_krb5_locator.so
 %{_sysconfdir}/ld.so.conf.d
@@ -1081,7 +1122,6 @@ fi
 %{_libdir}/samba/libcli-spoolss-private-samba.so
 %{_libdir}/samba/libcliauth-private-samba.so
 %{_libdir}/samba/libclidns-private-samba.so
-%{_libdir}/samba/libsamba-net.cpython*.so
 %{_libdir}/samba/libsamba-python.cpython*.so
 %{_libdir}/samba/libcluster-private-samba.so
 %{_libdir}/samba/libcmdline-contexts-private-samba.so
@@ -1163,7 +1203,6 @@ fi
 %{_libdir}/samba/libtdb-wrap-private-samba.so
 %{_libdir}/samba/libtime-basic-private-samba.so
 %{_libdir}/samba/libtorture-private-samba.so
-%{_libdir}/samba/libtrusts-util-private-samba.so
 %{_libdir}/samba/libutil-reg-private-samba.so
 %{_libdir}/samba/libutil-setid-private-samba.so
 %{_libdir}/samba/libutil-tdb-private-samba.so
@@ -1448,12 +1487,12 @@ fi
 %{_libdir}/pkgconfig/samba-hostconfig.pc
 
 %files -n %{libsambapolicy}
-%{_libdir}/libsamba-policy.cpython*.so.%{major}*
+%{_libdir}/libsamba-policy.so.0*
 
 %files -n %{devsambapolicy}
+%{_libdir}/libsamba-policy.so
+%{_libdir}/pkgconfig/samba-policy.pc
 %{_includedir}/samba-4.0/policy.h
-%{_libdir}/libsamba-policy.cpython*.so
-%{_libdir}/pkgconfig/samba-policy.cpython*.pc
 
 %files -n %{libsambautil}
 %{_libdir}/libsamba-util.so.%{major}*
@@ -1524,3 +1563,22 @@ fi
 %{_datadir}/pixmaps/samba/logo.png
 %{_datadir}/pixmaps/samba/logo-small.png
 %endif
+
+%files -n %{libldb}
+%{_libdir}/libldb.so.2*
+%{_libdir}/samba/libldb-*.so
+
+%files -n python-ldb
+%{_libdir}/samba/libpyldb-*.so
+%{py_platsitedir}/_ldb_text.py
+%{py_platsitedir}/ldb.cpython-*.so
+
+%files -n %{devldb}
+%{_libdir}/libldb.so
+%{_libdir}/pkgconfig/ldb.pc
+%{_includedir}/samba-4.0/ldb*
+
+%files -n ldb-utils
+%{_bindir}/ldb*
+%{_mandir}/man1/ldb*.1*
+%{_mandir}/man3/ldb*.3*
