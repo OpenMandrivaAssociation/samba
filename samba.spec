@@ -105,9 +105,6 @@
 
 %define _serverbuild_flags -fstack-protector-all
 
-# (tpg) set here maximum supported ldb version
-%define ldb_max_ver 2.9.999
-
 #define beta rc4
 
 Summary:	Samba SMB server
@@ -164,7 +161,6 @@ BuildRequires:	perl-Parse-Yapp
 BuildRequires:	readline-devel
 BuildRequires:	pkgconfig(ctdb) >= 2.0
 BuildRequires:	pkgconfig(gnutls)
-BuildRequires:	pkgconfig(ldb) >= 2.7.2
 BuildRequires:	pkgconfig(libcap)
 BuildRequires:	pkgconfig(cmocka)
 BuildRequires:	pkgconfig(libtirpc)
@@ -172,8 +168,6 @@ BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libunwind)
-BuildRequires:	pyldb-util-devel >= 2.1.1
-BuildRequires:	pyldb-util-devel <= %{ldb_max_ver}
 BuildRequires:	python-talloc
 BuildRequires:	pytalloc-util-devel
 BuildRequires:	pkgconfig(talloc) >= 2.2.0
@@ -184,6 +178,7 @@ BuildRequires:	pkgconfig(libarchive)
 BuildRequires:	pkgconfig(jansson)
 BuildRequires:	pkgconfig(dbus-1)
 BuildRequires:	pkgconfig(liburing)
+BuildRequires:	pkgconfig(lmdb)
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig(icu-uc)
