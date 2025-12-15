@@ -109,7 +109,7 @@
 
 Summary:	Samba SMB server
 Name:		samba
-Version:	4.23.1
+Version:	4.23.4
 License:	GPLv3
 Group:		System/Servers
 Url:		https://www.samba.org
@@ -148,8 +148,6 @@ BuildRequires:	docbook-style-xsl
 BuildRequires:	docbook-dtd42-xml
 BuildRequires:	gnupg
 BuildRequires:	gpgme-devel
-BuildRequires:	python-tdb
-BuildRequires:	python-tevent >= 0.10.0
 BuildRequires:	xsltproc
 BuildRequires:	acl-devel
 BuildRequires:	keyutils-devel
@@ -168,7 +166,6 @@ BuildRequires:	pkgconfig(libxml-2.0)
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(popt)
 BuildRequires:	pkgconfig(libunwind)
-BuildRequires:	python-talloc
 BuildRequires:	pytalloc-util-devel
 BuildRequires:	pkgconfig(talloc) >= 2.2.0
 BuildRequires:	pkgconfig(tdb) >= 1.4.0
@@ -182,8 +179,11 @@ BuildRequires:	pkgconfig(lmdb)
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig(icu-uc)
-BuildRequires:	python3dist(markdown)
-BuildRequires:	python3-dns
+BuildRequires:	python-tevent >= 0.10.0
+BuildRequires:	python-talloc
+BuildRequires:	python-tdb
+BuildRequires:	python%{pyver}dist(markdown)
+BuildRequires:	python%{pyver}dist(dnspython)
 # For asn1Parser
 BuildRequires:	libtasn1-tools
 %if %{with ads}
@@ -801,10 +801,11 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
 # Looks like autoconf, but is actually a waf wrapper
 # (and not compatible with the macro)
 ./configure \
+  --check-c-compiler=clang \
 	--enable-fhs \
 	--private-libraries='!ldb' \
 	--with-privatelibdir=%{_libdir}/%{name} \
-	--bundled-libraries=NONE \
+	--bundled-libraries=libquic \
 	--enable-cups \
 	--enable-avahi \
 	--with-pam \
@@ -1093,6 +1094,10 @@ fi
 %{_libdir}/samba/libsamba-net-join.cpython-*-private-samba.so
 %{_libdir}/samba/libsamba-net-private-samba.so
 %{_libdir}/samba/libutil-crypt-private-samba.so
+%{_libdir}/%name/libngtcp2-crypto-gnutls-private-samba.so
+%{_libdir}/%name/libngtcp2-private-samba.so
+%{_libdir}/%name/libquic-private-samba.so
+%{_libdir}/%name/libsamba-security-trusts-private-samba.so
 %dir %{_libdir}/samba/krb5
 %{_libdir}/samba/krb5/async_dns_krb5_locator.so
 %{_sysconfdir}/ld.so.conf.d
@@ -1185,7 +1190,7 @@ fi
 %{_libdir}/samba/libserver-role-private-samba.so
 %{_libdir}/samba/libservice-private-samba.so
 %{_libdir}/samba/libshares-private-samba.so
-%{_libdir}/samba/libsmb-transport-private-samba.so
+# %{_libdir}/samba/libsmb-transport-private-samba.so
 %{_libdir}/samba/libsmbclient-raw-private-samba.so
 %{_libdir}/samba/libsmbd-base-private-samba.so
 %{_libdir}/samba/libsmbd-shim-private-samba.so
@@ -1371,12 +1376,13 @@ fi
 %{_mandir}/man8/idmap_*.8*
 %{_mandir}/man8/pam_winbind.8*
 %{_mandir}/man8/winbindd.8*
+%{_datadir}/locale/*/LC_MESSAGES/pam_winbind.mo
 
 %files -n nss_wins
 %attr(755,root,root) /%{_lib}/libnss_wins.so.*
 
 %files python
-%{py_platsitedir}/samba
+%{py_sitedir}/samba
 
 %if %{build_test}
 %files test
@@ -1448,6 +1454,7 @@ fi
 
 %files -n %{libnetapi}
 %{_libdir}/libnetapi.so.%{netapimajor}*
+%{_datadir}/locale/*/LC_MESSAGES/net.mo
 
 %files -n %{devnetapi}
 %{_libdir}/libnetapi*.so
@@ -1565,8 +1572,8 @@ fi
 
 %files -n python-ldb
 %{_libdir}/samba/libpyldb-*.so
-%{py_platsitedir}/_ldb_text.py
-%{py_platsitedir}/ldb.cpython-*.so
+%{py_sitedir}/_ldb_text.py
+%{py_sitedir}/ldb.cpython-*.so
 
 %files -n %{devldb}
 %{_libdir}/libldb.so
