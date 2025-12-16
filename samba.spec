@@ -177,6 +177,7 @@ BuildRequires:	pkgconfig(dbus-1)
 BuildRequires:	pkgconfig(liburing)
 BuildRequires:	pkgconfig(lmdb)
 BuildRequires:	pkgconfig(libngtcp2)
+BuildRequires:	%mklibname ngtcp2_crypto_gnutls
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	make
