@@ -181,6 +181,7 @@ BuildRequires:	%mklibname ngtcp2_crypto_gnutls
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	make
+BuildRequires:	gettext
 BuildRequires:	pkgconfig(icu-uc)
 BuildRequires:	python-tevent >= 0.10.0
 BuildRequires:	python-talloc
