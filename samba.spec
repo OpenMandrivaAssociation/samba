@@ -176,6 +176,7 @@ BuildRequires:	pkgconfig(jansson)
 BuildRequires:	pkgconfig(dbus-1)
 BuildRequires:	pkgconfig(liburing)
 BuildRequires:	pkgconfig(lmdb)
+BuildRequires:	pkgconfig(libngtcp2)
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	pkgconfig(icu-uc)
@@ -805,7 +806,7 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
 	--enable-fhs \
 	--private-libraries='!ldb' \
 	--with-privatelibdir=%{_libdir}/%{name} \
-	--bundled-libraries=libquic \
+	--bundled-libraries=libquic,NONE \
 	--enable-cups \
 	--enable-avahi \
 	--with-pam \
@@ -1094,8 +1095,6 @@ fi
 %{_libdir}/samba/libsamba-net-join.cpython-*-private-samba.so
 %{_libdir}/samba/libsamba-net-private-samba.so
 %{_libdir}/samba/libutil-crypt-private-samba.so
-%{_libdir}/%name/libngtcp2-crypto-gnutls-private-samba.so
-%{_libdir}/%name/libngtcp2-private-samba.so
 %{_libdir}/%name/libquic-private-samba.so
 %{_libdir}/%name/libsamba-security-trusts-private-samba.so
 %dir %{_libdir}/samba/krb5
