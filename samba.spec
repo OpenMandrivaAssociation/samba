@@ -179,6 +179,7 @@ BuildRequires:	pkgconfig(lmdb)
 BuildRequires:	pkgconfig(libngtcp2)
 BuildRequires:	bison
 BuildRequires:	flex
+BuildRequires:	make
 BuildRequires:	pkgconfig(icu-uc)
 BuildRequires:	python-tevent >= 0.10.0
 BuildRequires:	python-talloc
