@@ -143,6 +143,10 @@ Patch3:		samba-4.5.0-bug12274.patch
 Patch5:		samba-4.13.2-libunwind.patch
 Patch6:		samba-4.13.2-link-libunwind.patch
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
 BuildRequires:	cups-devel
 BuildRequires:	docbook-style-xsl
 BuildRequires:	docbook-dtd42-xml
