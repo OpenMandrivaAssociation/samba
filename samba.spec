@@ -813,7 +813,7 @@ sed -i -e 's,@LIBUNWIND_LIBS@,-L%{_libdir}/libunwind -lunwind,' wscript
 	--enable-fhs \
 	--private-libraries='!ldb' \
 	--with-privatelibdir=%{_libdir}/%{name} \
-	--bundled-libraries=libquic,NONE \
+	--bundled-libraries=libquic,cmocka \
 	--enable-cups \
 	--enable-avahi \
 	--with-pam \
