@@ -1334,6 +1334,7 @@ fi
 %{_mandir}/man8/vfs_acl_xattr.8*
 %{_mandir}/man8/vfs_aio_fork.8*
 %{_mandir}/man8/vfs_aio_pthread.8*
+%{_mandir}/man8/vfs_aio_ratelimit.8*
 %{_mandir}/man8/vfs_audit.8*
 %{_mandir}/man8/vfs_cap.8*
 %{_mandir}/man8/vfs_catia.8*
