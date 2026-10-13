@@ -943,8 +943,8 @@ install -m644 %{SOURCE31} %{buildroot}/%{_sysconfdir}/%{name}/smb.conf
 #perl -pi -e 's/printcap name = lpstat/printcap name = cups/g' %{buildroot}/%{_sysconfdir}/%{name}/smb-winbind.conf
 # Link smbspool to CUPS (does not require installed CUPS)
 
-        mkdir -p %{buildroot}/%{_prefix}/lib/cups/backend
-        ln -s %{_bindir}/smbspool %{buildroot}/%{_prefix}/lib/cups/backend/smb
+        mkdir -p %{buildroot}/%{_usr}/lib/cups/backend
+        ln -s %{_bindir}/smbspool %{buildroot}/%{_usr}/lib/cups/backend/smb
 %endif
 
         echo 127.0.0.1 localhost > %{buildroot}/%{_sysconfdir}/%{name}/lmhosts
@@ -1290,7 +1290,7 @@ fi
 
 # Link of smbspool to CUPS
 %if %{build_cupspc}
-%{_prefix}/lib/cups/backend/smb
+%{_usr}/lib/cups/backend/smb
 %endif
 
 %if "%{_lib}" != "lib"
